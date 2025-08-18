@@ -178,7 +178,7 @@ local style = require "ui._style"
 local rect = require "ui.rect"
 
 local function handle_click(x, y)
-    if BATTLE[1].team == 0 and SELECTED then
+    if BATTLE[1].team == 0 and SELECTED and AWAIT_TURN then
         local offset_y = 50
         local offset_x = 400
         local acting_actor = BATTLE[1]

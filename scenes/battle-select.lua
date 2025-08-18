@@ -66,6 +66,7 @@ local function handle_click(x, y)
         GENERATE_WAVE = require "fights.fight-1"
         GENERATE_WAVE()
         CURRENT_SCENE = SCENE_BATTLE
+        AWAIT_TURN = true
     end
 
     for i = 1, 4 do
