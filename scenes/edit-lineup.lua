@@ -16,7 +16,7 @@ local function render()
     end
 end
 
-local function update()
+local function update(dt)
 
 end
 

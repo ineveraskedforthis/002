@@ -11,6 +11,7 @@ BIG_FONT = love.graphics.newFont(
 SCENE_BATTLE_SELECTOR = 0
 SCENE_BATTLE = 1
 SCENE_EDIT_LINEUP = 2
+SCENE_PULL_ACTORS = 3
 
 ---@type MetaActorWrapper[]
 PLAYABLE_META_ACTORS = {
@@ -36,6 +37,7 @@ CHARACTER_LINEUP = {
 local scene_data_battle = require "scenes.battle"
 local scene_data_battle_select = require "scenes.battle-select"
 local scene_data_edit_lineup = require "scenes.edit-lineup"
+local scene_data_pull = require "scenes.hire-actor"
 
 function love.load()
     CURRENT_SCENE = SCENE_BATTLE_SELECTOR
@@ -48,6 +50,8 @@ function love.update(dt)
         scene_data_battle_select.update(dt)
     elseif CURRENT_SCENE == SCENE_EDIT_LINEUP then
         scene_data_edit_lineup.update(dt)
+    elseif CURRENT_SCENE == SCENE_PULL_ACTORS then
+        scene_data_pull.update(dt)
     end
 end
 
@@ -58,6 +62,8 @@ function love.draw()
         scene_data_battle_select.render()
     elseif CURRENT_SCENE == SCENE_EDIT_LINEUP then
         scene_data_edit_lineup.render()
+    elseif CURRENT_SCENE == SCENE_PULL_ACTORS then
+        scene_data_pull.render()
     end
 end
 
@@ -68,5 +74,7 @@ function love.mousepressed(x, y, button, istouch, presses)
         scene_data_battle_select.on_click(x, y)
     elseif CURRENT_SCENE == SCENE_EDIT_LINEUP then
         scene_data_edit_lineup.on_click(x, y)
+    elseif CURRENT_SCENE == SCENE_PULL_ACTORS then
+        scene_data_pull.on_click(x, y)
     end
 end

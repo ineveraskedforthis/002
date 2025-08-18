@@ -3,7 +3,7 @@ local function enter()
 
 end
 
-local function update()
+local function update(dt)
 
 end
 
@@ -48,12 +48,19 @@ local function render()
             render_meta_actor(i * (ACTOR_WIDTH + 20) + 400, 400, nil, true, i)
         end
     end
+
+    love.graphics.rectangle("line", 500, 500, 100, 20)
+    love.graphics.print("pull", 500, 500)
 end
 
 local circle = require "ui.circle"
 local rect = require "ui.rect"
 
 local function handle_click(x, y)
+    if rect(500, 500, 100, 20, x, y) then
+        CURRENT_SCENE = SCENE_PULL_ACTORS
+    end
+
     if circle(fight_1_x, fight_1_y, 50, x ,y) then
         WAVE = 1
         GENERATE_WAVE = require "fights.fight-1"
