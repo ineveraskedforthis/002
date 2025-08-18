@@ -69,6 +69,14 @@ local function handle_click(x, y)
         AWAIT_TURN = true
     end
 
+    if circle(fight_2_x, fight_2_y, 50, x ,y) then
+        WAVE = 1
+        GENERATE_WAVE = require "fights.fight-2"
+        GENERATE_WAVE()
+        CURRENT_SCENE = SCENE_BATTLE
+        AWAIT_TURN = true
+    end
+
     for i = 1, 4 do
         if rect(i * (ACTOR_WIDTH + 20) + 400, 400, ACTOR_WIDTH, ACTOR_HEIGHT, x, y) then
             CURRENT_SCENE = SCENE_EDIT_LINEUP

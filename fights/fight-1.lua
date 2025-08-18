@@ -1,16 +1,5 @@
 return function ()
-    ---@type Actor
-    GG = GENERATE_ACTOR(require "meta-actors.main-character", 1, 0)
-    CHUD = GENERATE_ACTOR(require "meta-actors.chud", 2, 0)
-
-    ---@type Actor[]
-    BATTLE = {}
-    ---@type Effect[]
-    EFFECTS_QUEUE = {}
-    ---@type Effect[]
-    STATUS_EFFECT_QUEUE = {}
-    SELECTED = nil
-
+    RESET_BATTLE()
     PLAYER_ENTER_BATTLE()
 
     if WAVE == 1 then

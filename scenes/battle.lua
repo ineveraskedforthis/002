@@ -176,38 +176,9 @@ end
 
 local style = require "ui._style"
 local rect = require "ui.rect"
+local skills_panel = require "ui.skills-panel"
 
 local function handle_click(x, y)
-    if BATTLE[1].team == 0 and SELECTED and AWAIT_TURN then
-        local offset_y = 50
-        local offset_x = 400
-        local acting_actor = BATTLE[1]
-        for key, value in ipairs(acting_actor.definition.skills) do
-            if rect(offset_x, offset_y, 50, 20, x, y) then
-                AWAIT_TURN = false
-                -- ATTACK(ACTORS[BATTLE[1].actor_id], ACTORS[SELECTED])
-                for index, effect in ipairs(value.effects_sequence) do
-                    ---@type Effect
-                    local new_effect = {
-                        data = {},
-                        def = effect,
-                        origin = BATTLE[1],
-                        target = SELECTED,
-                        time_passed = 0,
-                        started = false,
-                        times_activated = 0
-                    }
-                    table.insert(EFFECTS_QUEUE, new_effect)
-                end
-                break
-            end
-            offset_y = offset_y + 60
-            for index, effect in ipairs(value.effects_sequence) do
-                offset_y = offset_y + 20
-            end
-        end
-    end
-
     local offset_x = 150
     local offset_y = 50
 
@@ -219,9 +190,12 @@ local function handle_click(x, y)
             end
         end
     end
+
+    skills_panel.on_click(x, y)
 end
 
 local main_render = require "fights.battle-render"
+
 
 local function render()
     love.graphics.setBackgroundColor(1, 1, 1, 1)
@@ -253,24 +227,7 @@ local function render()
 
 
     -- draw skill buttons
-
-    if BATTLE[1].team == 0 and SELECTED then
-        local offset_y = 50
-        local offset_x = 400
-        local acting_actor = BATTLE[1]
-        for key, value in ipairs(acting_actor.definition.skills) do
-            love.graphics.rectangle("line", offset_x, offset_y, 50, 20)
-            love.graphics.setFont(DEFAULT_FONT)
-            love.graphics.print("Use", offset_x, offset_y)
-            love.graphics.print(value.name, offset_x, offset_y + 20)
-            love.graphics.print(value.description(acting_actor), offset_x, offset_y + 40)
-            offset_y = offset_y + 60
-            for index, effect in ipairs(value.effects_sequence) do
-                love.graphics.print(tostring(index) .. " ".. effect.description, offset_x, offset_y)
-                offset_y = offset_y + 20
-            end
-        end
-    end
+    skills_panel.render()
 end
 
 local function enter()

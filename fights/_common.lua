@@ -24,6 +24,16 @@ function PLAYER_ENTER_BATTLE()
     end
 end
 
+function RESET_BATTLE()
+    ---@type Actor[]
+    BATTLE = {}
+    ---@type Effect[]
+    EFFECTS_QUEUE = {}
+    ---@type Effect[]
+    STATUS_EFFECT_QUEUE = {}
+    SELECTED = nil
+end
+
 function SORT_BATTLE()
     table.sort(BATTLE, function (a, b)
         return a.action_number < b.action_number
@@ -44,7 +54,7 @@ function ENTER_BATTLE(actor, team, was_in_battle)
         end
     end
 
-    actor.action_number = max_action_number + SPEED_TO_ACTION_OFFSET(actor.definition.SPD)
+    actor.action_number = math.floor(max_action_number * 0.5) + SPEED_TO_ACTION_OFFSET(actor.definition.SPD)
     actor.team = team
     table.insert(BATTLE, actor)
     SORT_BATTLE()

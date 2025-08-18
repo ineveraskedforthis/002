@@ -1,8 +1,4 @@
 return function ()
-    ---@type Actor
-    GG = GENERATE_ACTOR(require "meta-actors.main-character", 1, 0)
-    CHUD = GENERATE_ACTOR(require "meta-actors.chud", 2, 0)
-
     ---@type Actor[]
     BATTLE = {}
     ---@type Effect[]
