@@ -13,6 +13,10 @@
 ---@field damaged_sound love.Source?
 ---@field skills ActiveSkill[]
 
+---@class MetaActorWrapper
+---@field def MetaActor
+---@field unlocked boolean
+---@field lineup_position number
 
 ---@class Actor
 ---@field definition MetaActor

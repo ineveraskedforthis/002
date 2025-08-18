@@ -58,8 +58,10 @@ local function process_turn()
     SORT_BATTLE()
 
     -- queue all effects on new current character
-    for index, value in ipairs(BATTLE[1].status_effects) do
-        table.insert(STATUS_EFFECT_QUEUE, value)
+    if (BATTLE[1]) then
+        for index, value in ipairs(BATTLE[1].status_effects) do
+            table.insert(STATUS_EFFECT_QUEUE, value)
+        end
     end
 end
 
@@ -111,6 +113,7 @@ local function update(dt)
                 current_effect.def.target_effect(current_effect.origin, current_effect.target)
                 if #EFFECTS_QUEUE == 0 then
                     process_turn()
+                    return
                 end
             else
                 return

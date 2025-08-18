@@ -15,6 +15,15 @@ function GENERATE_ACTOR(def, pos, team)
     return temp
 end
 
+function PLAYER_ENTER_BATTLE()
+    for i = 1, 4 do
+        if CHARACTER_LINEUP[i] ~= 0 then
+            local def = PLAYABLE_META_ACTORS[CHARACTER_LINEUP[i]].def
+            ENTER_BATTLE(GENERATE_ACTOR(def, i, 0), 0, false)
+        end
+    end
+end
+
 function SORT_BATTLE()
     table.sort(BATTLE, function (a, b)
         return a.action_number < b.action_number

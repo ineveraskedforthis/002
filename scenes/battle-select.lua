@@ -21,6 +21,8 @@ local fight_3_y = 250
 local fight_4_x = fight_3_x + spacing
 local fight_4_y = 300
 
+local render_meta_actor = require "ui.meta-actor"
+
 local function render()
     love.graphics.setBackgroundColor(1, 1, 1, 1)
     love.graphics.setColor(0, 0, 0, 1)
@@ -36,9 +38,20 @@ local function render()
 
     love.graphics.circle("line", fight_4_x, fight_4_y, 50)
     love.graphics.print("Enter battle 4", fight_4_x - 40, fight_4_y - 10)
+
+    --- render lineup
+
+    for i = 1, 4 do
+        if CHARACTER_LINEUP[i] ~= 0 then
+            render_meta_actor(i * (ACTOR_WIDTH + 20) + 400, 400, PLAYABLE_META_ACTORS[CHARACTER_LINEUP[i]].def, true, i)
+        else
+            render_meta_actor(i * (ACTOR_WIDTH + 20) + 400, 400, nil, true, i)
+        end
+    end
 end
 
 local circle = require "ui.circle"
+local rect = require "ui.rect"
 
 local function handle_click(x, y)
     if circle(fight_1_x, fight_1_y, 50, x ,y) then
@@ -46,6 +59,13 @@ local function handle_click(x, y)
         GENERATE_WAVE = require "fights.fight-1"
         GENERATE_WAVE()
         CURRENT_SCENE = SCENE_BATTLE
+    end
+
+    for i = 1, 4 do
+        if rect(i * (ACTOR_WIDTH + 20) + 400, 400, ACTOR_WIDTH, ACTOR_HEIGHT, x, y) then
+            CURRENT_SCENE = SCENE_EDIT_LINEUP
+            SELECTED_LINEUP_POSITION = i
+        end
     end
 end
 
