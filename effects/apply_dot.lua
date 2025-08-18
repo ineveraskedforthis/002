@@ -2,10 +2,10 @@ local draw_actor = require "ui.actor"
 
 local duration = 0.5
 
-local offset_target_x = 300
-local offset_target_y = 300
-
 local actual_dot = require "effects.basic_dot"
+
+local get_x = require "ui.battle".get_x
+local get_y = require "ui.battle".get_y
 
 ---@type EffectDef
 return {
@@ -17,14 +17,21 @@ return {
         APPLY_EFFECT(origin, target, actual_dot)
     end,
     scene_render = function (time_passed, origin, target, scene_data)
-        local progress = time_passed / duration * time_passed / duration
-        draw_actor(offset_target_x, offset_target_y, target)
-        love.graphics.line(
-            offset_target_x - 10,
-            offset_target_y - 10,
-            offset_target_x - 10 + (ACTOR_WIDTH + 20) * progress,
-            offset_target_y - 10 + (ACTOR_HEIGHT + 20) * progress
-        )
+        local progress = time_passed / duration
+
+        local origin_x = get_x(origin)
+        local target_x = get_x(target)
+
+        local origin_y = get_y(origin)
+        local target_y = get_y(target)
+
+        draw_actor(target_x, target_y, target)
+        draw_actor(origin_x, origin_y, origin)
+
+        local x = progress * target_x + (1 - progress) * origin_x
+        local y = progress * target_y + (1 - progress) * origin_y
+
+        love.graphics.circle("line", x, y, 10)
     end,
     scene_update = function (time_passed, dt, origin, target, scene_data)
         if (time_passed > duration) then

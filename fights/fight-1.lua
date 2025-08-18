@@ -17,7 +17,7 @@ return function ()
         local chris = GENERATE_ACTOR(require "meta-actors.chris", 1, 1)
 
         ENTER_BATTLE(chris, 1, false)
-        return
+        return true
     end
 
     if WAVE == 2 then
@@ -26,7 +26,7 @@ return function ()
 
         ENTER_BATTLE(strong_enemy, 1, false)
         ENTER_BATTLE(fast_enemy, 1, false)
-        return
+        return true
     end
 
     if WAVE == 3 then
@@ -34,6 +34,8 @@ return function ()
         local enemy = GENERATE_ACTOR(require "meta-actors.john", 1, 1)
 
         ENTER_BATTLE(enemy, 1, false)
-        return
+        return true
     end
+
+    return false
 end

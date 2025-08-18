@@ -26,14 +26,11 @@ local function clear_dead()
     end
 end
 
-
-
 local function process_turn()
-    local actor = BATTLE[1]
-    table.remove(BATTLE, 1)
+    ---@type Actor
+    local actor = table.remove(BATTLE, 1)
 
-
-    if BATTLE[1].HP > 0 then
+    if actor.HP > 0 then
         print("readd to battle:" .. BATTLE[1].definition.name)
         ENTER_BATTLE(actor, actor.team, true)
 
@@ -66,11 +63,15 @@ local function process_turn()
 end
 
 
-
-
-
 local function update(dt)
-    if GG.HP <= 0 then
+    local battle_lost = true
+    for key, value in ipairs(BATTLE) do
+        if value.team == 0 and (value.HP_view == nil or value.HP_view > 0) then
+            battle_lost = false
+        end
+    end
+
+    if battle_lost then
         love.load()
     end
 
@@ -84,7 +85,9 @@ local function update(dt)
 
     if not enemies_alive then
         WAVE = WAVE + 1
-        GENERATE_WAVE()
+        if not GENERATE_WAVE() then
+            CURRENT_SCENE = SCENE_BATTLE_SELECTOR
+        end
         return
     end
 
@@ -171,7 +174,7 @@ local function update(dt)
     end
 end
 
-local spacing = 50
+local style = require "ui._style"
 local rect = require "ui.rect"
 
 local function handle_click(x, y)
@@ -210,7 +213,7 @@ local function handle_click(x, y)
 
     for key, value in ipairs(BATTLE) do
         if BATTLE[key].team == 1 then
-            local r_x = offset_x + (spacing + ACTOR_WIDTH) * (value.pos - 1)
+            local r_x = offset_x + (style.battle_actors_spacing + ACTOR_WIDTH) * (value.pos - 1)
             if (rect(r_x, offset_y, ACTOR_WIDTH, ACTOR_HEIGHT, x, y)) then
                 SELECTED = value
             end
@@ -218,7 +221,7 @@ local function handle_click(x, y)
     end
 end
 
-local draw_actor = require "ui.actor"
+local main_render = require "fights.battle-render"
 
 local function render()
     love.graphics.setBackgroundColor(1, 1, 1, 1)
@@ -226,6 +229,7 @@ local function render()
 
     local current_effect = EFFECTS_QUEUE[1]
     if current_effect then
+        main_render(current_effect.origin, current_effect.target)
         current_effect.def.scene_render(
             current_effect.time_passed,
             current_effect.origin,
@@ -233,6 +237,8 @@ local function render()
             current_effect.data
         )
         return
+    else
+        main_render(nil, nil)
     end
 
     if not BATTLE[1] then
@@ -243,48 +249,6 @@ local function render()
     if BATTLE[1].team == 0 then
         love.graphics.setFont(DEFAULT_FONT)
         love.graphics.print("YOUR TURN", 150, 10)
-    end
-
-    -- draw player's team
-
-    local offset_x = 150
-    local offset_y = 400
-
-    for key, value in ipairs(BATTLE) do
-        if value.team == 0 then
-            local x = offset_x + (spacing + ACTOR_WIDTH) * (value.pos - 1)
-            draw_actor(x, offset_y, value)
-        end
-    end
-
-    -- draw enemy team
-
-    local offset_x = 150
-    local offset_y = 50
-
-    for key, value in ipairs(BATTLE) do
-        if value.team == 1 then
-            local x = offset_x + (spacing + ACTOR_WIDTH) * (value.pos - 1)
-            draw_actor(x, offset_y, value)
-        end
-    end
-
-    --- draw battle order
-    love.graphics.setFont(DEFAULT_FONT)
-    love.graphics.setColor(0, 0, 0, 1)
-    love.graphics.print("ACTION BAR", 0, 0)
-
-    local offset_x = 20
-    local offset_y = 20
-
-    for key, value in ipairs(BATTLE) do
-        love.graphics.setColor(1, 1, 1, 1)
-        love.graphics.draw(value.definition.image, offset_x, offset_y, 0, 1.5, 0.5)
-        love.graphics.setFont(DEFAULT_FONT)
-        love.graphics.setColor(0, 0, 0, 1)
-        love.graphics.print(tostring(value.action_number), offset_x + ACTOR_WIDTH * 1.5 + 2, offset_y + 2)
-        love.graphics.rectangle("line", offset_x, offset_y, ACTOR_WIDTH * 1.5, ACTOR_HEIGHT * 0.5)
-        offset_y = offset_y + ACTOR_HEIGHT * 0.5 + 10
     end
 
 

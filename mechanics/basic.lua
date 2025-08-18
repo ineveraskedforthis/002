@@ -25,6 +25,7 @@ end
 function DEAL_DAMAGE(a, b, attacker_atk_ratio, defender_defense_ratio)
     local damage = math.floor(math.max(0, a.definition.ATK * attacker_atk_ratio - b.definition.DEF * defender_defense_ratio))
     b.HP = b.HP - damage
+    print(a.definition.name .. " attacks " .. b.definition.name .. ". " .. tostring(damage) .. "DMG. " .. "HP left: " .. tostring(b.HP))
     ---@type PendingDamage
     local pending = {
         alpha = 1,

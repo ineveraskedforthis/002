@@ -49,3 +49,4 @@ function ENTER_BATTLE(actor, team, was_in_battle)
     table.insert(BATTLE, actor)
     SORT_BATTLE()
 end
+
