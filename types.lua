@@ -1,0 +1,48 @@
+---@class PendingDamage
+---@field value number
+---@field alpha number
+
+---@class MetaActor
+---@field MAX_HP number
+---@field ATK number
+---@field DEF number
+---@field SPD number
+---@field name string
+---@field image love.Image
+---@field attack_sound love.Source?
+---@field damaged_sound love.Source?
+---@field skills ActiveSkill[]
+
+
+---@class Actor
+---@field definition MetaActor
+---@field HP number
+---@field HP_view number?
+---@field pos number
+---@field pending_damage PendingDamage[]
+---@field status_effects Effect[]
+---@field action_number number
+---@field team number
+
+---@class EffectDef
+---@field description string
+---@field target_effect fun(origin: Actor, target: Actor)
+---@field scene_update fun(time_passed: number, dt: number, origin: Actor, target: Actor, scene_data: table): boolean
+---@field scene_render fun(time_passed: number, origin: Actor, target: Actor, scene_data: table)
+---@field scene_on_start fun(origin: Actor, target: Actor)
+---@field max_times_activated number?
+
+---@class Effect
+---@field def EffectDef
+---@field data table
+---@field time_passed number
+---@field origin Actor
+---@field target Actor
+---@field started boolean
+---@field times_activated number
+
+
+---@class ActiveSkill
+---@field name string
+---@field description fun(actor: Actor): string
+---@field effects_sequence EffectDef[]
