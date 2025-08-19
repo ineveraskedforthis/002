@@ -19,7 +19,7 @@ local function draw_image_in_rect(img, x, y, w, h, r, ox, oy, kx, ky)
 end
 
 local hp_gradient_ally = gradient_h({{0.7, 0.9, 0.8}, {100 / 255, 190 / 255, 175 / 255}})
-
+local hp_gradient_enemy = gradient_h({{0.95, 0.1, 0.05}, {1, 0.11, 0.05}})
 
 ---comment
 ---@param x number
@@ -30,7 +30,8 @@ local hp_gradient_ally = gradient_h({{0.7, 0.9, 0.8}, {100 / 255, 190 / 255, 175
 ---@param hp_view number
 ---@param max_hp number
 ---@param shield number
-local function hp_bar(x, y, w, h, hp, hp_view, max_hp, shield)
+---@param team number
+local function hp_bar(x, y, w, h, hp, hp_view, max_hp, shield, team)
 	local outerouter = 1
 	local outer = 1
 	local shield_offset = 1
@@ -76,12 +77,21 @@ local function hp_bar(x, y, w, h, hp, hp_view, max_hp, shield)
 		local _w = w - 2 * margin
 		local _h = h - 2 * margin
 		love.graphics.setColor(1, 1, 1)
-		draw_image_in_rect(hp_gradient_ally, _x, _y, _w * hp_ratio_actual, _h, 0)
+		if team == 1 then
+			draw_image_in_rect(hp_gradient_enemy, _x, _y, _w * hp_ratio_actual, _h, 0)
+		else
+			draw_image_in_rect(hp_gradient_ally, _x, _y, _w * hp_ratio_actual, _h, 0)
+		end
+
+		if team == 1 then
+			love.graphics.setColor(1, 0.8, 0.8, 1)
+		else
+			love.graphics.setColor(0.35, 0.45, 0.4)
+		end
+
 		if hp_ratio_view > hp_ratio_actual then
-			love.graphics.setColor(1, 1, 0, 1)
 			love.graphics.rectangle("fill", _x + _w * hp_ratio_actual, _y, _w * (hp_ratio_view - hp_ratio_actual), _h)
 		else
-			love.graphics.setColor(1, 1, 0, 1)
 			love.graphics.rectangle("fill", _x + _w * hp_ratio_view, _y, _w * (hp_ratio_actual - hp_ratio_view), _h)
 		end
 	end
@@ -121,7 +131,8 @@ return function (x, y, actor, alpha)
 	-- draw shield
 	hp_bar(
 		hp_bar_left, y + ACTOR_HEIGHT + margin, hp_bar_width, 12,
-		actor.HP, actor.HP_view or actor.HP, actor.definition.MAX_HP, actor.SHIELD
+		actor.HP, actor.HP_view or actor.HP, actor.definition.MAX_HP, actor.SHIELD,
+		actor.team
 	)
 
 	love.graphics.setColor(0, 0, 0, alpha)
@@ -136,10 +147,11 @@ return function (x, y, actor, alpha)
 		local a = value.alpha
 		love.graphics.setFont(BIG_FONT)
 		love.graphics.setColor(0, 0, 0, a)
-		love.graphics.print(tostring(value.value), x - 2, y - 50 * (1 - a) - 2)
-		love.graphics.print(tostring(value.value), x, y - 50 * (1 - a) + 2)
-		love.graphics.print(tostring(value.value), x + 2, y - 50 * (1 - a))
-		love.graphics.print(tostring(value.value), x, y - 50 * (1 - a) - 2)
+		local text_border = 1
+		love.graphics.print(tostring(value.value), x - text_border, y - 50 * (1 - a))
+		love.graphics.print(tostring(value.value), x, y - 50 * (1 - a) + text_border)
+		love.graphics.print(tostring(value.value), x + text_border, y - 50 * (1 - a))
+		love.graphics.print(tostring(value.value), x, y - 50 * (1 - a) - text_border)
 		if value.value > 0 then
 			love.graphics.setColor(1, 0, 0, a)
 		else
