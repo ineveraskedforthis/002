@@ -22,6 +22,7 @@
 ---@field definition MetaActor
 ---@field HP number
 ---@field HP_view number?
+---@field SHIELD number
 ---@field pos number
 ---@field pending_damage PendingDamage[]
 ---@field status_effects Effect[]
@@ -35,6 +36,9 @@
 ---@field scene_render fun(time_passed: number, origin: Actor, target: Actor, scene_data: table)
 ---@field scene_on_start fun(origin: Actor, target: Actor)
 ---@field max_times_activated number?
+---@field target_selection (fun(origin: Actor): Actor)?
+---@field multi_target_selection (fun(origin: Actor) : Actor[])?
+---@field multitarget boolean?
 
 ---@class Effect
 ---@field def EffectDef
@@ -50,3 +54,4 @@
 ---@field name string
 ---@field description fun(actor: Actor): string
 ---@field effects_sequence EffectDef[]
+---@field targeted boolean

@@ -5,5 +5,6 @@ return {
     end,
     effects_sequence = {
         require "effects.apply_dot"
-    }
+    },
+    targeted = true
 }

@@ -7,5 +7,6 @@ return {
     end,
     effects_sequence = {
         attack, attack
-    }
+    },
+    targeted = true
 }

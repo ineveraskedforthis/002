@@ -7,9 +7,19 @@ local get_y = require "ui.battle".get_y
 
 ---@type EffectDef
 return {
-    description = "\n\tDeals 30% of ATK as damage\n\tignores defense",
+    description = "\n\tRestores 30% (of origin's MAX_HP) HP of all allies.",
+    multitarget = true,
+    multi_target_selection = function (origin)
+        local targets = {}
+        for index, value in ipairs(BATTLE) do
+            if value.team == origin.team then
+                table.insert(targets, value)
+            end
+        end
+        return targets
+    end,
     target_effect = function (origin, target)
-        DEAL_DAMAGE(origin, target, 0.30, 0)
+        RESTORE_HP(origin, target, 0.3, 0)
     end,
     scene_render = function (time_passed, origin, target, scene_data)
         local origin_x = get_x(origin)
@@ -29,5 +39,4 @@ return {
     end,
     scene_on_start = function (origin, target)
     end,
-    max_times_activated = 200
 }

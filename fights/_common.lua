@@ -4,6 +4,7 @@ function GENERATE_ACTOR(def, pos, team)
     ---@type Actor
     local temp = {
         HP = def.MAX_HP,
+        SHIELD = 0,
         action_number = 0,
         definition = def,
         pending_damage = {},

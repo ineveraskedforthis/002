@@ -5,5 +5,6 @@ return {
     end,
     effects_sequence = {
         require "effects.heavy_atttack"
-    }
+    },
+    targeted = true
 }

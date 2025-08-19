@@ -33,8 +33,6 @@ local function process_turn()
     if actor.HP > 0 then
         print("readd to battle:" .. BATTLE[1].definition.name)
         ENTER_BATTLE(actor, actor.team, true)
-
-        AWAIT_TURN = true
     end
 
     -- reduce action number
@@ -66,6 +64,18 @@ end
 local function update(dt)
     local battle_lost = true
     for key, value in ipairs(BATTLE) do
+        if value.HP_view == nil then
+            value.HP_view = value.HP
+        end
+
+        local diff = value.HP - value.HP_view
+        local diff_abs = math.abs(diff)
+        if (diff_abs < value.definition.MAX_HP / 30) then
+            value.HP_view = value.HP
+        else
+            value.HP_view = value.HP_view + math.max(-value.definition.MAX_HP, math.min(value.definition.MAX_HP, diff * dt))
+        end
+
         if value.team == 0 and (value.HP_view == nil or value.HP_view > 0) then
             battle_lost = false
         end
@@ -113,7 +123,14 @@ local function update(dt)
             current_effect.time_passed = current_effect.time_passed + dt
             if current_effect.def.scene_update(current_effect.time_passed, dt, current_effect.origin, current_effect.target, current_effect.data) then
                 table.remove(EFFECTS_QUEUE, 1)
-                current_effect.def.target_effect(current_effect.origin, current_effect.target)
+                if current_effect.def.multitarget then
+                    local targets = current_effect.def.multi_target_selection(current_effect.origin)
+                    for index, value in ipairs(targets) do
+                        current_effect.def.target_effect(current_effect.origin, value)
+                    end
+                else
+                    current_effect.def.target_effect(current_effect.origin, current_effect.target)
+                end
                 if #EFFECTS_QUEUE == 0 then
                     process_turn()
                     return
@@ -121,6 +138,8 @@ local function update(dt)
             else
                 return
             end
+        else
+            AWAIT_TURN = true
         end
     end
 
@@ -145,28 +164,50 @@ local function update(dt)
         print("turn of " .. BATTLE[1].definition.name)
         -- AI turn
         -- attack the first target
+
+
+        ---@type number?
         local target = nil
 
-        for key, value in ipairs(BATTLE) do
-            if value.team == 0 then
-                target = key
-                break
+        local used_skill = BATTLE[1].definition.skills[1]
+
+
+        if used_skill.targeted then
+            ---@type number[]
+            local potential_targets = {}
+            local count = 0
+            for key, value in ipairs(BATTLE) do
+                if value.team == 0 then
+                    table.insert(potential_targets, key)
+                    count = count + 1
+                    break
+                end
             end
+            target = potential_targets[love.math.random(1, count)]
         end
 
-        if target then
-            for index, effect in ipairs(BATTLE[1].definition.skills[1].effects_sequence) do
-                ---@type Effect
-                local new_effect = {
-                    data = {},
-                    def = effect,
-                    origin = BATTLE[1],
-                    target = BATTLE[target],
-                    time_passed = 0,
-                    started = false,
-                    times_activated = 0
-                }
-                table.insert(EFFECTS_QUEUE, new_effect)
+        if target or (not used_skill.targeted) then
+            for index, effect in ipairs(used_skill.effects_sequence) do
+                local selected_target = nil
+                if effect.target_selection then
+                    selected_target = effect.target_selection(BATTLE[1])
+                else
+                    selected_target = BATTLE[target]
+                end
+
+                if (selected_target) then
+                    ---@type Effect
+                    local new_effect = {
+                        data = {},
+                        def = effect,
+                        origin = BATTLE[1],
+                        target = selected_target,
+                        time_passed = 0,
+                        started = false,
+                        times_activated = 0
+                    }
+                    table.insert(EFFECTS_QUEUE, new_effect)
+                end
             end
         end
 

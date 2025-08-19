@@ -1,3 +1,3 @@
 return {
-    battle_actors_spacing = 50
+    battle_actors_spacing = 20
 }

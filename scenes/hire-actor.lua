@@ -55,7 +55,7 @@ local function update(dt)
             pull_progress = math.min(1, pull_progress + dt * 2)
         elseif turn_over_progress < 1 then
             if turn_over_progress > 0.5 and pulled_character == 0 then
-                pulled_character = 2
+                pulled_character = math.random(1, #PLAYABLE_META_ACTORS)
             end
             turn_over_progress = math.min(1, turn_over_progress + dt * 2)
         else

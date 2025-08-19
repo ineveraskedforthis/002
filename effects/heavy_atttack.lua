@@ -1,6 +1,6 @@
 local draw_actor = require "ui.actor"
 
-local duration = 0.5
+local duration = 1.0
 
 local get_x = require "ui.battle".get_x
 local get_y = require "ui.battle".get_y
@@ -15,11 +15,10 @@ return {
     scene_render = function (time_passed, origin, target, scene_data)
         local progress = time_passed / duration
 
-        local progress_movement = math.min(1, progress * 3)
+        local progress_movement = SMOOTHERSTEP(math.min(1, progress * 3))
         local progress_attack = math.min(1, math.max(0, progress - 0.33) * 3)
         local progress_attack = progress_attack * progress_attack
-
-        local progress_jump_back = math.max(0, progress - 0.66) * 3
+        local progress_jump_back = SMOOTHERSTEP(math.max(0, progress - 0.66) * 3)
 
         local origin_x = get_x(origin)
         local target_x = get_x(target)

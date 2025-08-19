@@ -1,11 +1,34 @@
 require "fights._common"
 require "mechanics.basic"
 
+function CLAMP(x, a, b)
+    if (x < a) then
+        return a
+    end
+    if (x > b) then
+        return b
+    end
+    return x
+end
+
+---comment
+---@param t number
+---@return number
+function SMOOTHSTEP(t)
+    return t * t * (3 - 2 * t)
+end
+
+---@param x number
+---@return number
+function SMOOTHERSTEP(x)
+    return x * x * x * (x * (6 * x - 15) + 10);
+end
+
 DEFAULT_FONT = love.graphics.newFont(
     "assets/Baskervville/static/Baskervville-Regular.ttf", 14
 )
 BIG_FONT = love.graphics.newFont(
-    "assets/Baskervville/static/Baskervville-Bold.ttf", 28
+    "assets/Baskervville/static/Baskervville-Bold.ttf", 80
 )
 
 SCENE_BATTLE_SELECTOR = 0
@@ -25,6 +48,11 @@ PLAYABLE_META_ACTORS = {
         unlocked = false,
         lineup_position = 0
     },
+    {
+        def = require "meta-actors.basic-healer",
+        unlocked = false,
+        lineup_position = 0
+    }
 }
 
 CHARACTER_LINEUP = {
