@@ -4,15 +4,15 @@
 
 ---@enum WEAPON
 WEAPON = {
-    NONE = 0,
-    SWORD = 1
+	NONE = 0,
+	SWORD = 1
 }
 
 ---@enum ELEMENT
 ELEMENT = {
-    FIRE = 0,
-    RESTORATION = 1,
-    CHAOS = 2,
+	FIRE = 0,
+	RESTORATION = 1,
+	CHAOS = 2,
 }
 
 ---@class MetaActor

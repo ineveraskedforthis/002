@@ -3,33 +3,33 @@ require "mechanics.basic"
 require "types"
 
 function CLAMP(x, a, b)
-    if (x < a) then
-        return a
-    end
-    if (x > b) then
-        return b
-    end
-    return x
+	if (x < a) then
+		return a
+	end
+	if (x > b) then
+		return b
+	end
+	return x
 end
 
 ---comment
 ---@param t number
 ---@return number
 function SMOOTHSTEP(t)
-    return t * t * (3 - 2 * t)
+	return t * t * (3 - 2 * t)
 end
 
 ---@param x number
 ---@return number
 function SMOOTHERSTEP(x)
-    return x * x * x * (x * (6 * x - 15) + 10);
+	return x * x * x * (x * (6 * x - 15) + 10);
 end
 
 DEFAULT_FONT = love.graphics.newFont(
-    "assets/Baskervville/static/Baskervville-Regular.ttf", 14
+	"assets/Baskervville/static/Baskervville-Regular.ttf", 14
 )
 BIG_FONT = love.graphics.newFont(
-    "assets/Baskervville/static/Baskervville-Bold.ttf", 80
+	"assets/Baskervville/static/Baskervville-Bold.ttf", 80
 )
 
 SCENE_BATTLE_SELECTOR = 0
@@ -47,73 +47,73 @@ local scene_data_edit_lineup = require "scenes.edit-lineup"
 local scene_data_pull = require "scenes.hire-actor"
 
 function love.load()
-    CURRENT_SCENE = SCENE_BATTLE_SELECTOR
+	CURRENT_SCENE = SCENE_BATTLE_SELECTOR
 
-    ---@type MetaActorWrapper[]
-    PLAYABLE_META_ACTORS = {
-        {
-            def = require "meta-actors.main-character",
-            unlocked = true,
-            lineup_position = 1,
-            experience = 0,
-            additional_weapon_mastery = 0
-        },
-        {
-            def = require "meta-actors.chud",
-            unlocked = false,
-            lineup_position = 0,
-            experience = 0,
-            additional_weapon_mastery = 0
-        },
-        {
-            def = require "meta-actors.basic-healer",
-            unlocked = false,
-            lineup_position = 0,
-            experience = 0,
-            additional_weapon_mastery = 0
-        }
-    }
+	---@type MetaActorWrapper[]
+	PLAYABLE_META_ACTORS = {
+		{
+			def = require "meta-actors.main-character",
+			unlocked = true,
+			lineup_position = 1,
+			experience = 0,
+			additional_weapon_mastery = 0
+		},
+		{
+			def = require "meta-actors.chud",
+			unlocked = false,
+			lineup_position = 0,
+			experience = 0,
+			additional_weapon_mastery = 0
+		},
+		{
+			def = require "meta-actors.basic-healer",
+			unlocked = false,
+			lineup_position = 0,
+			experience = 0,
+			additional_weapon_mastery = 0
+		}
+	}
 
-    CHARACTER_LINEUP = {
-        1,
-        0,
-        0,
-        0
-    }
+	CHARACTER_LINEUP = {
+		1,
+		0,
+		0,
+		0
+	}
 end
 
 function love.update(dt)
-    if CURRENT_SCENE == SCENE_BATTLE then
-        scene_data_battle.update(dt)
-    elseif CURRENT_SCENE == SCENE_BATTLE_SELECTOR then
-        scene_data_battle_select.update(dt)
-    elseif CURRENT_SCENE == SCENE_EDIT_LINEUP then
-        scene_data_edit_lineup.update(dt)
-    elseif CURRENT_SCENE == SCENE_PULL_ACTORS then
-        scene_data_pull.update(dt)
-    end
+	if CURRENT_SCENE == SCENE_BATTLE then
+		scene_data_battle.update(dt)
+	elseif CURRENT_SCENE == SCENE_BATTLE_SELECTOR then
+		scene_data_battle_select.update(dt)
+	elseif CURRENT_SCENE == SCENE_EDIT_LINEUP then
+		scene_data_edit_lineup.update(dt)
+	elseif CURRENT_SCENE == SCENE_PULL_ACTORS then
+		scene_data_pull.update(dt)
+	end
 end
 
 function love.draw()
-    if CURRENT_SCENE == SCENE_BATTLE then
-        scene_data_battle.render()
-    elseif CURRENT_SCENE == SCENE_BATTLE_SELECTOR then
-        scene_data_battle_select.render()
-    elseif CURRENT_SCENE == SCENE_EDIT_LINEUP then
-        scene_data_edit_lineup.render()
-    elseif CURRENT_SCENE == SCENE_PULL_ACTORS then
-        scene_data_pull.render()
-    end
+	if CURRENT_SCENE == SCENE_BATTLE then
+		scene_data_battle.render()
+	elseif CURRENT_SCENE == SCENE_BATTLE_SELECTOR then
+		scene_data_battle_select.render()
+	elseif CURRENT_SCENE == SCENE_EDIT_LINEUP then
+		scene_data_edit_lineup.render()
+	elseif CURRENT_SCENE == SCENE_PULL_ACTORS then
+		scene_data_pull.render()
+	end
 end
 
 function love.mousepressed(x, y, button, istouch, presses)
-    if CURRENT_SCENE == SCENE_BATTLE then
-        scene_data_battle.on_click(x, y)
-    elseif CURRENT_SCENE == SCENE_BATTLE_SELECTOR then
-        scene_data_battle_select.on_click(x, y)
-    elseif CURRENT_SCENE == SCENE_EDIT_LINEUP then
-        scene_data_edit_lineup.on_click(x, y)
-    elseif CURRENT_SCENE == SCENE_PULL_ACTORS then
-        scene_data_pull.on_click(x, y)
-    end
+	if CURRENT_SCENE == SCENE_BATTLE then
+		scene_data_battle.on_click(x, y)
+	elseif CURRENT_SCENE == SCENE_BATTLE_SELECTOR then
+		scene_data_battle_select.on_click(x, y)
+	elseif CURRENT_SCENE == SCENE_EDIT_LINEUP then
+		scene_data_edit_lineup.on_click(x, y)
+	elseif CURRENT_SCENE == SCENE_PULL_ACTORS then
+		scene_data_pull.on_click(x, y)
+	end
 end

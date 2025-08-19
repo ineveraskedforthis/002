@@ -3,33 +3,33 @@
 ---@param b Actor
 ---@param effect EffectDef
 function APPLY_EFFECT(a, b, effect)
-    ---@type Effect
-    local new_effect = {
-        data = {},
-        def = effect,
-        origin = a,
-        started = false,
-        target = b,
-        time_passed = 0,
-        times_activated = 0
-    }
+	---@type Effect
+	local new_effect = {
+		data = {},
+		def = effect,
+		origin = a,
+		started = false,
+		target = b,
+		time_passed = 0,
+		times_activated = 0
+	}
 
-    table.insert(b.status_effects, new_effect)
+	table.insert(b.status_effects, new_effect)
 end
 
 function LVL_TO_REQUIRED_EXP(lvl)
-    return math.pow(2, lvl)
+	return math.pow(2, lvl)
 end
 
 ---@param a Actor
 function WEAPON_MASTERY_PENENETRATION(a)
-    local mastery = a.definition.weapon_mastery
+	local mastery = a.definition.weapon_mastery
 
-    if a.wrapper then
-        mastery = mastery + a.wrapper.additional_weapon_mastery
-    end
+	if a.wrapper then
+		mastery = mastery + a.wrapper.additional_weapon_mastery
+	end
 
-    return mastery * 5
+	return mastery * 5
 end
 
 ---comment
@@ -39,50 +39,50 @@ end
 ---@param attacker_mag_ratio number
 ---@param defender_defense_ratio number
 function DEAL_DAMAGE(a, b, attacker_str_ratio, attacker_mag_ratio, defender_defense_ratio)
-    local output = a.definition.STR * attacker_str_ratio + a.definition.MAG * attacker_mag_ratio
-    local reduction = b.definition.DEF * defender_defense_ratio
+	local output = a.definition.STR * attacker_str_ratio + a.definition.MAG * attacker_mag_ratio
+	local reduction = b.definition.DEF * defender_defense_ratio
 
-    local raw_damage = output - reduction
-    local max_min_damage = WEAPON_MASTERY_PENENETRATION(a)
-    local damage = math.max(raw_damage, math.min(max_min_damage, output))
+	local raw_damage = output - reduction
+	local max_min_damage = WEAPON_MASTERY_PENENETRATION(a)
+	local damage = math.max(raw_damage, math.min(max_min_damage, output))
 
-    damage = math.floor(damage)
+	damage = math.floor(damage)
 
-    -- local recorded_damage = damage
-    b.SHIELD = b.SHIELD - damage
-    if b.SHIELD < 0 then
-        damage = -b.SHIELD
-        b.SHIELD = 0
-    else
-        damage = 0
-    end
-    b.HP = math.max(0, b.HP - damage)
+	-- local recorded_damage = damage
+	b.SHIELD = b.SHIELD - damage
+	if b.SHIELD < 0 then
+		damage = -b.SHIELD
+		b.SHIELD = 0
+	else
+		damage = 0
+	end
+	b.HP = math.max(0, b.HP - damage)
 
-    if b.HP == 0 then
-        ---@type Effect
-        local death =  {
-            data = {},
-            def = require "effects.death",
-            origin = b,
-            target = b,
-            started = false,
-            time_passed = 0,
-            times_activated = 0
-        }
-        table.insert(EFFECTS_QUEUE, death)
-    end
+	if b.HP == 0 then
+		---@type Effect
+		local death =  {
+			data = {},
+			def = require "effects.death",
+			origin = b,
+			target = b,
+			started = false,
+			time_passed = 0,
+			times_activated = 0
+		}
+		table.insert(EFFECTS_QUEUE, death)
+	end
 
-    -- print(a.definition.name .. " attacks " .. b.definition.name .. ". " .. tostring(recorded_damage) .. "DMG. " .. "HP left: " .. tostring(b.HP))
-    ---@type PendingDamage
-    local pending = {
-        alpha = 1,
-        value = damage
-    }
-    table.insert(b.pending_damage, pending)
-    if b.definition.damaged_sound then
-        b.definition.damaged_sound:stop()
-        b.definition.damaged_sound:play()
-    end
+	-- print(a.definition.name .. " attacks " .. b.definition.name .. ". " .. tostring(recorded_damage) .. "DMG. " .. "HP left: " .. tostring(b.HP))
+	---@type PendingDamage
+	local pending = {
+		alpha = 1,
+		value = damage
+	}
+	table.insert(b.pending_damage, pending)
+	if b.definition.damaged_sound then
+		b.definition.damaged_sound:stop()
+		b.definition.damaged_sound:play()
+	end
 end
 
 ---@param origin Actor
@@ -91,43 +91,43 @@ end
 ---@param origin_defense_ratio number
 ---@param max_hp_ratio number
 function ADD_SHIELD(origin, target, origin_hp_ratio, origin_defense_ratio, max_hp_ratio)
-    local add = math.floor(origin.definition.MAX_HP * origin_hp_ratio + origin.definition.DEF * origin_defense_ratio)
-    local mult = math.min(1, max_hp_ratio * target.definition.MAX_HP / target.SHIELD)
-    target.SHIELD = target.SHIELD + math.floor(add * mult)
+	local add = math.floor(origin.definition.MAX_HP * origin_hp_ratio + origin.definition.DEF * origin_defense_ratio)
+	local mult = math.min(1, max_hp_ratio * target.definition.MAX_HP / target.SHIELD)
+	target.SHIELD = target.SHIELD + math.floor(add * mult)
 end
 
 ---@param origin Actor
 ---@param target Actor
 ---@param attacker_mag_ratio number
 function RESTORE_HP(origin, target, attacker_mag_ratio)
-    local add = math.floor(origin.definition.MAG * attacker_mag_ratio)
-    target.HP = math.min(target.definition.MAX_HP, target.HP + add)
+	local add = math.floor(origin.definition.MAG * attacker_mag_ratio)
+	target.HP = math.min(target.definition.MAX_HP, target.HP + add)
 
-    ---@type PendingDamage
-    local pending = {
-        alpha = 1,
-        value = -add
-    }
-    table.insert(target.pending_damage, pending)
+	---@type PendingDamage
+	local pending = {
+		alpha = 1,
+		value = -add
+	}
+	table.insert(target.pending_damage, pending)
 end
 
 function SPEED_TO_ACTION_OFFSET(speed)
-    return math.floor(10000 / speed)
+	return math.floor(10000 / speed)
 end
 
 ---comment
 ---@param actor Actor
 function CLEAR_PENDING_EFFECTS(actor)
-    local count = #actor.pending_damage
-    local to_remove = {}
-    for i = count, 1, -1 do
-        if actor.pending_damage[i].alpha < 0 then
-            table.insert(to_remove, i)
-            -- actor.HP_view = actor.HP_view - actor.pending_damage[i].value
-        end
-    end
+	local count = #actor.pending_damage
+	local to_remove = {}
+	for i = count, 1, -1 do
+		if actor.pending_damage[i].alpha < 0 then
+			table.insert(to_remove, i)
+			-- actor.HP_view = actor.HP_view - actor.pending_damage[i].value
+		end
+	end
 
-    for index, value in ipairs(to_remove) do
-        table.remove(actor.pending_damage, value)
-    end
+	for index, value in ipairs(to_remove) do
+		table.remove(actor.pending_damage, value)
+	end
 end
