@@ -6,25 +6,26 @@ SELECTED = nil
 ---@type number
 WAVE = 1
 
-local function clear_dead()
-    local removed = false
-    local to_remove = 0
-    for k, v in ipairs(BATTLE) do
-        if v.HP <= 0 then
-            removed = true
-            to_remove = k
-            break
-        end
-    end
+-- local function clear_dead()
+--     local removed = false
+--     local to_remove = 0
+--     for k, v in ipairs(BATTLE) do
+--         if v.HP <= 0 then
+--             removed = true
+--             to_remove = k
+--             break
+--         end
+--     end
 
-    if removed then
-        table.remove(BATTLE, to_remove)
-        clear_dead()
-        SELECTED = nil
-    else
-        return
-    end
-end
+--     if removed then
+--         local kill_effect =
+--         table.remove(BATTLE, to_remove)
+--         clear_dead()
+--         SELECTED = nil
+--     else
+--         return
+--     end
+-- end
 
 local function process_turn()
     ---@type Actor
@@ -40,7 +41,7 @@ local function process_turn()
     local offset = -1
 
     for k, v in ipairs(BATTLE) do
-        if v.action_number < offset or offset == -1 then
+        if v.HP > 0 and v.action_number < offset or offset == -1 then
             offset = v.action_number
         end
     end
@@ -49,7 +50,7 @@ local function process_turn()
         v.action_number = v.action_number - offset
     end
 
-    clear_dead()
+    -- clear_dead()
     SORT_BATTLE()
 
     -- queue all effects on new current character
@@ -62,7 +63,18 @@ end
 
 
 local function update(dt)
-    local battle_lost = true
+    for key, value in pairs(BATTLE) do
+        if not value.HP_view then
+            value.HP_view = value.HP
+        end
+
+        for index, pending in ipairs(value.pending_damage) do
+            pending.alpha = pending.alpha - dt * 2 * (1 / (1 + index))
+        end
+
+        CLEAR_PENDING_EFFECTS(value)
+    end
+
     for key, value in ipairs(BATTLE) do
         if value.HP_view == nil then
             value.HP_view = value.HP
@@ -75,7 +87,61 @@ local function update(dt)
         else
             value.HP_view = value.HP_view + math.max(-value.definition.MAX_HP, math.min(value.definition.MAX_HP, diff * dt))
         end
+    end
 
+    local no_running_effects = true
+
+    do
+        local current_effect = EFFECTS_QUEUE[1]
+        if (current_effect) then
+            no_running_effects = false
+            if not current_effect.started then
+                current_effect.def.scene_on_start(current_effect.origin, current_effect.target, current_effect.data)
+                current_effect.started = true
+            end
+            current_effect.time_passed = current_effect.time_passed + dt
+            if current_effect.def.scene_update(current_effect.time_passed, dt, current_effect.origin, current_effect.target, current_effect.data) then
+                table.remove(EFFECTS_QUEUE, 1)
+                if current_effect.def.multitarget then
+                    local targets = current_effect.def.multi_target_selection(current_effect.origin)
+                    for index, value in ipairs(targets) do
+                        current_effect.def.target_effect(current_effect.origin, value)
+                    end
+                else
+                    current_effect.def.target_effect(current_effect.origin, current_effect.target)
+                end
+            end
+            return
+        end
+    end
+
+    do
+        local current_effect = STATUS_EFFECT_QUEUE[1]
+        if (current_effect) then
+            no_running_effects = false
+            if not current_effect.started then
+                current_effect.def.scene_on_start(current_effect.origin, current_effect.target, current_effect.data)
+                current_effect.started = true
+            end
+            current_effect.time_passed = current_effect.time_passed + dt
+            if current_effect.def.scene_update(current_effect.time_passed, dt, current_effect.origin, current_effect.target, current_effect.data) then
+                table.remove(STATUS_EFFECT_QUEUE, 1)
+                current_effect.def.target_effect(current_effect.origin, current_effect.target)
+            end
+            return
+        end
+    end
+
+    if no_running_effects and not AWAIT_TURN then
+        process_turn()
+        AWAIT_TURN = true
+    end
+
+    -- now, when all effects are resolved, we can update the battle state
+
+    local battle_lost = true
+
+    for key, value in ipairs(BATTLE) do
         if value.team == 0 and (value.HP_view == nil or value.HP_view > 0) then
             battle_lost = false
         end
@@ -101,66 +167,7 @@ local function update(dt)
         return
     end
 
-    for key, value in pairs(BATTLE) do
-        if not value.HP_view then
-            value.HP_view = value.HP
-        end
-
-        for index, pending in ipairs(value.pending_damage) do
-            pending.alpha = pending.alpha - dt * 2 * (1 / (1 + index))
-        end
-
-        CLEAR_PENDING_EFFECTS(value)
-    end
-
-    do
-        local current_effect = EFFECTS_QUEUE[1]
-        if (current_effect) then
-            if not current_effect.started then
-                current_effect.def.scene_on_start(current_effect.origin, current_effect.target)
-                current_effect.started = true
-            end
-            current_effect.time_passed = current_effect.time_passed + dt
-            if current_effect.def.scene_update(current_effect.time_passed, dt, current_effect.origin, current_effect.target, current_effect.data) then
-                table.remove(EFFECTS_QUEUE, 1)
-                if current_effect.def.multitarget then
-                    local targets = current_effect.def.multi_target_selection(current_effect.origin)
-                    for index, value in ipairs(targets) do
-                        current_effect.def.target_effect(current_effect.origin, value)
-                    end
-                else
-                    current_effect.def.target_effect(current_effect.origin, current_effect.target)
-                end
-                if #EFFECTS_QUEUE == 0 then
-                    process_turn()
-                    return
-                end
-            else
-                return
-            end
-        else
-            AWAIT_TURN = true
-        end
-    end
-
-    do
-        local current_effect = STATUS_EFFECT_QUEUE[1]
-        if (current_effect) then
-            if not current_effect.started then
-                current_effect.def.scene_on_start(current_effect.origin, current_effect.target)
-                current_effect.started = true
-            end
-            current_effect.time_passed = current_effect.time_passed + dt
-            if current_effect.def.scene_update(current_effect.time_passed, dt, current_effect.origin, current_effect.target, current_effect.data) then
-                table.remove(STATUS_EFFECT_QUEUE, 1)
-                current_effect.def.target_effect(current_effect.origin, current_effect.target)
-            else
-                return
-            end
-        end
-    end
-
-    if BATTLE[1].team == 1 and AWAIT_TURN then
+    if BATTLE[1].team == 1 and AWAIT_TURN and BATTLE[1].HP > 0 then
         print("turn of " .. BATTLE[1].definition.name)
         -- AI turn
         -- attack the first target
@@ -243,8 +250,8 @@ local function render()
     love.graphics.setColor(0, 0, 0, 1)
 
     local current_effect = EFFECTS_QUEUE[1]
+    main_render()
     if current_effect then
-        main_render(current_effect.origin, current_effect.target)
         current_effect.def.scene_render(
             current_effect.time_passed,
             current_effect.origin,
@@ -252,8 +259,6 @@ local function render()
             current_effect.data
         )
         return
-    else
-        main_render(nil, nil)
     end
 
     if not BATTLE[1] then

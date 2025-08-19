@@ -1,3 +1,6 @@
+local get_x = require "ui.battle".get_x
+local get_y = require "ui.battle".get_y
+
 ---comment
 ---@param def MetaActor
 function GENERATE_ACTOR(def, pos, team)
@@ -11,7 +14,13 @@ function GENERATE_ACTOR(def, pos, team)
         pos = pos,
         status_effects = {},
         team = team,
+        x = 0,
+        y = 0,
+        visible = false
     }
+
+    temp.x = get_x(temp)
+    temp.y = get_y(temp)
 
     return temp
 end
@@ -37,6 +46,15 @@ end
 
 function SORT_BATTLE()
     table.sort(BATTLE, function (a, b)
+        if (b.HP == 0 and a.HP == 0) then
+            return a.definition.name < b.definition.name
+        end
+        if (b.HP == 0) then
+            return true
+        end
+        if (a.HP == 0) then
+            return false
+        end
         return a.action_number < b.action_number
     end)
 end
@@ -49,7 +67,7 @@ function ENTER_BATTLE(actor, team, was_in_battle)
     local max_action_number = 0
     if not was_in_battle then
         for k, v in ipairs(BATTLE) do
-            if v.action_number > max_action_number then
+            if v.action_number > max_action_number and v.HP > 0 then
                 max_action_number = v.action_number
             end
         end
@@ -59,5 +77,20 @@ function ENTER_BATTLE(actor, team, was_in_battle)
     actor.team = team
     table.insert(BATTLE, actor)
     SORT_BATTLE()
+
+    if (not was_in_battle) then
+        ---@type Effect
+        local effect = {
+            data = {},
+            def = require "effects.enter_battle",
+            origin = actor,
+            target = actor,
+            started = false,
+            time_passed = 0,
+            times_activated = 0
+        }
+
+        table.insert(EFFECTS_QUEUE, effect)
+    end
 end
 

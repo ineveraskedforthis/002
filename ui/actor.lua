@@ -91,16 +91,19 @@ end
 ---@param x number
 ---@param y number
 ---@param actor Actor
-return function (x, y, actor)
+return function (x, y, actor, alpha)
+    if not alpha then
+        alpha = 1
+    end
     if SELECTED == actor then
         love.graphics.rectangle("line", x - 4, y - 4, ACTOR_WIDTH + 8, ACTOR_HEIGHT + 8)
     end
-    love.graphics.setColor(0, 0, 0, 1)
+    love.graphics.setColor(0, 0, 0, alpha)
     love.graphics.setFont(DEFAULT_FONT)
     love.graphics.printf(actor.definition.name, x - 10, y - 20, ACTOR_WIDTH + 20, "center")
-    love.graphics.setColor(1, 1, 1, 1)
+    love.graphics.setColor(1, 1, 1, alpha)
     love.graphics.draw(actor.definition.image, x, y, 0)
-    love.graphics.setColor(0, 0, 0, 1)
+    love.graphics.setColor(0, 0, 0, alpha)
     love.graphics.rectangle("line", x, y, ACTOR_WIDTH, ACTOR_HEIGHT)
 
     local shield_ratio = math.min(1, actor.SHIELD / actor.definition.MAX_HP / 10)
@@ -121,7 +124,7 @@ return function (x, y, actor)
         actor.HP, actor.HP_view or actor.HP, actor.definition.MAX_HP, actor.SHIELD
     )
 
-    love.graphics.setColor(0, 0, 0, 1)
+    love.graphics.setColor(0, 0, 0, alpha)
 
     if (actor.SHIELD > 0) then
         love.graphics.printf(tostring(math.floor(actor.HP)) .. " + " .. tostring(actor.SHIELD), x, y + ACTOR_HEIGHT + margin + 20, ACTOR_WIDTH, "center")

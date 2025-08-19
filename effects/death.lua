@@ -1,25 +1,25 @@
 local draw_actor = require "ui.actor"
 
-local duration = 0.01
+local duration = 0.5
 
-local get_x = require "ui.battle".get_x
-local get_y = require "ui.battle".get_y
+local actual_dot = require "effects.basic_dot"
 
 ---@type EffectDef
 return {
-    description = "\n\tDeals 30% of ATK as damage\n\tignores defense",
+    description = "Death",
     target_effect = function (origin, target)
-        DEAL_DAMAGE(origin, target, 0.30, 0)
     end,
     scene_render = function (time_passed, origin, target, scene_data)
+        draw_actor(origin.x, origin.y, target, 1 - time_passed / duration)
     end,
     scene_update = function (time_passed, dt, origin, target, scene_data)
         if (time_passed > duration) then
             return true
         end
+        origin.HP_view = origin.HP_view * (1 - time_passed / duration)
         return false
     end,
     scene_on_start = function (origin, target)
-    end,
-    max_times_activated = 200
+        origin.visible = false
+    end
 }

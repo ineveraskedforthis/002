@@ -6,7 +6,9 @@ return {
         return "Attack the target enemy"
     end,
     effects_sequence = {
-        attack, attack
+        require "effects.move_to_target",
+        attack, attack,
+        require "effects.move_to_original_position"
     },
     targeted = true
 }

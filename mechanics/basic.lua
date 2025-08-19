@@ -32,7 +32,21 @@ function DEAL_DAMAGE(a, b, attacker_atk_ratio, defender_defense_ratio)
     else
         damage = 0
     end
-    b.HP = b.HP - damage
+    b.HP = math.max(0, b.HP - damage)
+
+    if b.HP == 0 then
+        ---@type Effect
+        local death =  {
+            data = {},
+            def = require "effects.death",
+            origin = b,
+            target = b,
+            started = false,
+            time_passed = 0,
+            times_activated = 0
+        }
+        table.insert(EFFECTS_QUEUE, death)
+    end
 
     -- print(a.definition.name .. " attacks " .. b.definition.name .. ". " .. tostring(recorded_damage) .. "DMG. " .. "HP left: " .. tostring(b.HP))
     ---@type PendingDamage

@@ -21,7 +21,10 @@
 ---@field lineup_position number
 
 ---@class Actor
+---@field x number
+---@field y number
 ---@field definition MetaActor
+---@field visible boolean
 ---@field HP number
 ---@field HP_view number?
 ---@field SHIELD number
@@ -36,11 +39,12 @@
 ---@field target_effect fun(origin: Actor, target: Actor)
 ---@field scene_update fun(time_passed: number, dt: number, origin: Actor, target: Actor, scene_data: table): boolean
 ---@field scene_render fun(time_passed: number, origin: Actor, target: Actor, scene_data: table)
----@field scene_on_start fun(origin: Actor, target: Actor)
+---@field scene_on_start fun(origin: Actor, target: Actor, scene_data: table)
 ---@field max_times_activated number?
 ---@field target_selection (fun(origin: Actor): Actor)?
 ---@field multi_target_selection (fun(origin: Actor) : Actor[])?
 ---@field multitarget boolean?
+---@field ignore_description boolean?
 
 ---@class Effect
 ---@field def EffectDef
