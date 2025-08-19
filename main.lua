@@ -36,31 +36,9 @@ SCENE_BATTLE = 1
 SCENE_EDIT_LINEUP = 2
 SCENE_PULL_ACTORS = 3
 
----@type MetaActorWrapper[]
-PLAYABLE_META_ACTORS = {
-    {
-        def = require "meta-actors.main-character",
-        unlocked = true,
-        lineup_position = 1
-    },
-    {
-        def = require "meta-actors.chud",
-        unlocked = false,
-        lineup_position = 0
-    },
-    {
-        def = require "meta-actors.basic-healer",
-        unlocked = false,
-        lineup_position = 0
-    }
-}
 
-CHARACTER_LINEUP = {
-    1,
-    0,
-    0,
-    0
-}
+
+
 
 local scene_data_battle = require "scenes.battle"
 local scene_data_battle_select = require "scenes.battle-select"
@@ -69,6 +47,32 @@ local scene_data_pull = require "scenes.hire-actor"
 
 function love.load()
     CURRENT_SCENE = SCENE_BATTLE_SELECTOR
+
+    ---@type MetaActorWrapper[]
+    PLAYABLE_META_ACTORS = {
+        {
+            def = require "meta-actors.main-character",
+            unlocked = true,
+            lineup_position = 1
+        },
+        {
+            def = require "meta-actors.chud",
+            unlocked = false,
+            lineup_position = 0
+        },
+        {
+            def = require "meta-actors.basic-healer",
+            unlocked = false,
+            lineup_position = 0
+        }
+    }
+
+    CHARACTER_LINEUP = {
+        1,
+        0,
+        0,
+        0
+    }
 end
 
 function love.update(dt)

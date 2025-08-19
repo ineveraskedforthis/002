@@ -28,7 +28,7 @@ local function handle_click(x, y)
     local cols = 4
 
     for index, value in ipairs(PLAYABLE_META_ACTORS) do
-        if rect(col * (ACTOR_WIDTH + 10) + 40, row * (ACTOR_HEIGHT + 10) + 50, ACTOR_WIDTH, ACTOR_WIDTH, x, y) then
+        if value.unlocked and rect(col * (ACTOR_WIDTH + 10) + 40, row * (ACTOR_HEIGHT + 10) + 50, ACTOR_WIDTH, ACTOR_WIDTH, x, y) then
             local old_actor = PLAYABLE_META_ACTORS[CHARACTER_LINEUP[SELECTED_LINEUP_POSITION]]
             if old_actor then
                 old_actor.lineup_position = 0
