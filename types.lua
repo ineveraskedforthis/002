@@ -37,6 +37,8 @@ ELEMENT = {
 ---@field unlocked boolean
 ---@field lineup_position number
 ---@field experience number
+---@field level number
+---@field skill_points number
 ---@field additional_weapon_mastery number
 
 ---@class Actor

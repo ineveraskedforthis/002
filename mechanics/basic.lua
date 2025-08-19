@@ -21,6 +21,17 @@ function LVL_TO_REQUIRED_EXP(lvl)
 	return math.pow(2, lvl)
 end
 
+---@param a MetaActorWrapper
+---@param x number
+function ADD_EXP(a, x)
+	a.experience = a.experience + x
+	while a.experience > LVL_TO_REQUIRED_EXP(a.level) do
+		a.experience = a.experience - LVL_TO_REQUIRED_EXP(a.level)
+		a.level = a.level + 1
+		a.skill_points = a.skill_points + 1
+	end
+end
+
 ---@param a Actor
 function WEAPON_MASTERY_PENENETRATION(a)
 	local mastery = a.definition.weapon_mastery

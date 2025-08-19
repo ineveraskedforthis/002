@@ -26,10 +26,10 @@ function SMOOTHERSTEP(x)
 end
 
 DEFAULT_FONT = love.graphics.newFont(
-	"assets/Baskervville/static/Baskervville-Regular.ttf", 14
+	"assets/alte-din-1451-mittelschrift/din1451alt.ttf", 14
 )
 BIG_FONT = love.graphics.newFont(
-	"assets/Baskervville/static/Baskervville-Bold.ttf", 80
+	"assets/alte-din-1451-mittelschrift/din1451alt.ttf", 80
 )
 
 SCENE_BATTLE_SELECTOR = 0
@@ -56,21 +56,27 @@ function love.load()
 			unlocked = true,
 			lineup_position = 1,
 			experience = 0,
-			additional_weapon_mastery = 0
+			additional_weapon_mastery = 0,
+			level = 0,
+			skill_points = 0
 		},
 		{
 			def = require "meta-actors.chud",
 			unlocked = false,
 			lineup_position = 0,
 			experience = 0,
-			additional_weapon_mastery = 0
+			additional_weapon_mastery = 0,
+			level = 0,
+			skill_points = 0
 		},
 		{
 			def = require "meta-actors.basic-healer",
 			unlocked = false,
 			lineup_position = 0,
 			experience = 0,
-			additional_weapon_mastery = 0
+			additional_weapon_mastery = 0,
+			level = 0,
+			skill_points = 0
 		}
 	}
 

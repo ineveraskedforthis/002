@@ -8,6 +8,14 @@ local actual_dot = require "effects.basic_dot"
 return {
 	description = "Death",
 	target_effect = function (origin, target)
+		if target.team == 1 then
+			for index, value in ipairs(BATTLE) do
+				if value.team == 0 and value.wrapper then
+					-- todo: variable experience
+					ADD_EXP(value.wrapper, 1)
+				end
+			end
+		end
 	end,
 	scene_render = function (time_passed, origin, target, scene_data)
 		draw_actor(origin.x, origin.y, target, 1 - time_passed / duration)
