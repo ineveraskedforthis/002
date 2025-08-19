@@ -10,5 +10,8 @@ return {
 		attack, attack,
 		require "effects.move_to_original_position"
 	},
-	targeted = true
+	targeted = true,
+	required_strength = 5,
+	required_magic = 0,
+	required_elements = {}
 }

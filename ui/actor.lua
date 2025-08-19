@@ -1,7 +1,7 @@
 ACTOR_WIDTH = 50
 ACTOR_HEIGHT = 70
 
-
+---@param colors table[]
 local function gradient_h(colors)
 	local result = love.image.newImageData(#colors, 1)
 	for i, color in ipairs(colors) do

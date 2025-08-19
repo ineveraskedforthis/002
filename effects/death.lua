@@ -13,6 +13,7 @@ return {
 				if value.team == 0 and value.wrapper then
 					-- todo: variable experience
 					ADD_EXP(value.wrapper, 1)
+					CURRENCY = CURRENCY + 1
 				end
 			end
 		end

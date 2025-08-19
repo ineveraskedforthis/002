@@ -9,6 +9,9 @@ end
 
 local spacing = 150
 
+local fight_easy_1_x = 100
+local fight_easy_1_y = 120
+
 local fight_1_x = 150
 local fight_1_y = 300
 
@@ -26,6 +29,9 @@ local render_meta_actor = require "ui.meta-actor"
 local function render()
 	love.graphics.setBackgroundColor(1, 1, 1, 1)
 	love.graphics.setColor(0, 0, 0, 1)
+
+	love.graphics.circle("line", fight_easy_1_x, fight_easy_1_y, 50)
+	love.graphics.printf("Enter easy battle 1", fight_easy_1_x - 40, fight_easy_1_y - 10, 80, "center")
 
 	love.graphics.circle("line", fight_1_x, fight_1_y, 50)
 	love.graphics.print("Enter battle 1", fight_1_x - 40, fight_1_y - 10)
@@ -50,7 +56,10 @@ local function render()
 	end
 
 	love.graphics.rectangle("line", 500, 500, 100, 20)
-	love.graphics.print("pull", 500, 500)
+	love.graphics.printf("pull", 500, 500, 100, "center")
+
+	love.graphics.rectangle("line", 600, 500, 100, 20)
+	love.graphics.printf("learn", 600, 500, 100, "center")
 end
 
 local circle = require "ui.circle"
@@ -59,6 +68,18 @@ local rect = require "ui.rect"
 local function handle_click(x, y)
 	if rect(500, 500, 100, 20, x, y) then
 		CURRENT_SCENE = SCENE_PULL_ACTORS
+	end
+
+	if rect(600, 500, 100, 20, x, y) then
+		CURRENT_SCENE = SCENE_LEARN_SKILLS
+	end
+
+	if circle(fight_easy_1_x, fight_easy_1_y, 50, x ,y) then
+		WAVE = 1
+		GENERATE_WAVE = require "fights.fight-easy-1"
+		GENERATE_WAVE()
+		CURRENT_SCENE = SCENE_BATTLE
+		AWAIT_TURN = true
 	end
 
 	if circle(fight_1_x, fight_1_y, 50, x ,y) then

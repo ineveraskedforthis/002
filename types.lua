@@ -13,6 +13,7 @@ ELEMENT = {
 	FIRE = 0,
 	RESTORATION = 1,
 	CHAOS = 2,
+	PROTECTION = 3
 }
 
 ---@class MetaActor
@@ -30,7 +31,7 @@ ELEMENT = {
 ---@field image_skills love.Image?
 ---@field attack_sound love.Source?
 ---@field damaged_sound love.Source?
----@field skills ActiveSkill[]
+---@field inherent_skills ActiveSkill[]
 
 ---@class MetaActorWrapper
 ---@field def MetaActor
@@ -40,6 +41,7 @@ ELEMENT = {
 ---@field level number
 ---@field skill_points number
 ---@field additional_weapon_mastery number
+---@field skills ActiveSkill[]
 
 ---@class Actor
 ---@field x number
@@ -83,3 +85,6 @@ ELEMENT = {
 ---@field description fun(actor: Actor): string
 ---@field effects_sequence EffectDef[]
 ---@field targeted boolean
+---@field required_strength number
+---@field required_magic number
+---@field required_elements ELEMENT[]

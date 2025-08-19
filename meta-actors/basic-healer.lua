@@ -5,11 +5,11 @@ local def = {
 	alignment = {},
 	weapon = WEAPON.NONE,
 	weapon_mastery = 0,
-	STR = 10,
+	STR = 4,
 	DEF = 0,
 	SPD = 120,
 	name = "Hia",
-	skills = {require "skills.heal-allies"},
+	inherent_skills = {require "skills.wait"},
 	image = love.graphics.newImage("assets/hia.png"),
 }
 

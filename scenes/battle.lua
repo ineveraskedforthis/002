@@ -28,12 +28,15 @@ WAVE = 1
 -- end
 
 local function process_turn()
-	---@type Actor
-	local actor = table.remove(BATTLE, 1)
-
-	if actor.HP > 0 then
-		print("readd to battle:" .. BATTLE[1].definition.name)
-		ENTER_BATTLE(actor, actor.team, true)
+	local can_proceed = false
+	while not can_proceed do
+		---@type Actor
+		local actor = table.remove(BATTLE, 1)
+		if actor.HP > 0 then
+			print("readd to battle:" .. BATTLE[1].definition.name)
+			ENTER_BATTLE(actor, actor.team, true)
+			can_proceed = true
+		end
 	end
 
 	-- reduce action number
@@ -176,7 +179,7 @@ local function update(dt)
 		---@type number?
 		local target = nil
 
-		local used_skill = BATTLE[1].definition.skills[1]
+		local used_skill = BATTLE[1].definition.inherent_skills[1]
 
 
 		if used_skill.targeted then

@@ -8,5 +8,8 @@ return {
 		require "effects.heavy_atttack",
 		require "effects.move_to_original_position"
 	},
-	targeted = true
+	targeted = true,
+	required_strength = 15,
+	required_magic = 0,
+	required_elements = {}
 }

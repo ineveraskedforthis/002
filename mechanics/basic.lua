@@ -32,15 +32,48 @@ function ADD_EXP(a, x)
 	end
 end
 
+---comment
+---@param w WEAPON
+function WEAPON_DMG_MULT(w)
+	if w == WEAPON.NONE then
+		return 0
+	elseif w == WEAPON.SWORD then
+		return 0.5
+	end
+end
+
 ---@param a Actor
-function WEAPON_MASTERY_PENENETRATION(a)
+function WEAPON_MASTERY(a)
 	local mastery = a.definition.weapon_mastery
 
 	if a.wrapper then
 		mastery = mastery + a.wrapper.additional_weapon_mastery
 	end
 
-	return mastery * 5
+	return mastery
+end
+
+---@param origin Actor
+---@param target Actor
+---@param value ActiveSkill
+function USE_SKILL(origin, target, value)
+	-- ATTACK(ACTORS[BATTLE[1].actor_id], ACTORS[SELECTED])
+	for index, effect in ipairs(value.effects_sequence) do
+		if effect.target_selection then
+			target = effect.target_selection(origin)
+		end
+		---@type Effect
+		local new_effect = {
+			data = {},
+			def = effect,
+			origin = origin,
+			target = target,
+			time_passed = 0,
+			started = false,
+			times_activated = 0
+		}
+		table.insert(EFFECTS_QUEUE, new_effect)
+	end
 end
 
 ---comment
@@ -50,12 +83,13 @@ end
 ---@param attacker_mag_ratio number
 ---@param defender_defense_ratio number
 function DEAL_DAMAGE(a, b, attacker_str_ratio, attacker_mag_ratio, defender_defense_ratio)
-	local output = a.definition.STR * attacker_str_ratio + a.definition.MAG * attacker_mag_ratio
+	local output = (
+		a.definition.STR * attacker_str_ratio + a.definition.MAG * attacker_mag_ratio
+	) * (1 + WEAPON_DMG_MULT(a.definition.weapon) * (1 + WEAPON_MASTERY(a)))
 	local reduction = b.definition.DEF * defender_defense_ratio
-
 	local raw_damage = output - reduction
-	local max_min_damage = WEAPON_MASTERY_PENENETRATION(a)
-	local damage = math.max(raw_damage, math.min(max_min_damage, output))
+
+	local damage = raw_damage
 
 	damage = math.floor(damage)
 
@@ -130,6 +164,7 @@ end
 ---@param actor Actor
 function CLEAR_PENDING_EFFECTS(actor)
 	local count = #actor.pending_damage
+	---@type number[]
 	local to_remove = {}
 	for i = count, 1, -1 do
 		if actor.pending_damage[i].alpha < 0 then

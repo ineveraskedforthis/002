@@ -59,7 +59,11 @@ local function update(dt)
 			end
 			turn_over_progress = math.min(1, turn_over_progress + dt * 2)
 		else
-			PLAYABLE_META_ACTORS[pulled_character].unlocked = true
+			if PLAYABLE_META_ACTORS[pulled_character].unlocked then
+				ADD_EXP(PLAYABLE_META_ACTORS[pulled_character], 5)
+			else
+				PLAYABLE_META_ACTORS[pulled_character].unlocked = true
+			end
 		end
 	end
 
@@ -77,12 +81,14 @@ local rect = require "ui.rect"
 
 
 local function handle_click(x, y)
-	if not pull_in_progress and rect(200, 200, 200, 200, x, y) then
+	if not pull_in_progress and rect(200, 200, 200, 200, x, y) and CURRENCY > 0 then
 		pull_in_progress = true
+		CURRENCY = CURRENCY - 1
 	end
 
-	if pull_in_progress and turn_over_progress == 1 and rect(200, 200, 200, 200, x, y) then
+	if pull_in_progress and turn_over_progress == 1 and rect(200, 200, 200, 200, x, y) and CURRENCY > 0  then
 		pull_away_in_progress = true
+		CURRENCY = CURRENCY - 1
 	end
 
 	if pull_in_progress and pull_progress == 1 and turn_over_progress == 1 then
