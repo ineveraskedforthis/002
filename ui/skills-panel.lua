@@ -9,11 +9,20 @@ local function render()
     local padding = 5
     local x = window_size - width - padding
 
-    love.graphics.rectangle("line", x, 0 + padding, width, art_h)
+
 
     if BATTLE[1].team == 0 and SELECTED then
-        local offset_y = art_h + padding
         local acting_actor = BATTLE[1]
+
+        if (acting_actor.definition.image_skills) then
+            love.graphics.setColor(1, 1, 1, 1)
+            love.graphics.draw(acting_actor.definition.image_skills, x, padding)
+        end
+
+        love.graphics.setColor(0, 0, 0, 1)
+        love.graphics.rectangle("line", x, 0 + padding, width, art_h)
+
+        local offset_y = art_h + padding
         for key, value in ipairs(acting_actor.definition.skills) do
             love.graphics.rectangle("line", x, offset_y, 50, 20)
             love.graphics.setFont(DEFAULT_FONT)

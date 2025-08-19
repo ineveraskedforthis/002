@@ -9,6 +9,8 @@
 ---@field SPD number
 ---@field name string
 ---@field image love.Image
+---@field image_action_bar love.Image?
+---@field image_skills love.Image?
 ---@field attack_sound love.Source?
 ---@field damaged_sound love.Source?
 ---@field skills ActiveSkill[]
