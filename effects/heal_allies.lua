@@ -2,7 +2,7 @@ local duration = 0.01
 
 ---@type EffectDef
 return {
-    description = "\n\tRestores 30% (of origin's MAX_HP) HP of all allies.",
+    description = "\n\tRestores 150% (of origin's MAG) HP of all allies.",
     multitarget = true,
     multi_target_selection = function (origin)
         local targets = {}
@@ -14,7 +14,7 @@ return {
         return targets
     end,
     target_effect = function (origin, target)
-        RESTORE_HP(origin, target, 0.3, 0)
+        RESTORE_HP(origin, target, 1.5)
     end,
     scene_render = function (time_passed, origin, target, scene_data)
     end,

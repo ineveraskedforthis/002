@@ -2,11 +2,28 @@
 ---@field value number
 ---@field alpha number
 
+---@enum WEAPON
+WEAPON = {
+    NONE = 0,
+    SWORD = 1
+}
+
+---@enum ELEMENT
+ELEMENT = {
+    FIRE = 0,
+    RESTORATION = 1,
+    CHAOS = 2,
+}
+
 ---@class MetaActor
 ---@field MAX_HP number
----@field ATK number
+---@field STR number
+---@field MAG number
 ---@field DEF number
 ---@field SPD number
+---@field weapon WEAPON
+---@field weapon_mastery number
+---@field alignment table<ELEMENT, boolean|nil>
 ---@field name string
 ---@field image love.Image
 ---@field image_action_bar love.Image?
@@ -19,11 +36,14 @@
 ---@field def MetaActor
 ---@field unlocked boolean
 ---@field lineup_position number
+---@field experience number
+---@field additional_weapon_mastery number
 
 ---@class Actor
 ---@field x number
 ---@field y number
 ---@field definition MetaActor
+---@field wrapper MetaActorWrapper|nil
 ---@field visible boolean
 ---@field HP number
 ---@field HP_view number?

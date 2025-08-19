@@ -17,13 +17,37 @@ function APPLY_EFFECT(a, b, effect)
     table.insert(b.status_effects, new_effect)
 end
 
+function LVL_TO_REQUIRED_EXP(lvl)
+    return math.pow(2, lvl)
+end
+
+---@param a Actor
+function WEAPON_MASTERY_PENENETRATION(a)
+    local mastery = a.definition.weapon_mastery
+
+    if a.wrapper then
+        mastery = mastery + a.wrapper.additional_weapon_mastery
+    end
+
+    return mastery * 5
+end
+
 ---comment
 ---@param a Actor
 ---@param b Actor
----@param attacker_atk_ratio number
+---@param attacker_str_ratio number
+---@param attacker_mag_ratio number
 ---@param defender_defense_ratio number
-function DEAL_DAMAGE(a, b, attacker_atk_ratio, defender_defense_ratio)
-    local damage = math.floor(math.max(0, a.definition.ATK * attacker_atk_ratio - b.definition.DEF * defender_defense_ratio))
+function DEAL_DAMAGE(a, b, attacker_str_ratio, attacker_mag_ratio, defender_defense_ratio)
+    local output = a.definition.STR * attacker_str_ratio + a.definition.MAG * attacker_mag_ratio
+    local reduction = b.definition.DEF * defender_defense_ratio
+
+    local raw_damage = output - reduction
+    local max_min_damage = WEAPON_MASTERY_PENENETRATION(a)
+    local damage = math.max(raw_damage, math.min(max_min_damage, output))
+
+    damage = math.floor(damage)
+
     -- local recorded_damage = damage
     b.SHIELD = b.SHIELD - damage
     if b.SHIELD < 0 then
@@ -74,10 +98,9 @@ end
 
 ---@param origin Actor
 ---@param target Actor
----@param origin_hp_ratio number
----@param origin_atk_ratio number
-function RESTORE_HP(origin, target, origin_hp_ratio, origin_atk_ratio)
-    local add = math.floor(origin.definition.MAX_HP * origin_hp_ratio + origin.definition.ATK * origin_atk_ratio)
+---@param attacker_mag_ratio number
+function RESTORE_HP(origin, target, attacker_mag_ratio)
+    local add = math.floor(origin.definition.MAG * attacker_mag_ratio)
     target.HP = math.min(target.definition.MAX_HP, target.HP + add)
 
     ---@type PendingDamage

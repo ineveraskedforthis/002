@@ -3,7 +3,10 @@ local get_y = require "ui.battle".get_y
 
 ---comment
 ---@param def MetaActor
-function GENERATE_ACTOR(def, pos, team)
+---@param pos number
+---@param team number
+---@param wrapper MetaActorWrapper|nil
+function GENERATE_ACTOR(def, pos, team, wrapper)
     ---@type Actor
     local temp = {
         HP = def.MAX_HP,
@@ -16,7 +19,8 @@ function GENERATE_ACTOR(def, pos, team)
         team = team,
         x = 0,
         y = 0,
-        visible = false
+        visible = false,
+        wrapper = wrapper
     }
 
     temp.x = get_x(temp)
@@ -28,8 +32,9 @@ end
 function PLAYER_ENTER_BATTLE()
     for i = 1, 4 do
         if CHARACTER_LINEUP[i] ~= 0 then
-            local def = PLAYABLE_META_ACTORS[CHARACTER_LINEUP[i]].def
-            ENTER_BATTLE(GENERATE_ACTOR(def, i, 0), 0, false)
+            local wrapper = PLAYABLE_META_ACTORS[CHARACTER_LINEUP[i]]
+            local def = wrapper.def
+            ENTER_BATTLE(GENERATE_ACTOR(def, i, 0, wrapper), 0, false)
         end
     end
 end

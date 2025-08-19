@@ -2,9 +2,9 @@ local duration = 1.0
 
 ---@type EffectDef
 return {
-    description = "Deals 100% of ATK as damage and delays target's action",
+    description = "Deals 150% of ATK as damage and delays target's action",
     target_effect = function (origin, target)
-        DEAL_DAMAGE(origin, target, 1, 1)
+        DEAL_DAMAGE(origin, target, 1.5, 0, 1)
         target.action_number = target.action_number + SPEED_TO_ACTION_OFFSET(target.definition.SPD)
     end,
     scene_render = function (time_passed, origin, target, scene_data)

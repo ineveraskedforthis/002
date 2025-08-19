@@ -1,5 +1,6 @@
 require "fights._common"
 require "mechanics.basic"
+require "types"
 
 function CLAMP(x, a, b)
     if (x < a) then
@@ -53,17 +54,23 @@ function love.load()
         {
             def = require "meta-actors.main-character",
             unlocked = true,
-            lineup_position = 1
+            lineup_position = 1,
+            experience = 0,
+            additional_weapon_mastery = 0
         },
         {
             def = require "meta-actors.chud",
             unlocked = false,
-            lineup_position = 0
+            lineup_position = 0,
+            experience = 0,
+            additional_weapon_mastery = 0
         },
         {
             def = require "meta-actors.basic-healer",
             unlocked = false,
-            lineup_position = 0
+            lineup_position = 0,
+            experience = 0,
+            additional_weapon_mastery = 0
         }
     }
 

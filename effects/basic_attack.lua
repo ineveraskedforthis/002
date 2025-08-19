@@ -2,9 +2,9 @@ local duration = 0.6
 
 ---@type EffectDef
 return {
-    description = "Deals 75% of ATK as damage",
+    description = "Deals 100% of STR as damage.",
     target_effect = function (origin, target)
-        DEAL_DAMAGE(origin, target, 0.75, 1)
+        DEAL_DAMAGE(origin, target, 1, 0, 1)
     end,
     scene_render = function (time_passed, origin, target, scene_data)
         local progress = SMOOTHERSTEP(time_passed / duration)

@@ -7,6 +7,13 @@ local def = {
     name = "Chud",
     skills = {require "skills.poison-strike"},
     image = love.graphics.newImage("assets/chud.png"),
+    MAG = 10,
+    STR = 10,
+    alignment = {},
+    weapon = WEAPON.NONE,
+    weapon_mastery = 0,
 }
+
+def.alignment[ELEMENT.CHAOS] = true
 
 return def
