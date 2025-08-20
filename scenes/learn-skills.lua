@@ -10,7 +10,8 @@ local skills_to_learn = {
 	require "skills.poison-strike",
 	require "skills.shield-random-allies",
 	require "skills.fireball",
-	require "skills.firestorm"
+	require "skills.firestorm",
+	require "skills.magic-arrow"
 }
 
 ---comment
