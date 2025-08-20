@@ -2,12 +2,12 @@ local duration = 0.8
 
 ---@type EffectDef
 return {
-	description = "Deals 300% of MAG damage to target and then 100% of MAG to everyone",
+	description = "Deals 200% of MAG damage to target and then 75% of MAG to everyone",
 	target_effect = function (origin, target)
-		DEAL_DAMAGE(origin, target, 0, 3, 0)
+		DEAL_DAMAGE(origin, target, 0, 2, 0)
 		for index, value in ipairs(BATTLE) do
 			if target.team == value.team then
-				DEAL_DAMAGE(origin, value, 0, 1, 0)
+				DEAL_DAMAGE(origin, value, 0, 0.75, 0)
 			end
 		end
 
