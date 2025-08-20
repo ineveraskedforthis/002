@@ -151,7 +151,7 @@ local function handle_click(x, y)
 				selected.skill_points = selected.skill_points - 1
 				table.insert(selected.skills, value)
 			end
-			y_button = y_button + 70
+			y_button = y_button + 50
 		end
 	end
 end

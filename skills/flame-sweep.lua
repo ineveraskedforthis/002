@@ -9,8 +9,8 @@ return {
 		require "effects.move_to_original_position"
 	},
 	targeted = true,
-	required_strength = 20,
-	required_magic = 10,
+	required_strength = 30,
+	required_magic = 15,
 	required_elements = {},
 	cost = 5,
 	allowed_weapons = {WEAPON.SWORD}
