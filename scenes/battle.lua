@@ -201,10 +201,10 @@ local function update(dt)
 				if value.team == 0 then
 					table.insert(potential_targets, key)
 					count = count + 1
-					break
 				end
 			end
-			target = potential_targets[love.math.random(1, count)]
+			local index = love.math.random(1, count)
+			target = potential_targets[index]
 		end
 
 		if target or (not used_skill.targeted) then
