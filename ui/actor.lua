@@ -116,22 +116,17 @@ return function (x, y, actor, alpha)
 	love.graphics.setColor(0, 0, 0, alpha)
 	love.graphics.rectangle("line", x, y, ACTOR_WIDTH, ACTOR_HEIGHT)
 
-	local shield_ratio = math.min(1, actor.SHIELD / actor.definition.MAX_HP / 10)
-	local hp_ratio_actual = actor.HP / actor.definition.MAX_HP
-	local hp_ratio_view = hp_ratio_actual
-	if (actor.HP_view) then
-		hp_ratio_view = actor.HP_view / actor.definition.MAX_HP
-	end
-
 	local margin = 5
 
 	local hp_bar_left = x - 8
 	local hp_bar_width = ACTOR_WIDTH + 16
 
+	local max_hp = TOTAL_MAX_HP(actor.definition, actor.wrapper)
+
 	-- draw shield
 	hp_bar(
 		hp_bar_left, y + ACTOR_HEIGHT + margin, hp_bar_width, 12,
-		actor.HP, actor.HP_view or actor.HP, actor.definition.MAX_HP, actor.SHIELD,
+		actor.HP, actor.HP_view or actor.HP, max_hp, actor.SHIELD,
 		actor.team
 	)
 

@@ -19,9 +19,12 @@ ELEMENT = {
 ---@class MetaActor
 ---@field MAX_HP number
 ---@field STR number
+---@field STR_per_level number
 ---@field MAG number
----@field DEF number
+---@field MAG_per_level number
 ---@field SPD number
+---@field SPD_per_level number
+---@field DEF number
 ---@field weapon WEAPON
 ---@field weapon_mastery number
 ---@field alignment table<ELEMENT, boolean|nil>

@@ -13,7 +13,10 @@ local def = {
 	STR = 15,
 	alignment = {},
 	weapon = WEAPON.SWORD,
-	weapon_mastery = 0
+	weapon_mastery = 0,
+	STR_per_level = 4,
+	MAG_per_level = 4,
+	SPD_per_level = 1,
 }
 
 def.alignment[ELEMENT.FIRE] = true

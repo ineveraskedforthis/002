@@ -2,6 +2,9 @@
 local def = {
 	MAX_HP = 100,
 	STR = 30,
+	STR_per_level = 0,
+	MAG_per_level = 0,
+	SPD_per_level = 0,
 	DEF = 0,
 	SPD = 100,
 	name = "Strong Enemy",

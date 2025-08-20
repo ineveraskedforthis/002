@@ -32,11 +32,11 @@ local function can_learn(value, actor)
 		end
 	end
 
-	if actor.def.STR < value.required_strength then
+	if TOTAL_STR(actor.def, actor) < value.required_strength then
 		return false
 	end
 
-	if actor.def.MAG < value.required_magic then
+	if TOTAL_MAG(actor.def, actor) < value.required_magic then
 		return false
 	end
 

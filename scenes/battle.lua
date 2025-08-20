@@ -85,10 +85,11 @@ local function update(dt)
 
 		local diff = value.HP - value.HP_view
 		local diff_abs = math.abs(diff)
-		if (diff_abs < value.definition.MAX_HP / 30) then
+		local max_hp = TOTAL_MAX_HP(value.definition, value.wrapper)
+		if (diff_abs < max_hp / 20) then
 			value.HP_view = value.HP
 		else
-			value.HP_view = value.HP_view + math.max(-value.definition.MAX_HP, math.min(value.definition.MAX_HP, diff * dt))
+			value.HP_view = value.HP_view + math.max(-max_hp, math.min(max_hp, diff * dt))
 		end
 	end
 

@@ -10,7 +10,6 @@ return {
 				DEAL_DAMAGE(origin, value, 0, 0.75, 0)
 			end
 		end
-
 	end,
 	scene_render = function (time_passed, origin, target, scene_data)
 		local progress = time_passed / duration

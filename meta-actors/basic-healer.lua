@@ -11,6 +11,9 @@ local def = {
 	name = "Hia",
 	inherent_skills = {require "skills.wait"},
 	image = love.graphics.newImage("assets/hia.png"),
+	STR_per_level = 1,
+	MAG_per_level = 5,
+	SPD_per_level = 5,
 }
 
 def.alignment[ELEMENT.RESTORATION] = true

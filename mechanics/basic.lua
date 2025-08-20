@@ -53,6 +53,46 @@ function WEAPON_MASTERY(a)
 	return mastery
 end
 
+---@param a MetaActor
+---@param w MetaActorWrapper?
+function TOTAL_STR(a, w)
+	local str = a.STR
+	if w then
+		str = str + w.level * a.STR_per_level
+	end
+	return str
+end
+
+---@param a MetaActor
+---@param w MetaActorWrapper?
+function TOTAL_MAG(a, w)
+	local x = a.MAG
+	if w then
+		x = x + w.level * a.MAG_per_level
+	end
+	return x
+end
+
+---@param a MetaActor
+---@param w MetaActorWrapper?
+function TOTAL_MAX_HP(a, w)
+	local x = a.MAX_HP
+	if w then
+		x = x + w.level * 10
+	end
+	return x
+end
+
+---@param a MetaActor
+---@param w MetaActorWrapper?
+function TOTAL_SPD(a, w)
+	local x = a.SPD
+	if w then
+		x = x + w.level * a.SPD_per_level
+	end
+	return x
+end
+
 ---@param origin Actor
 ---@param target Actor
 ---@param value ActiveSkill
@@ -87,7 +127,7 @@ function DEAL_DAMAGE(a, b, attacker_str_ratio, attacker_mag_ratio, defender_defe
 		return
 	end
 	local output = (
-		a.definition.STR * attacker_str_ratio + a.definition.MAG * attacker_mag_ratio
+		TOTAL_STR(a.definition, a.wrapper) * attacker_str_ratio + TOTAL_MAG(a.definition, a.wrapper) * attacker_mag_ratio
 	) * (1 + WEAPON_DMG_MULT(a.definition.weapon) * (1 + WEAPON_MASTERY(a)))
 	local reduction = b.definition.DEF * defender_defense_ratio
 	local raw_damage = output - reduction
@@ -139,8 +179,10 @@ end
 ---@param origin_defense_ratio number
 ---@param max_hp_ratio number
 function ADD_SHIELD(origin, target, origin_hp_ratio, origin_defense_ratio, max_hp_ratio)
-	local add = math.floor(origin.definition.MAX_HP * origin_hp_ratio + origin.definition.DEF * origin_defense_ratio)
-	local mult = math.min(1, max_hp_ratio * target.definition.MAX_HP / target.SHIELD)
+	local origin_max_hp = TOTAL_MAX_HP(origin.definition, origin.wrapper)
+	local target_max_hp = TOTAL_MAX_HP(target.definition, target.wrapper)
+	local add = math.floor(origin_max_hp * origin_hp_ratio + origin.definition.DEF * origin_defense_ratio)
+	local mult = math.min(1, max_hp_ratio * target_max_hp / target.SHIELD)
 	target.SHIELD = target.SHIELD + math.floor(add * mult)
 end
 
@@ -148,8 +190,9 @@ end
 ---@param target Actor
 ---@param attacker_mag_ratio number
 function RESTORE_HP(origin, target, attacker_mag_ratio)
-	local add = math.floor(origin.definition.MAG * attacker_mag_ratio)
-	target.HP = math.min(target.definition.MAX_HP, target.HP + add)
+	local add = math.floor(TOTAL_MAG(origin.definition, origin.wrapper) * attacker_mag_ratio)
+	local target_max_hp = TOTAL_MAX_HP(target.definition, target.wrapper)
+	target.HP = math.min(target_max_hp, target.HP + add)
 
 	---@type PendingDamage
 	local pending = {

@@ -13,7 +13,10 @@ local def = {
 	STR = 10,
 	alignment = {},
 	weapon = WEAPON.NONE,
-	weapon_mastery = 0
+	weapon_mastery = 0,
+	STR_per_level = 0,
+	MAG_per_level = 0,
+	SPD_per_level = 0,
 }
 
 

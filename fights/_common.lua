@@ -9,7 +9,7 @@ local get_y = require "ui.battle".get_y
 function GENERATE_ACTOR(def, pos, team, wrapper)
 	---@type Actor
 	local temp = {
-		HP = def.MAX_HP,
+		HP = TOTAL_MAX_HP(def, wrapper),
 		SHIELD = 0,
 		action_number = 0,
 		definition = def,
