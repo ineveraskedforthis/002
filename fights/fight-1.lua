@@ -6,6 +6,7 @@ return function ()
 		local chris = GENERATE_ACTOR(require "meta-actors.chris", 1, 1)
 
 		ENTER_BATTLE(chris, 1, false)
+		SELECTED = chris
 		return true
 	end
 
@@ -15,6 +16,7 @@ return function ()
 
 		ENTER_BATTLE(strong_enemy, 1, false)
 		ENTER_BATTLE(fast_enemy, 1, false)
+		SELECTED = strong_enemy
 		return true
 	end
 
@@ -23,6 +25,7 @@ return function ()
 		local enemy = GENERATE_ACTOR(require "meta-actors.john", 1, 1)
 
 		ENTER_BATTLE(enemy, 1, false)
+		SELECTED = enemy
 		return true
 	end
 

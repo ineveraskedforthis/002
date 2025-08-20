@@ -66,6 +66,16 @@ end
 
 
 local function update(dt)
+
+	if SELECTED.HP <= 0 or not SELECTED.visible then
+		-- select the first enemy target
+		for index, value in ipairs(BATTLE) do
+			if value.team == 1 and (value.HP > 0 and value.visible) then
+				SELECTED = value
+			end
+		end
+	end
+
 	for key, value in pairs(BATTLE) do
 		if not value.HP_view then
 			value.HP_view = value.HP
@@ -235,7 +245,7 @@ local function handle_click(x, y)
 	local offset_y = 50
 
 	for key, value in ipairs(BATTLE) do
-		if BATTLE[key].team == 1 then
+		if BATTLE[key].team == 1 and BATTLE[key].HP > 0 and BATTLE[key].visible then
 			local r_x = offset_x + (style.battle_actors_spacing + ACTOR_WIDTH) * (value.pos - 1)
 			if (rect(r_x, offset_y, ACTOR_WIDTH, ACTOR_HEIGHT, x, y)) then
 				SELECTED = value

@@ -2,7 +2,7 @@
 return {
 	name = "Firestorm",
 	description = function (actor)
-		return "Deals a lot of damage to enemies"
+		return "Deals a lot of aoe damage"
 	end,
 	effects_sequence = {
 		require "effects.firestorm-stage",
