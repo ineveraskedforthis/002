@@ -11,7 +11,7 @@ local def = {
 	name = "Kols",
 	inherent_skills = {require "skills.wait"},
 	image = love.graphics.newImage("assets/kols.png"),
-        image_action_bar = love.graphics.newImage("assets/kols-h.png"),
+	image_action_bar = love.graphics.newImage("assets/kols-h.png"),
 }
 
 def.alignment[ELEMENT.FIRE] = true
