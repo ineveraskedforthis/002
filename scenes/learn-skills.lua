@@ -11,7 +11,8 @@ local skills_to_learn = {
 	require "skills.shield-random-allies",
 	require "skills.fireball",
 	require "skills.firestorm",
-	require "skills.magic-arrow"
+	require "skills.magic-arrow",
+	require "skills.flame-sweep"
 }
 
 ---comment
@@ -45,6 +46,17 @@ local function can_learn(value, actor)
 		if not actor.def.alignment[element] then
 			return false
 		end
+	end
+
+	local allowed_weapon = false
+	for _, weapon in ipairs(value.allowed_weapons) do
+		if actor.def.weapon == weapon then
+			allowed_weapon = true
+		end
+	end
+
+	if not allowed_weapon then
+		return false
 	end
 
 	return true

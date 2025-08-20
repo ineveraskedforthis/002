@@ -1,16 +1,16 @@
 return {
-	name = "Heavy strike",
+	name = "Flame sweep",
 	description = function (actor)
-		return "Stun the enemy and deal heavy damage"
+		return "Strikes all enemies"
 	end,
 	effects_sequence = {
 		require "effects.move_to_target",
-		require "effects.heavy_atttack",
+		require "effects.flame-sweep",
 		require "effects.move_to_original_position"
 	},
 	targeted = true,
-	required_strength = 15,
-	required_magic = 0,
+	required_strength = 20,
+	required_magic = 10,
 	required_elements = {},
 	cost = 5,
 	allowed_weapons = {WEAPON.SWORD}

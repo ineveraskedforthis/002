@@ -49,7 +49,7 @@ local scene_data_learn = require "scenes.learn-skills"
 
 function love.load()
 	---@type number
-	CURRENCY = 3
+	CURRENCY = 5
 
 	CURRENT_SCENE = SCENE_BATTLE_SELECTOR
 

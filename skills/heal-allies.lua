@@ -1,3 +1,4 @@
+---@type ActiveSkill
 return {
 	name = "Heal allies",
 	description = function (actor)
@@ -10,5 +11,6 @@ return {
 	required_strength = 0,
 	required_magic = 10,
 	required_elements = {ELEMENT.RESTORATION},
-	cost = 5
+	cost = 5,
+	allowed_weapons = {}
 }
