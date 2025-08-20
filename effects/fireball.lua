@@ -1,14 +1,16 @@
-local duration = 0.5
-local actual_dot = require "effects.basic_dot"
+local duration = 0.8
 
 ---@type EffectDef
 return {
-	description = "Activate old dots and apply new dot:\n\t" .. actual_dot.description,
+	description = "Deals 300% of MAG damage to target and then 100% of MAG to everyone",
 	target_effect = function (origin, target)
-		for index, value in ipairs(target.status_effects) do
-			value.def.target_effect(value.origin, target)
-		end
-		APPLY_EFFECT(origin, target, actual_dot)
+                DEAL_DAMAGE(origin, target, 0, 3, 0)
+                for index, value in ipairs(BATTLE) do
+                        if target.team == value.team then
+                                DEAL_DAMAGE(origin, value, 0, 1, 0)
+                        end
+                end
+
 	end,
 	scene_render = function (time_passed, origin, target, scene_data)
 		local progress = time_passed / duration
@@ -16,7 +18,7 @@ return {
 		local x = progress * target.x + (1 - progress) * origin.x
 		local y = progress * target.y + (1 - progress) * origin.y
 
-		love.graphics.setColor(0, 0.5, 0, 1)
+		love.graphics.setColor(1, 0.4, 0.4, 1)
 		love.graphics.circle("fill", x, y, 10)
 	end,
 	scene_update = function (time_passed, dt, origin, target, scene_data)

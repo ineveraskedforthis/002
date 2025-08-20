@@ -83,6 +83,9 @@ end
 ---@param attacker_mag_ratio number
 ---@param defender_defense_ratio number
 function DEAL_DAMAGE(a, b, attacker_str_ratio, attacker_mag_ratio, defender_defense_ratio)
+	if b.HP <= 0 then
+		return
+	end
 	local output = (
 		a.definition.STR * attacker_str_ratio + a.definition.MAG * attacker_mag_ratio
 	) * (1 + WEAPON_DMG_MULT(a.definition.weapon) * (1 + WEAPON_MASTERY(a)))

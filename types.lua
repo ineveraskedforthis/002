@@ -88,3 +88,4 @@ ELEMENT = {
 ---@field required_strength number
 ---@field required_magic number
 ---@field required_elements ELEMENT[]
+---@field cost number

@@ -12,7 +12,7 @@ return {
 				count = count + 1
 			end
 		end
-		local dice_roll = math.random(count)
+		local dice_roll = love.math.random(count)
 		return potential_targets[dice_roll]
 	end,
 	target_effect = function (origin, target)

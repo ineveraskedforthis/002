@@ -11,5 +11,6 @@ return {
 	targeted = true,
 	required_strength = 15,
 	required_magic = 0,
-	required_elements = {}
+	required_elements = {},
+	cost = 5
 }

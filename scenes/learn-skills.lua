@@ -9,6 +9,8 @@ local skills_to_learn = {
 	require "skills.heavy-strike",
 	require "skills.poison-strike",
 	require "skills.shield-random-allies",
+	require "skills.fireball",
+	require "skills.firestorm"
 }
 
 ---comment
@@ -74,7 +76,7 @@ local function render()
 		if can_learn(value, selected) then
 			love.graphics.rectangle("line", x, y, 200, 40)
 			love.graphics.printf("Learn " .. value.name, x, y, 200, "center")
-			love.graphics.printf("1 skill point, 1 point", x, y + 20, 200, "center")
+			love.graphics.printf("1 skill point, " .. tostring(value.cost) .. " points", x, y + 20, 200, "center")
 			y = y + 50
 		end
 	end
@@ -85,13 +87,16 @@ local function render()
 	love.graphics.printf("Current skill points: " .. selected.skill_points, 300, 80, 80, "center")
 
 	love.graphics.printf("Known skills:", 300, 120, 80, "center")
+	---@type number
 	local y_skill = 140
-	for index, value in ipairs(selected.skills) do
+	for _, value in ipairs(selected.skills) do
 		love.graphics.printf(value.name, 280, y_skill, 100, "center")
+		---@type number
 		y_skill = y_skill + 20
 	end
-	for index, value in ipairs(selected.def.inherent_skills) do
+	for _, value in ipairs(selected.def.inherent_skills) do
 		love.graphics.printf(value.name, 280, y_skill, 100, "center")
+		---@type number
 		y_skill = y_skill + 20
 	end
 end
@@ -109,7 +114,7 @@ local function handle_click(x, y)
 	end
 	local row = 0
 	local col = 0
-	local cols = 4
+	local cols = 3
 
 	for index, value in ipairs(PLAYABLE_META_ACTORS) do
 		if value.unlocked and rect(col * (ACTOR_WIDTH + 10) + 40, row * (ACTOR_HEIGHT + 10) + 50, ACTOR_WIDTH, ACTOR_WIDTH, x, y) then
@@ -127,8 +132,9 @@ local function handle_click(x, y)
 	local y_button = 20
 	for _, value in ipairs(skills_to_learn) do
 		if can_learn(value, selected) then
-			if rect(x_button, y_button, 200, 40, x, y) and selected.skill_points > 0 and CURRENCY > 0 then
-				CURRENCY = CURRENCY - 1
+			if rect(x_button, y_button, 200, 40, x, y) and selected.skill_points > 0 and CURRENCY >= value.cost then
+				---@type number
+				CURRENCY = CURRENCY - value.cost
 				selected.skill_points = selected.skill_points - 1
 				table.insert(selected.skills, value)
 			end

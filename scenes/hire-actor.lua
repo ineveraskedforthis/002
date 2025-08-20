@@ -2,6 +2,7 @@
 local pull_in_progress = false
 local pull_progress = 0
 local turn_over_progress = 0
+local pulled = false
 ---@type number
 local pulled_character = 0
 local pull_away_in_progress = false
@@ -15,6 +16,7 @@ local function reset()
 	pulled_character = 0
 	pull_away_in_progress = false
 	pull_away_progress = 0
+	pulled = false
 end
 
 local render_meta_actor = require "ui.meta-actor"
@@ -53,16 +55,21 @@ local function update(dt)
 	if pull_in_progress then
 		if pull_progress < 1 then
 			pull_progress = math.min(1, pull_progress + dt * 2)
+			-- print(pull_progress, turn_over_progress)
 		elseif turn_over_progress < 1 then
-			if turn_over_progress > 0.5 and pulled_character == 0 then
-				pulled_character = math.random(1, #PLAYABLE_META_ACTORS)
-			end
 			turn_over_progress = math.min(1, turn_over_progress + dt * 2)
-		else
-			if PLAYABLE_META_ACTORS[pulled_character].unlocked then
-				ADD_EXP(PLAYABLE_META_ACTORS[pulled_character], 5)
-			else
-				PLAYABLE_META_ACTORS[pulled_character].unlocked = true
+			-- print(pull_progress, turn_over_progress)
+			if turn_over_progress > 0.5 and pulled_character == 0 then
+				pulled_character = love.math.random(1, #PLAYABLE_META_ACTORS)
+				if not pulled then
+					print("pull")
+					if PLAYABLE_META_ACTORS[pulled_character].unlocked then
+						ADD_EXP(PLAYABLE_META_ACTORS[pulled_character], 5)
+					else
+						PLAYABLE_META_ACTORS[pulled_character].unlocked = true
+					end
+					pulled = true
+				end
 			end
 		end
 	end
@@ -83,6 +90,7 @@ local rect = require "ui.rect"
 local function handle_click(x, y)
 	if not pull_in_progress and rect(200, 200, 200, 200, x, y) and CURRENCY > 0 then
 		pull_in_progress = true
+		---@type number
 		CURRENCY = CURRENCY - 1
 	end
 

@@ -48,6 +48,7 @@ local scene_data_pull = require "scenes.hire-actor"
 local scene_data_learn = require "scenes.learn-skills"
 
 function love.load()
+	---@type number
 	CURRENCY = 3
 
 	CURRENT_SCENE = SCENE_BATTLE_SELECTOR
@@ -76,6 +77,16 @@ function love.load()
 		},
 		{
 			def = require "meta-actors.basic-healer",
+			unlocked = false,
+			lineup_position = 0,
+			experience = 0,
+			additional_weapon_mastery = 0,
+			level = 0,
+			skill_points = 0,
+			skills = {}
+		},
+		{
+			def = require "meta-actors.fire-mage",
 			unlocked = false,
 			lineup_position = 0,
 			experience = 0,

@@ -9,5 +9,6 @@ return {
 	targeted = false,
 	required_strength = 0,
 	required_magic = 10,
-	required_elements = {ELEMENT.RESTORATION}
+	required_elements = {ELEMENT.RESTORATION},
+	cost = 5
 }

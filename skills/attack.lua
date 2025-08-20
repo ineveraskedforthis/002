@@ -1,5 +1,6 @@
 local attack = require "effects.basic_attack"
 
+---@type ActiveSkill
 return {
 	name = "Attack",
 	description = function (actor)
@@ -13,5 +14,6 @@ return {
 	targeted = true,
 	required_strength = 5,
 	required_magic = 0,
-	required_elements = {}
+	required_elements = {},
+	cost = 2
 }
