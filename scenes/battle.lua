@@ -1,3 +1,5 @@
+local effects_manager = require "effects._manager"
+
 AWAIT_TURN = false
 
 ---@type Actor?
@@ -99,7 +101,7 @@ local function update(dt)
 		if (diff_abs < max_hp / 20) then
 			value.HP_view = value.HP
 		else
-			value.HP_view = value.HP_view + math.max(-max_hp, math.min(max_hp, diff * dt))
+			value.HP_view = value.HP_view + math.max(-max_hp, math.min(max_hp, diff / diff_abs * max_hp * dt))
 		end
 	end
 
@@ -109,20 +111,21 @@ local function update(dt)
 		local current_effect = EFFECTS_QUEUE[1]
 		if (current_effect) then
 			no_running_effects = false
+			local def = effects_manager.get(current_effect.def)
 			if not current_effect.started then
-				current_effect.def.scene_on_start(current_effect.origin, current_effect.target, current_effect.data)
+				def.scene_on_start(current_effect.origin, current_effect.target, current_effect.data)
 				current_effect.started = true
 			end
 			current_effect.time_passed = current_effect.time_passed + dt
-			if current_effect.def.scene_update(current_effect.time_passed, dt, current_effect.origin, current_effect.target, current_effect.data) then
+			if def.scene_update(current_effect.time_passed, dt, current_effect.origin, current_effect.target, current_effect.data) then
 				table.remove(EFFECTS_QUEUE, 1)
-				if current_effect.def.multitarget then
-					local targets = current_effect.def.multi_target_selection(current_effect.origin)
+				if def.multitarget then
+					local targets = def.multi_target_selection(current_effect.origin)
 					for index, value in ipairs(targets) do
-						current_effect.def.target_effect(current_effect.origin, value)
+						def.target_effect(current_effect.origin, value, current_effect.data)
 					end
 				else
-					current_effect.def.target_effect(current_effect.origin, current_effect.target)
+					def.target_effect(current_effect.origin, current_effect.target, current_effect.data)
 				end
 			end
 			return
@@ -132,15 +135,16 @@ local function update(dt)
 	do
 		local current_effect = STATUS_EFFECT_QUEUE[1]
 		if (current_effect) then
+			local def = effects_manager.get(current_effect.def)
 			no_running_effects = false
 			if not current_effect.started then
-				current_effect.def.scene_on_start(current_effect.origin, current_effect.target, current_effect.data)
+				def.scene_on_start(current_effect.origin, current_effect.target, current_effect.data)
 				current_effect.started = true
 			end
 			current_effect.time_passed = current_effect.time_passed + dt
-			if current_effect.def.scene_update(current_effect.time_passed, dt, current_effect.origin, current_effect.target, current_effect.data) then
+			if def.scene_update(current_effect.time_passed, dt, current_effect.origin, current_effect.target, current_effect.data) then
 				table.remove(STATUS_EFFECT_QUEUE, 1)
-				current_effect.def.target_effect(current_effect.origin, current_effect.target)
+				def.target_effect(current_effect.origin, current_effect.target, current_effect.data)
 			end
 			return
 		end
@@ -162,6 +166,7 @@ local function update(dt)
 	end
 
 	if battle_lost then
+		BATTLE_IN_PROGRESS = false
 		love.load()
 	end
 
@@ -176,6 +181,7 @@ local function update(dt)
 	if not enemies_alive then
 		WAVE = WAVE + 1
 		if not GENERATE_WAVE() then
+			BATTLE_IN_PROGRESS = false
 			CURRENT_SCENE = SCENE_BATTLE_SELECTOR
 		end
 		return
@@ -210,8 +216,9 @@ local function update(dt)
 		if target or (not used_skill.targeted) then
 			for index, effect in ipairs(used_skill.effects_sequence) do
 				local selected_target = nil
-				if effect.target_selection then
-					selected_target = effect.target_selection(BATTLE[1])
+				local def = effects_manager.get(effect)
+				if def.target_selection then
+					selected_target = def.target_selection(BATTLE[1])
 				else
 					selected_target = BATTLE[target]
 				end
@@ -266,7 +273,8 @@ local function render()
 	local current_effect = EFFECTS_QUEUE[1]
 	main_render()
 	if current_effect then
-		current_effect.def.scene_render(
+		local def = effects_manager.get(current_effect.def)
+		def.scene_render(
 			current_effect.time_passed,
 			current_effect.origin,
 			current_effect.target,

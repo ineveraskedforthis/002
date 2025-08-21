@@ -13,7 +13,8 @@ ELEMENT = {
 	FIRE = 0,
 	RESTORATION = 1,
 	CHAOS = 2,
-	PROTECTION = 3
+	PROTECTION = 3,
+	LIGHT = 4
 }
 
 ---@class MetaActor
@@ -63,7 +64,8 @@ ELEMENT = {
 
 ---@class EffectDef
 ---@field description string
----@field target_effect fun(origin: Actor, target: Actor)
+---@field target_effect fun(origin: Actor, target: Actor, scene_data: table)
+---@field target_effect_on_kill (fun(origin: Actor, target: Actor, scene_data: table))?
 ---@field scene_update fun(time_passed: number, dt: number, origin: Actor, target: Actor, scene_data: table): boolean
 ---@field scene_render fun(time_passed: number, origin: Actor, target: Actor, scene_data: table)
 ---@field scene_on_start fun(origin: Actor, target: Actor, scene_data: table)
@@ -74,7 +76,7 @@ ELEMENT = {
 ---@field ignore_description boolean?
 
 ---@class Effect
----@field def EffectDef
+---@field def number
 ---@field data table
 ---@field time_passed number
 ---@field origin Actor
@@ -86,7 +88,7 @@ ELEMENT = {
 ---@class ActiveSkill
 ---@field name string
 ---@field description fun(actor: Actor): string
----@field effects_sequence EffectDef[]
+---@field effects_sequence number[]
 ---@field targeted boolean
 ---@field required_strength number
 ---@field required_magic number

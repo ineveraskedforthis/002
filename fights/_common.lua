@@ -47,6 +47,8 @@ function RESET_BATTLE()
 	---@type Effect[]
 	STATUS_EFFECT_QUEUE = {}
 	SELECTED = nil
+
+	BATTLE_IN_PROGRESS = true
 end
 
 function SORT_BATTLE()
@@ -69,6 +71,8 @@ end
 ---@param team number
 ---@param was_in_battle boolean
 function ENTER_BATTLE(actor, team, was_in_battle)
+	assert(BATTLE_IN_PROGRESS)
+
 	local max_action_number = 0
 	if not was_in_battle then
 		for k, v in ipairs(BATTLE) do

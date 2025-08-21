@@ -94,6 +94,16 @@ function love.load()
 			level = 0,
 			skill_points = 0,
 			skills = {}
+		},
+		{
+			def = require "meta-actors.rebe",
+			unlocked = false,
+			lineup_position = 0,
+			experience = 0,
+			additional_weapon_mastery = 0,
+			level = 0,
+			skill_points = 0,
+			skills = {}
 		}
 	}
 

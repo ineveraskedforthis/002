@@ -1,29 +1,21 @@
+local manager = require "effects._manager"
 local duration = 0.01
+local id, def = manager.new_effect(duration)
 
----@type EffectDef
-return {
-	description = "\n\tRestores 150% (of origin's MAG) HP of all allies.",
-	multitarget = true,
-	multi_target_selection = function (origin)
-		local targets = {}
-		for index, value in ipairs(BATTLE) do
-			if value.team == origin.team then
-				table.insert(targets, value)
-			end
+def.description = "Restore [150% of MAG] HP to all allies"
+
+function def.multi_target_selection(origin)
+	local targets = {}
+	for index, value in ipairs(BATTLE) do
+		if value.team == origin.team then
+			table.insert(targets, value)
 		end
-		return targets
-	end,
-	target_effect = function (origin, target)
-		RESTORE_HP(origin, target, 1.5)
-	end,
-	scene_render = function (time_passed, origin, target, scene_data)
-	end,
-	scene_update = function (time_passed, dt, origin, target, scene_data)
-		if (time_passed > duration) then
-			return true
-		end
-		return false
-	end,
-	scene_on_start = function (origin, target)
-	end,
-}
+	end
+	return targets
+end
+
+function def.target_effect(origin, target)
+	RESTORE_HP(origin, target, 1.5)
+end
+
+return id

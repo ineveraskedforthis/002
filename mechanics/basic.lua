@@ -1,7 +1,9 @@
+local effects = require "effects._manager"
+
 ---comment
 ---@param a Actor
 ---@param b Actor
----@param effect EffectDef
+---@param effect number
 function APPLY_EFFECT(a, b, effect)
 	---@type Effect
 	local new_effect = {
@@ -97,10 +99,10 @@ end
 ---@param target Actor
 ---@param value ActiveSkill
 function USE_SKILL(origin, target, value)
-	-- ATTACK(ACTORS[BATTLE[1].actor_id], ACTORS[SELECTED])
 	for index, effect in ipairs(value.effects_sequence) do
-		if effect.target_selection then
-			target = effect.target_selection(origin)
+		local def = effects.get(effect)
+		if def.target_selection then
+			target = def.target_selection(origin)
 		end
 		---@type Effect
 		local new_effect = {
