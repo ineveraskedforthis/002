@@ -65,6 +65,12 @@ function TOTAL_STR(a, w)
 	return str
 end
 
+---comment
+---@param a Actor
+function TOTAL_STR_ACTOR(a)
+	return TOTAL_STR(a.definition, a.wrapper)
+end
+
 ---@param a MetaActor
 ---@param w MetaActorWrapper?
 function TOTAL_MAG(a, w)
@@ -73,6 +79,12 @@ function TOTAL_MAG(a, w)
 		x = x + w.level * a.MAG_per_level
 	end
 	return x
+end
+
+---comment
+---@param a Actor
+function TOTAL_MAG_ACTOR(a)
+	return TOTAL_MAG(a.definition, a.wrapper)
 end
 
 ---@param a MetaActor
@@ -121,21 +133,11 @@ end
 ---comment
 ---@param a Actor
 ---@param b Actor
----@param attacker_str_ratio number
----@param attacker_mag_ratio number
----@param defender_defense_ratio number
-function DEAL_DAMAGE(a, b, attacker_str_ratio, attacker_mag_ratio, defender_defense_ratio)
+---@param damage number
+function DEAL_DAMAGE(a, b, damage)
 	if b.HP <= 0 then
 		return
 	end
-	local output = (
-		TOTAL_STR(a.definition, a.wrapper) * attacker_str_ratio + TOTAL_MAG(a.definition, a.wrapper) * attacker_mag_ratio
-	) * (1 + WEAPON_DMG_MULT(a.definition.weapon) * (1 + WEAPON_MASTERY(a)))
-	local reduction = b.definition.DEF * defender_defense_ratio
-	local raw_damage = output - reduction
-
-	local damage = raw_damage
-
 	damage = math.floor(damage)
 
 	-- local recorded_damage = damage

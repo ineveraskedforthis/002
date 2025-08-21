@@ -12,7 +12,8 @@ local skills_to_learn = {
 	require "skills.fireball",
 	require "skills.firestorm",
 	require "skills.magic-arrow",
-	require "skills.flame-sweep"
+	require "skills.flame-sweep",
+	require "skills.blood-spear"
 }
 
 ---comment
@@ -24,12 +25,14 @@ local function can_learn(value, actor)
 
 	for _, value2 in ipairs(actor.skills) do
 		if value2.name == value.name then
+			print("1")
 			return false
 		end
 	end
 
 	for _, value2 in ipairs(actor.def.inherent_skills) do
 		if value2.name == value.name then
+			print("2")
 			return false
 		end
 	end

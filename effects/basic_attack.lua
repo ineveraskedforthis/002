@@ -4,7 +4,11 @@ local id, def = manager.new_effect(duration)
 def.description = "Deal [100% of STR] damage."
 
 function def.target_effect(origin, target, scene_data)
-	DEAL_DAMAGE(origin, target, 1, 0, 1)
+	local damage = TOTAL_STR_ACTOR(origin)
+	local negated_damage = target.definition.DEF
+	local final_damage = math.max(0, damage - negated_damage)
+
+	DEAL_DAMAGE(origin, target, final_damage)
 end
 
 function def.scene_render(time_passed, origin, target, scene_data)

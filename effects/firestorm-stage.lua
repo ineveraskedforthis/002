@@ -7,7 +7,7 @@ def.description = "Deal [50% of MAG] damage to everyone"
 function def.target_effect(origin, target, data)
 	for _, value in ipairs(BATTLE) do
 		if target.team == value.team then
-			DEAL_DAMAGE(origin, value, 0, 0.5, 0)
+			DEAL_DAMAGE(origin, value, TOTAL_MAG_ACTOR(origin) * 0.5)
 		end
 	end
 end

@@ -4,8 +4,7 @@ return {
 		return "Jump around and deal damage"
 	end,
 	effects_sequence = {
-		require "effects.flicker-strike",
-		require "effects.move_to_original_position"
+		require "effects.flicker-strike"
 	},
 	targeted = true,
 	required_strength = 10,

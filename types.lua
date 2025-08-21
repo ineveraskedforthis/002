@@ -14,7 +14,8 @@ ELEMENT = {
 	RESTORATION = 1,
 	CHAOS = 2,
 	PROTECTION = 3,
-	LIGHT = 4
+	LIGHT = 4,
+	BLOOD = 5,
 }
 
 ---@class MetaActor

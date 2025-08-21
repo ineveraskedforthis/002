@@ -5,9 +5,10 @@ local id, def = manager.new_effect(duration)
 def.description = "Deal [100% of STR + 100% of MAG] AOE damage"
 
 function def.target_effect(origin, target)
+	local damage = TOTAL_STR_ACTOR(origin) + TOTAL_MAG_ACTOR(origin)
 	for index, value in ipairs(BATTLE) do
 		if target.team == value.team then
-			DEAL_DAMAGE(origin, value, 1, 1, 0)
+			DEAL_DAMAGE(origin, value, damage)
 		end
 	end
 end

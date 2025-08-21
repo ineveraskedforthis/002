@@ -4,7 +4,11 @@ local id, def = manager.new_effect(duration)
 def.description = "Deal [150% of STR] damage. Delay target's action"
 
 function def.target_effect(origin, target)
-	DEAL_DAMAGE(origin, target, 1.5, 0, 1)
+	local damage = TOTAL_STR_ACTOR(origin) * 1.5
+	local negated_damage = target.definition.DEF
+	local final_damage = math.max(0, damage - negated_damage)
+
+	DEAL_DAMAGE(origin, target, final_damage)
 	target.action_number = target.action_number + SPEED_TO_ACTION_OFFSET(target.definition.SPD)
 end
 

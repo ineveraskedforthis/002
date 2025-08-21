@@ -2,6 +2,8 @@ local manager = require "effects._manager"
 local duration = 0.1
 local id, def = manager.new_effect(duration)
 
+local move_back = require "effects.move_to_original_position"
+
 def.description = "Launches 5 attacks against random targets. If one of them dies, add 5 more attacks"
 
 function def.scene_render(time_passed, origin, target, scene_data)
@@ -21,7 +23,9 @@ function def.target_effect(origin, target, data)
 		return
 	end
 
-	DEAL_DAMAGE(origin, target, 0.25, 1.0, 0.5)
+	local damage = TOTAL_MAG_ACTOR(origin) + TOTAL_STR_ACTOR(origin) * 0.25
+
+	DEAL_DAMAGE(origin, target, damage)
 
 	if target.HP <= 0 then
 		---@type number
@@ -60,6 +64,20 @@ function def.target_effect(origin, target, data)
 
 			table.insert(EFFECTS_QUEUE, next_attack)
 		end
+	else
+		---@type Effect
+		local go_back = {
+			data = {
+				counter = data.counter - 1,
+			},
+			def = move_back,
+			origin = origin,
+			target = origin,
+			started = false,
+			time_passed = 0,
+			times_activated = 0
+		}
+		table.insert(EFFECTS_QUEUE, go_back)
 	end
 end
 

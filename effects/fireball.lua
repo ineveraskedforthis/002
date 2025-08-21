@@ -5,10 +5,12 @@ local id, def = manager.new_effect(duration)
 def.description = "Deal [200% of MAG] damage"
 
 function def.target_effect(origin, target, data)
-	DEAL_DAMAGE(origin, target, 0, 2, 0)
+	local target_damage = TOTAL_MAG_ACTOR(origin) * 2
+	local aoe_damage = TOTAL_MAG_ACTOR(origin) * 0.75
+	DEAL_DAMAGE(origin, target, target_damage)
 	for index, value in ipairs(BATTLE) do
 		if target.team == value.team then
-			DEAL_DAMAGE(origin, value, 0, 0.75, 0)
+			DEAL_DAMAGE(origin, value, aoe_damage)
 		end
 	end
 end

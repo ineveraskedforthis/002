@@ -4,7 +4,8 @@ local id, def = manager.new_effect(duration)
 def.description = "Deal [100% of MAG] damage. Ignore defense."
 
 function def.target_effect(origin, target, scene_data)
-	DEAL_DAMAGE(origin, target, 0, 1, 0)
+	local damage = TOTAL_MAG_ACTOR(origin)
+	DEAL_DAMAGE(origin, target, damage)
 end
 
 return id
