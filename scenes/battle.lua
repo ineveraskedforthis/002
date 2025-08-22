@@ -119,7 +119,7 @@ local function update(dt)
 			current_effect.time_passed = current_effect.time_passed + dt
 			if def.scene_update(current_effect.time_passed, dt, current_effect.origin, current_effect.target, current_effect.data) then
 				table.remove(EFFECTS_QUEUE, 1)
-				if def.multitarget then
+				if def.multi_target_selection then
 					local targets = def.multi_target_selection(current_effect.origin)
 					for index, value in ipairs(targets) do
 						def.target_effect(current_effect.origin, value, current_effect.data)

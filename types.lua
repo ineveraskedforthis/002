@@ -73,7 +73,6 @@ ELEMENT = {
 ---@field max_times_activated number?
 ---@field target_selection (fun(origin: Actor): Actor)?
 ---@field multi_target_selection (fun(origin: Actor) : Actor[])?
----@field multitarget boolean?
 ---@field ignore_description boolean?
 
 ---@class Effect
