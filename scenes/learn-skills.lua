@@ -65,6 +65,8 @@ local function can_learn(value, actor)
 	return true
 end
 
+local vertical_spacing = 30
+
 local function render()
 	local row = 0
 	local col = 0
@@ -72,7 +74,7 @@ local function render()
 
 	for index, value in ipairs(PLAYABLE_META_ACTORS) do
 		local x = col * (ACTOR_WIDTH + 10) + 40
-		local y = row * (ACTOR_HEIGHT + 10) + 50
+		local y = row * (ACTOR_HEIGHT + vertical_spacing) + 50
 		if SELECTED_PLAYABLE_ACTOR == index then
 			love.graphics.setColor(0.5, 0.5, 0, 1)
 			love.graphics.rectangle("fill", x - 4, y - 4, ACTOR_WIDTH + 8, ACTOR_HEIGHT + 8)
@@ -133,7 +135,7 @@ local function handle_click(x, y)
 	local cols = 3
 
 	for index, value in ipairs(PLAYABLE_META_ACTORS) do
-		if value.unlocked and rect(col * (ACTOR_WIDTH + 10) + 40, row * (ACTOR_HEIGHT + 10) + 50, ACTOR_WIDTH, ACTOR_WIDTH, x, y) then
+		if value.unlocked and rect(col * (ACTOR_WIDTH + 10) + 40, row * (ACTOR_HEIGHT + vertical_spacing) + 50, ACTOR_WIDTH, ACTOR_HEIGHT, x, y) then
 			SELECTED_PLAYABLE_ACTOR = index
 		end
 		col = col + 1
