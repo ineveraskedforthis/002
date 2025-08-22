@@ -80,6 +80,7 @@ local function update(dt)
 		if pull_away_progress >= 1 then
 			reset()
 			pull_in_progress = true
+			CURRENCY = CURRENCY - 1
 		end
 	end
 end
@@ -96,7 +97,6 @@ local function handle_click(x, y)
 
 	if pull_in_progress and turn_over_progress == 1 and rect(200, 200, 200, 200, x, y) and CURRENCY > 0  then
 		pull_away_in_progress = true
-		CURRENCY = CURRENCY - 1
 	end
 
 	if pull_in_progress and pull_progress == 1 and turn_over_progress == 1 then

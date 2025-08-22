@@ -25,14 +25,12 @@ local function can_learn(value, actor)
 
 	for _, value2 in ipairs(actor.skills) do
 		if value2.name == value.name then
-			print("1")
 			return false
 		end
 	end
 
 	for _, value2 in ipairs(actor.def.inherent_skills) do
 		if value2.name == value.name then
-			print("2")
 			return false
 		end
 	end
@@ -52,13 +50,15 @@ local function can_learn(value, actor)
 	end
 
 	local allowed_weapon = false
+	local weapon_check_exists = false
 	for _, weapon in ipairs(value.allowed_weapons) do
+		weapon_check_exists = true
 		if actor.def.weapon == weapon then
 			allowed_weapon = true
 		end
 	end
 
-	if not allowed_weapon then
+	if weapon_check_exists and not allowed_weapon then
 		return false
 	end
 
