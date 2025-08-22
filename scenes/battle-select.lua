@@ -60,6 +60,9 @@ local function render()
 
 	love.graphics.rectangle("line", 600, 500, 100, 20)
 	love.graphics.printf("learn", 600, 500, 100, "center")
+
+	love.graphics.rectangle("line", 600, 520, 100, 20)
+	love.graphics.printf("gems", 600, 520, 100, "center")
 end
 
 local circle = require "ui.circle"
@@ -72,6 +75,10 @@ local function handle_click(x, y)
 
 	if rect(600, 500, 100, 20, x, y) then
 		CURRENT_SCENE = SCENE_LEARN_SKILLS
+	end
+
+	if rect(600, 520, 100, 20, x, y) then
+		CURRENT_SCENE = SCENE_CHANGE_GEMS
 	end
 
 	if circle(fight_easy_1_x, fight_easy_1_y, 50, x ,y) then

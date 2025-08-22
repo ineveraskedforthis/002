@@ -189,13 +189,13 @@ function GIVE_GEMSTONE(actor_index, gemstone_index)
 		end
 	end
 
+	gemstone.actor = actor_index
+
 	if actor_index == 0 then
 		return
 	end
-
 	local actor = PLAYABLE_META_ACTORS[actor_index]
 	table.insert(actor.gemstones, gemstone_index)
-	gemstone.actor = actor_index
 end
 
 ---@param a Actor

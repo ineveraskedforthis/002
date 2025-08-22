@@ -10,8 +10,8 @@ function def.target_effect(origin, target)
 	local damage_target = mag + 5 * hp
 	local damage_origin = 0.5 * hp
 
-	DEAL_DAMAGE(origin, target, damage_target)
 	DEAL_DAMAGE(origin, origin, damage_origin)
+	DEAL_DAMAGE(origin, target, damage_target)
 end
 
 function def.scene_render(time_passed, origin, target, scene_data)

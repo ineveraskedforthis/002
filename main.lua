@@ -37,6 +37,7 @@ SCENE_BATTLE = 1
 SCENE_EDIT_LINEUP = 2
 SCENE_PULL_ACTORS = 3
 SCENE_LEARN_SKILLS = 4
+SCENE_CHANGE_GEMS = 5
 
 
 
@@ -46,6 +47,7 @@ local scene_data_battle_select = require "scenes.battle-select"
 local scene_data_edit_lineup = require "scenes.edit-lineup"
 local scene_data_pull = require "scenes.hire-actor"
 local scene_data_learn = require "scenes.learn-skills"
+local scene_data_gems = require "scenes.choose-gemstones"
 
 function love.load()
 	---@type number
@@ -154,6 +156,8 @@ function love.update(dt)
 		scene_data_pull.update(dt)
 	elseif CURRENT_SCENE == SCENE_LEARN_SKILLS then
 		scene_data_learn.update(dt)
+	elseif CURRENT_SCENE == SCENE_CHANGE_GEMS then
+		scene_data_gems.update(dt)
 	end
 end
 
@@ -168,6 +172,8 @@ function love.draw()
 		scene_data_pull.render()
 	elseif CURRENT_SCENE == SCENE_LEARN_SKILLS then
 		scene_data_learn.render()
+	elseif CURRENT_SCENE == SCENE_CHANGE_GEMS then
+		scene_data_gems.render()
 	end
 
 	love.graphics.print(CURRENCY .. " points", 5, 580)
@@ -184,5 +190,7 @@ function love.mousepressed(x, y, button, istouch, presses)
 		scene_data_pull.on_click(x, y)
 	elseif CURRENT_SCENE == SCENE_LEARN_SKILLS then
 		scene_data_learn.on_click(x, y)
+	elseif CURRENT_SCENE == SCENE_CHANGE_GEMS then
+		scene_data_gems.on_click(x, y)
 	end
 end
