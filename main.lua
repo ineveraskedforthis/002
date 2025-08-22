@@ -53,6 +53,8 @@ function love.load()
 
 	CURRENT_SCENE = SCENE_BATTLE_SELECTOR
 
+
+
 	---@type MetaActorWrapper[]
 	PLAYABLE_META_ACTORS = {
 		{
@@ -63,7 +65,8 @@ function love.load()
 			additional_weapon_mastery = 0,
 			level = 0,
 			skill_points = 0,
-			skills = {}
+			skills = {},
+			gemstones = {}
 		},
 		{
 			def = require "meta-actors.chud",
@@ -73,7 +76,8 @@ function love.load()
 			additional_weapon_mastery = 0,
 			level = 0,
 			skill_points = 10,
-			skills = {}
+			skills = {},
+			gemstones = {}
 		},
 		{
 			def = require "meta-actors.basic-healer",
@@ -83,7 +87,8 @@ function love.load()
 			additional_weapon_mastery = 0,
 			level = 0,
 			skill_points = 0,
-			skills = {}
+			skills = {},
+			gemstones = {}
 		},
 		{
 			def = require "meta-actors.fire-mage",
@@ -93,7 +98,8 @@ function love.load()
 			additional_weapon_mastery = 0,
 			level = 0,
 			skill_points = 0,
-			skills = {}
+			skills = {},
+			gemstones = {}
 		},
 		{
 			def = require "meta-actors.rebe",
@@ -103,7 +109,8 @@ function love.load()
 			additional_weapon_mastery = 0,
 			level = 0,
 			skill_points = 0,
-			skills = {}
+			skills = {},
+			gemstones = {}
 		},
 		{
 			def = require "meta-actors.mohi",
@@ -113,9 +120,20 @@ function love.load()
 			additional_weapon_mastery = 0,
 			level = 0,
 			skill_points = 0,
-			skills = {}
+			skills = {},
+			gemstones = {}
 		}
 	}
+
+	---@type GemstoneWrapper[]
+	COLLECTED_GEMSTONES = {
+		{
+			actor = 0,
+			def = require "gemstones.scavenger"
+		}
+	}
+
+	GIVE_GEMSTONE(1, 1)
 
 	CHARACTER_LINEUP = {
 		1,

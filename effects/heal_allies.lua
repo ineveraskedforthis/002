@@ -15,7 +15,7 @@ function def.multi_target_selection(origin)
 end
 
 function def.target_effect(origin, target)
-	RESTORE_HP(origin, target, 1.5)
+	RESTORE_HP(origin, target, 1.5 * TOTAL_MAG_ACTOR(origin))
 end
 
 return id

@@ -1,4 +1,5 @@
 local effects = require "effects._manager"
+local gemstones = require "gemstones._manager"
 
 ---comment
 ---@param a Actor
@@ -77,6 +78,10 @@ function TOTAL_MAG(a, w)
 	local x = a.MAG
 	if w then
 		x = x + w.level * a.MAG_per_level
+		for index, value in ipairs(w.gemstones) do
+			local def = gemstones.get(value)
+			x = x + def.additional_mag
+		end
 	end
 	return x
 end
@@ -93,8 +98,18 @@ function TOTAL_MAX_HP(a, w)
 	local x = a.MAX_HP
 	if w then
 		x = x + w.level * 10
+		for index, value in ipairs(w.gemstones) do
+			local def = gemstones.get(value)
+			x = x + def.additional_hp
+		end
 	end
 	return x
+end
+
+---comment
+---@param a Actor
+function TOTAL_MAX_HP_ACTOR(a)
+	return TOTAL_MAX_HP(a.definition, a.wrapper)
 end
 
 ---@param a MetaActor
@@ -130,6 +145,70 @@ function USE_SKILL(origin, target, value)
 	end
 end
 
+---@param a Actor
+---@param b Actor
+---@param actual_damage number
+function ON_DAMAGE_DEALT(a, b, actual_damage)
+	if a.wrapper then
+		for index, value in ipairs(a.wrapper.gemstones) do
+			local def = gemstones.get(value)
+			def.on_damage_dealt_effect(a, b, actual_damage)
+		end
+	end
+end
+
+---@param a Actor
+function ON_TURN_START(a)
+	for index, value in ipairs(a.status_effects) do
+		table.insert(STATUS_EFFECT_QUEUE, value)
+	end
+	if a.wrapper then
+		for index, value in ipairs(a.wrapper.gemstones) do
+			local def = gemstones.get(value)
+			def.on_turn_start(a)
+		end
+	end
+end
+
+---@param actor_index number
+---@param gemstone_index number
+function GIVE_GEMSTONE(actor_index, gemstone_index)
+	-- remove from old owner if it exists
+	local gemstone = COLLECTED_GEMSTONES[gemstone_index]
+	local old_owner = gemstone.actor
+	if old_owner ~= 0 then
+		-- find gemstone and remove it
+		local id = 0
+		for index, value in ipairs(PLAYABLE_META_ACTORS[old_owner].gemstones) do
+			if value == gemstone_index then
+				id = index
+			end
+		end
+		if id ~= 0 then
+			table.remove(PLAYABLE_META_ACTORS[old_owner].gemstones, id)
+		end
+	end
+
+	if actor_index == 0 then
+		return
+	end
+
+	local actor = PLAYABLE_META_ACTORS[actor_index]
+	table.insert(actor.gemstones, gemstone_index)
+	gemstone.actor = actor_index
+end
+
+---@param a Actor
+---@param b Actor
+function ON_KILL(a, b)
+	if a.wrapper then
+		for index, value in ipairs(a.wrapper.gemstones) do
+			local def = gemstones.get(value)
+			def.on_kill_effect(a, b)
+		end
+	end
+end
+
 ---comment
 ---@param a Actor
 ---@param b Actor
@@ -138,8 +217,14 @@ function DEAL_DAMAGE(a, b, damage)
 	if b.HP <= 0 then
 		return
 	end
-	damage = math.floor(damage)
+	if damage <= 0 then
+		return
+	end
 
+	---@type number
+	local actual_damage = math.min(damage, b.SHIELD)
+
+	damage = math.floor(damage)
 	-- local recorded_damage = damage
 	b.SHIELD = b.SHIELD - damage
 	if b.SHIELD < 0 then
@@ -148,7 +233,19 @@ function DEAL_DAMAGE(a, b, damage)
 	else
 		damage = 0
 	end
+	actual_damage = actual_damage + math.min(b.HP, damage)
+	print("HP", b.HP)
+	print("damage", damage)
+	print("actual damage", actual_damage)
 	b.HP = math.max(0, b.HP - damage)
+	---@type PendingDamage
+	local pending = {
+		alpha = 1,
+		value = damage
+	}
+	table.insert(b.pending_damage, pending)
+	ON_DAMAGE_DEALT(a, b, actual_damage)
+
 
 	if b.HP == 0 then
 		---@type Effect
@@ -162,15 +259,9 @@ function DEAL_DAMAGE(a, b, damage)
 			times_activated = 0
 		}
 		table.insert(EFFECTS_QUEUE, death)
+		ON_KILL(a, b)
 	end
 
-	-- print(a.definition.name .. " attacks " .. b.definition.name .. ". " .. tostring(recorded_damage) .. "DMG. " .. "HP left: " .. tostring(b.HP))
-	---@type PendingDamage
-	local pending = {
-		alpha = 1,
-		value = damage
-	}
-	table.insert(b.pending_damage, pending)
 	if b.definition.damaged_sound then
 		b.definition.damaged_sound:stop()
 		b.definition.damaged_sound:play()
@@ -192,16 +283,16 @@ end
 
 ---@param origin Actor
 ---@param target Actor
----@param attacker_mag_ratio number
-function RESTORE_HP(origin, target, attacker_mag_ratio)
-	local add = math.floor(TOTAL_MAG(origin.definition, origin.wrapper) * attacker_mag_ratio)
+---@param amount number
+function RESTORE_HP(origin, target, amount)
+	local amount = math.floor(amount)
 	local target_max_hp = TOTAL_MAX_HP(target.definition, target.wrapper)
-	target.HP = math.min(target_max_hp, target.HP + add)
+	target.HP = math.min(target_max_hp, target.HP + amount)
 
 	---@type PendingDamage
 	local pending = {
 		alpha = 1,
-		value = -add
+		value = -amount
 	}
 	table.insert(target.pending_damage, pending)
 end

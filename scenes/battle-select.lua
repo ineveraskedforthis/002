@@ -79,7 +79,6 @@ local function handle_click(x, y)
 		GENERATE_WAVE = require "fights.fight-easy-1"
 		GENERATE_WAVE()
 		CURRENT_SCENE = SCENE_BATTLE
-		AWAIT_TURN = true
 	end
 
 	if circle(fight_1_x, fight_1_y, 50, x ,y) then
@@ -87,7 +86,6 @@ local function handle_click(x, y)
 		GENERATE_WAVE = require "fights.fight-1"
 		GENERATE_WAVE()
 		CURRENT_SCENE = SCENE_BATTLE
-		AWAIT_TURN = true
 	end
 
 	if circle(fight_2_x, fight_2_y, 50, x ,y) then
@@ -95,7 +93,6 @@ local function handle_click(x, y)
 		GENERATE_WAVE = require "fights.fight-2"
 		GENERATE_WAVE()
 		CURRENT_SCENE = SCENE_BATTLE
-		AWAIT_TURN = true
 	end
 
 	for i = 1, 4 do

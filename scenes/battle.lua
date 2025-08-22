@@ -60,9 +60,7 @@ local function process_turn()
 
 	-- queue all effects on new current character
 	if (BATTLE[1]) then
-		for index, value in ipairs(BATTLE[1].status_effects) do
-			table.insert(STATUS_EFFECT_QUEUE, value)
-		end
+		ON_TURN_START(BATTLE[1])
 	end
 end
 
@@ -150,9 +148,21 @@ local function update(dt)
 		end
 	end
 
-	if no_running_effects and not AWAIT_TURN then
+	if no_running_effects and not AWAIT_ON_TURN_START_EFFECTS and not AWAIT_TURN then
 		process_turn()
+		-- turn processing could add new effects on turn starting!
+		AWAIT_ON_TURN_START_EFFECTS = true
+		return
+	end
+
+	if AWAIT_ON_TURN_START_EFFECTS and not AWAIT_TURN then
+		local current_status_effect = STATUS_EFFECT_QUEUE[1]
+		local current_effect = EFFECTS_QUEUE[1]
+		if current_effect or current_status_effect then
+			return
+		end
 		AWAIT_TURN = true
+		AWAIT_ON_TURN_START_EFFECTS = false
 	end
 
 	-- now, when all effects are resolved, we can update the battle state

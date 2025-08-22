@@ -47,6 +47,11 @@ ELEMENT = {
 ---@field skill_points number
 ---@field additional_weapon_mastery number
 ---@field skills ActiveSkill[]
+---@field gemstones number[]
+
+---@class GemstoneWrapper
+---@field def number
+---@field actor number
 
 ---@class Actor
 ---@field x number
@@ -74,6 +79,15 @@ ELEMENT = {
 ---@field target_selection (fun(origin: Actor): Actor)?
 ---@field multi_target_selection (fun(origin: Actor) : Actor[])?
 ---@field ignore_description boolean?
+
+---@class GemstoneDefinition
+---@field name string
+---@field description string
+---@field on_kill_effect fun(origin: Actor, target: Actor)
+---@field on_damage_dealt_effect fun(origin: Actor, target: Actor, damage_dealt: number)
+---@field on_turn_start fun(origin: Actor)
+---@field additional_hp number
+---@field additional_mag number
 
 ---@class Effect
 ---@field def number

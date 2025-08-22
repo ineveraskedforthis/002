@@ -47,7 +47,8 @@ function RESET_BATTLE()
 	---@type Effect[]
 	STATUS_EFFECT_QUEUE = {}
 	SELECTED = nil
-
+	AWAIT_TURN = false
+	AWAIT_ON_TURN_START_EFFECTS = false
 	BATTLE_IN_PROGRESS = true
 end
 
@@ -83,6 +84,7 @@ function ENTER_BATTLE(actor, team, was_in_battle)
 	end
 
 	actor.action_number = math.floor(max_action_number * 0.5) + SPEED_TO_ACTION_OFFSET(actor.definition.SPD)
+	print("new action number:", actor.action_number)
 	actor.team = team
 	table.insert(BATTLE, actor)
 	SORT_BATTLE()
