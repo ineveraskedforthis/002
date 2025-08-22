@@ -1,33 +1,10 @@
 local effects_manager = require "effects._manager"
-
 AWAIT_TURN = false
-
 ---@type Actor?
 SELECTED = nil
-
 ---@type number
 WAVE = 1
 
--- local function clear_dead()
---	 local removed = false
---	 local to_remove = 0
---	 for k, v in ipairs(BATTLE) do
---		 if v.HP <= 0 then
---			 removed = true
---			 to_remove = k
---			 break
---		 end
---	 end
-
---	 if removed then
---		 local kill_effect =
---		 table.remove(BATTLE, to_remove)
---		 clear_dead()
---		 SELECTED = nil
---	 else
---		 return
---	 end
--- end
 
 local function process_turn()
 	local can_proceed = false
