@@ -4,9 +4,9 @@ local id, def = manager.new_effect(duration)
 
 def.description = "Restore [150% of MAG] HP to all allies"
 
-function def.multi_target_selection(origin)
+function def.multi_target_selection(state, battle, origin)
 	local targets = {}
-	for index, value in ipairs(BATTLE) do
+	for index, value in ipairs(battle.actors) do
 		if value.team == origin.team then
 			table.insert(targets, value)
 		end
@@ -14,8 +14,8 @@ function def.multi_target_selection(origin)
 	return targets
 end
 
-function def.target_effect(origin, target)
-	RESTORE_HP(origin, target, 1.5 * TOTAL_MAG_ACTOR(origin))
+function def.target_effect(state, battle, origin, target)
+	RESTORE_HP(state, battle, origin, target, 1.5 * TOTAL_MAG_ACTOR(origin))
 end
 
 return id

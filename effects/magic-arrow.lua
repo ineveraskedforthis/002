@@ -3,11 +3,11 @@ local duration = 0.8
 local id, def = manager.new_effect(duration)
 def.description = "Deal [50% of MAG] damage."
 
-function def.target_effect(origin, target)
-	DEAL_DAMAGE(origin, target, TOTAL_MAG_ACTOR(origin) * 0.5)
+function def.target_effect(state, battle, origin, target)
+	DEAL_DAMAGE(state, battle, origin, target, TOTAL_MAG_ACTOR(origin) * 0.5)
 end
 
-function def.scene_render(time_passed, origin, target, scene_data)
+function def.scene_render(state, battle, time_passed, origin, target, scene_data)
 	local progress = time_passed / duration
 
 	local x = progress * target.x + (1 - progress) * origin.x

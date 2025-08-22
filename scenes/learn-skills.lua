@@ -1,7 +1,14 @@
+local manager = require "scenes._manager"
+local style = require "ui._style"
+
+local ids = require "scenes._ids"
+local id = ids.learning
+local def = manager.get(id)
+
 
 local render_meta_actor = require "ui.meta-actor"
 
-SELECTED_PLAYABLE_ACTOR = 1
+local selected = 1
 
 ---@type ActiveSkill[]
 local skills_to_learn = {
@@ -67,15 +74,15 @@ end
 
 local vertical_spacing = 30
 
-local function render()
+function def.render(state)
 	local row = 0
 	local col = 0
 	local cols = 3
 
-	for index, value in ipairs(PLAYABLE_META_ACTORS) do
+	for index, value in ipairs(state.playable_actors) do
 		local x = col * (ACTOR_WIDTH + 10) + 40
 		local y = row * (ACTOR_HEIGHT + vertical_spacing) + 50
-		if SELECTED_PLAYABLE_ACTOR == index then
+		if selected == index then
 			love.graphics.setColor(0.5, 0.5, 0, 1)
 			love.graphics.rectangle("fill", x - 4, y - 4, ACTOR_WIDTH + 8, ACTOR_HEIGHT + 8)
 		end
@@ -87,7 +94,7 @@ local function render()
 		end
 	end
 
-	local selected = PLAYABLE_META_ACTORS[SELECTED_PLAYABLE_ACTOR]
+	local selected = state.playable_actors[selected]
 	local x = 400
 	local y = 20
 	for _, value in ipairs(skills_to_learn) do
@@ -125,18 +132,18 @@ end
 
 local rect = require "ui.rect"
 
-local function handle_click(x, y)
+function def.on_click(state, x, y)
 
 	if rect(300, 50, 80, 30, x, y) then
-		CURRENT_SCENE = SCENE_BATTLE_SELECTOR
+		state.set_scene(state, ids.select_battle)
 	end
 	local row = 0
 	local col = 0
 	local cols = 3
 
-	for index, value in ipairs(PLAYABLE_META_ACTORS) do
+	for index, value in ipairs(state.playable_actors) do
 		if value.unlocked and rect(col * (ACTOR_WIDTH + 10) + 40, row * (ACTOR_HEIGHT + vertical_spacing) + 50, ACTOR_WIDTH, ACTOR_HEIGHT, x, y) then
-			SELECTED_PLAYABLE_ACTOR = index
+			selected = index
 		end
 		col = col + 1
 		if col >= cols then
@@ -145,14 +152,14 @@ local function handle_click(x, y)
 		end
 	end
 
-	local selected = PLAYABLE_META_ACTORS[SELECTED_PLAYABLE_ACTOR]
+	local selected = state.playable_actors[selected]
 	local x_button = 400
 	local y_button = 20
 	for _, value in ipairs(skills_to_learn) do
 		if can_learn(value, selected) then
-			if rect(x_button, y_button, 200, 40, x, y) and selected.skill_points > 0 and CURRENCY >= value.cost then
+			if rect(x_button, y_button, 200, 40, x, y) and selected.skill_points > 0 and state.currency >= value.cost then
 				---@type number
-				CURRENCY = CURRENCY - value.cost
+				state.currency = state.currency - value.cost
 				selected.skill_points = selected.skill_points - 1
 				table.insert(selected.skills, value)
 			end
@@ -160,11 +167,3 @@ local function handle_click(x, y)
 		end
 	end
 end
-
-local scene = {
-	update = update,
-	render = render,
-	on_click = handle_click
-}
-
-return scene

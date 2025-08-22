@@ -1,0 +1,6 @@
+require "scenes.battle-select"
+require "scenes.battle"
+require "scenes.choose-gemstones"
+require "scenes.edit-lineup"
+require "scenes.hire-actor"
+require "scenes.learn-skills"

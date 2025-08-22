@@ -1,3 +1,6 @@
+
+local style = require "ui._style"
+
 ACTOR_WIDTH = 50
 ACTOR_HEIGHT = 70
 
@@ -98,18 +101,19 @@ local function hp_bar(x, y, w, h, hp, hp_view, max_hp, shield, team)
 end
 
 ---comment
+---@param battle Battle
 ---@param x number
 ---@param y number
 ---@param actor Actor
-return function (x, y, actor, alpha)
+return function (battle, x, y, actor, alpha)
 	if not alpha then
 		alpha = 1
 	end
-	if SELECTED == actor then
+	if battle.selected_actor == actor then
 		love.graphics.rectangle("line", x - 4, y - 4, ACTOR_WIDTH + 8, ACTOR_HEIGHT + 8)
 	end
 	love.graphics.setColor(0, 0, 0, alpha)
-	love.graphics.setFont(DEFAULT_FONT)
+	style.default_font()
 	love.graphics.printf(actor.definition.name, x - 10, y - 20, ACTOR_WIDTH + 20, "center")
 	love.graphics.setColor(1, 1, 1, alpha)
 	love.graphics.draw(actor.definition.image, x, y, 0)
@@ -140,7 +144,7 @@ return function (x, y, actor, alpha)
 
 	for index, value in ipairs(actor.pending_damage) do
 		local a = value.alpha
-		love.graphics.setFont(BIG_FONT)
+		style.font(math.log10(a))
 		love.graphics.setColor(0, 0, 0, a)
 		local text_border = 1
 		love.graphics.print(tostring(value.value), x - text_border, y - 50 * (1 - a))

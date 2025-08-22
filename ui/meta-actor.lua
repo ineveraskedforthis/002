@@ -1,6 +1,8 @@
 ACTOR_WIDTH = 50
 ACTOR_HEIGHT = 70
 
+local style = require "ui._style"
+
 ---comment
 ---@param x number
 ---@param y number
@@ -9,7 +11,7 @@ ACTOR_HEIGHT = 70
 ---@param position number
 return function (x, y, actor, unlocked, position)
 	if actor then
-		love.graphics.setFont(DEFAULT_FONT)
+		style.default_font()
 		if unlocked then
 			love.graphics.setColor(0, 0, 0, 1)
 		else

@@ -1,3 +1,5 @@
+
+
 ---@class PendingDamage
 ---@field value number
 ---@field alpha number
@@ -70,22 +72,22 @@ ELEMENT = {
 
 ---@class EffectDef
 ---@field description string
----@field target_effect fun(origin: Actor, target: Actor, scene_data: table)
----@field target_effect_on_kill (fun(origin: Actor, target: Actor, scene_data: table))?
----@field scene_update fun(time_passed: number, dt: number, origin: Actor, target: Actor, scene_data: table): boolean
----@field scene_render fun(time_passed: number, origin: Actor, target: Actor, scene_data: table)
----@field scene_on_start fun(origin: Actor, target: Actor, scene_data: table)
+---@field target_effect fun(state: GameState, battle: Battle, origin: Actor, target: Actor, scene_data: table)
+---@field target_effect_on_kill (fun(state: GameState, battle: Battle, origin: Actor, target: Actor, scene_data: table))?
+---@field scene_update fun(state: GameState, battle: Battle, time_passed: number, dt: number, origin: Actor, target: Actor, scene_data: table): boolean
+---@field scene_render fun(state: GameState, battle: Battle, time_passed: number, origin: Actor, target: Actor, scene_data: table)
+---@field scene_on_start fun(state: GameState, battle: Battle, origin: Actor, target: Actor, scene_data: table)
 ---@field max_times_activated number?
----@field target_selection (fun(origin: Actor): Actor)?
----@field multi_target_selection (fun(origin: Actor) : Actor[])?
+---@field target_selection (fun(state: GameState, battle: Battle, origin: Actor): Actor)?
+---@field multi_target_selection (fun(state: GameState, battle: Battle, origin: Actor) : Actor[])?
 ---@field ignore_description boolean?
 
 ---@class GemstoneDefinition
 ---@field name string
 ---@field description string
----@field on_kill_effect fun(origin: Actor, target: Actor)
----@field on_damage_dealt_effect fun(origin: Actor, target: Actor, damage_dealt: number)
----@field on_turn_start fun(origin: Actor)
+---@field on_kill_effect fun(state: GameState, battle: Battle, origin: Actor, target: Actor)
+---@field on_damage_dealt_effect fun(state: GameState, battle: Battle, origin: Actor, target: Actor, damage_dealt: number)
+---@field on_turn_start fun(state: GameState, battle: Battle, origin: Actor)
 ---@field additional_hp number
 ---@field additional_mag number
 

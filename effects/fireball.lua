@@ -4,18 +4,18 @@ local id, def = manager.new_effect(duration)
 
 def.description = "Deal [200% of MAG] damage"
 
-function def.target_effect(origin, target, data)
+function def.target_effect(state, battle, origin, target, data)
 	local target_damage = TOTAL_MAG_ACTOR(origin) * 2
 	local aoe_damage = TOTAL_MAG_ACTOR(origin) * 0.75
-	DEAL_DAMAGE(origin, target, target_damage)
-	for index, value in ipairs(BATTLE) do
+	DEAL_DAMAGE(state, battle, origin, target, target_damage)
+	for index, value in ipairs(battle.actors) do
 		if target.team == value.team then
-			DEAL_DAMAGE(origin, value, aoe_damage)
+			DEAL_DAMAGE(state, battle, origin, value, aoe_damage)
 		end
 	end
 end
 
-function def.scene_render(time_passed, origin, target, scene_data)
+function def.scene_render(state, battle, time_passed, origin, target, scene_data)
 	local progress = time_passed / duration
 
 	local x = progress * target.x + (1 - progress) * origin.x

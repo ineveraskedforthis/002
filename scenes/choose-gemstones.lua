@@ -1,19 +1,25 @@
+local manager = require "scenes._manager"
+local style = require "ui._style"
+
+local ids = require "scenes._ids"
+local id = ids.gemstones
+local def = manager.get(id)
 
 local render_meta_actor = require "ui.meta-actor"
 local gemstones = require "gemstones._manager"
 
-SELECTED_PLAYABLE_ACTOR = 1
+local selected_actor_index = 1
 
 local vertical_spacing = 30
 
-local function render()
+function def.render(state)
 	local row = 0
 	local col = 0
 	local cols = 3
-	for index, value in ipairs(PLAYABLE_META_ACTORS) do
+	for index, value in ipairs(state.playable_actors) do
 		local x = col * (ACTOR_WIDTH + 10) + 40
 		local y = row * (ACTOR_HEIGHT + vertical_spacing) + 50
-		if SELECTED_PLAYABLE_ACTOR == index then
+		if selected_actor_index == index then
 			love.graphics.setColor(0.5, 0.5, 0, 1)
 			love.graphics.rectangle("fill", x - 4, y - 4, ACTOR_WIDTH + 8, ACTOR_HEIGHT + 8)
 		end
@@ -27,7 +33,7 @@ local function render()
 
 	local x = 400
 	local y = 20
-	for _, value in ipairs(COLLECTED_GEMSTONES) do
+	for _, value in ipairs(state.collected_gemstones) do
 		local def = gemstones.get(value.def)
 		love.graphics.rectangle("line", x, y, 200, 20)
 		love.graphics.printf(def.name, x, y, 200, "center")
@@ -36,7 +42,7 @@ local function render()
 		love.graphics.printf("x", x + 210, y, 20, "center")
 
 		if value.actor ~= 0 then
-			local owner = PLAYABLE_META_ACTORS[value.actor]
+			local owner = state.playable_actors[value.actor]
 			love.graphics.print(owner.def.name, x + 240, y)
 		end
 		y = y + 30
@@ -46,24 +52,20 @@ local function render()
 	love.graphics.printf("Return", 300, 50, 80, "center")
 end
 
-local function update(dt)
-
-end
-
 local rect = require "ui.rect"
 
-local function handle_click(x, y)
+function def.on_click(state, x, y)
 
 	if rect(300, 50, 80, 30, x, y) then
-		CURRENT_SCENE = SCENE_BATTLE_SELECTOR
+		state.set_scene(state, ids.select_battle)
 	end
 	local row = 0
 	local col = 0
 	local cols = 3
 
-	for index, value in ipairs(PLAYABLE_META_ACTORS) do
+	for index, value in ipairs(state.playable_actors) do
 		if value.unlocked and rect(col * (ACTOR_WIDTH + 10) + 40, row * (ACTOR_HEIGHT + vertical_spacing) + 50, ACTOR_WIDTH, ACTOR_HEIGHT, x, y) then
-			SELECTED_PLAYABLE_ACTOR = index
+			selected_actor_index = index
 		end
 		col = col + 1
 		if col >= cols then
@@ -72,28 +74,20 @@ local function handle_click(x, y)
 		end
 	end
 
-	local selected = PLAYABLE_META_ACTORS[SELECTED_PLAYABLE_ACTOR]
+	local selected = state.playable_actors[selected_actor_index]
 	local x_button = 400
 	local y_button = 20
-	for index, value in ipairs(COLLECTED_GEMSTONES) do
+	for index, value in ipairs(state.collected_gemstones) do
 		local def = gemstones.get(value.def)
 		love.graphics.rectangle("line", x, y, 200, 20)
 		if rect(x_button, y_button, 200, 20, x, y) then
-			GIVE_GEMSTONE(SELECTED_PLAYABLE_ACTOR, index)
+			state.set_gemstone_owner(state, selected_actor_index, index)
 		end
 
 		if rect(x_button + 210, y_button, 20, 20, x, y) then
-			GIVE_GEMSTONE(0, index)
+			state.set_gemstone_owner(state, 0, index)
 		end
 
 		y_button = y_button + 30
 	end
 end
-
-local scene = {
-	update = update,
-	render = render,
-	on_click = handle_click
-}
-
-return scene

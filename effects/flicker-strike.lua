@@ -6,7 +6,7 @@ local move_back = require "effects.move_to_original_position"
 
 def.description = "Launches 5 attacks against random targets. If one of them dies, add 5 more attacks"
 
-function def.scene_render(time_passed, origin, target, scene_data)
+function def.scene_render(state, battle, time_passed, origin, target, scene_data)
 	local progress = SMOOTHERSTEP(time_passed / duration)
 
 	love.graphics.line(
@@ -18,14 +18,14 @@ function def.scene_render(time_passed, origin, target, scene_data)
 end
 
 
-function def.target_effect(origin, target, data)
+function def.target_effect(state, battle, origin, target, data)
 	if target.HP <= 0 then
 		return
 	end
 
 	local damage = TOTAL_MAG_ACTOR(origin) + TOTAL_STR_ACTOR(origin) * 0.25
 
-	DEAL_DAMAGE(origin, target, damage)
+	DEAL_DAMAGE(state, battle, origin, target, damage)
 
 	if target.HP <= 0 then
 		---@type number
@@ -38,7 +38,7 @@ function def.target_effect(origin, target, data)
 		---@type Actor[]
 		local potential_targets = {}
 		local count = 0
-		for index, value in ipairs(BATTLE) do
+		for index, value in ipairs(battle.actors) do
 			if value.team ~= origin.team and value.HP > 0 then
 				table.insert(potential_targets, value)
 				count = count + 1
@@ -62,7 +62,7 @@ function def.target_effect(origin, target, data)
 				times_activated = 0
 			}
 
-			table.insert(EFFECTS_QUEUE, next_attack)
+			table.insert(battle.effects_queue, next_attack)
 		end
 	else
 		---@type Effect
@@ -77,11 +77,11 @@ function def.target_effect(origin, target, data)
 			time_passed = 0,
 			times_activated = 0
 		}
-		table.insert(EFFECTS_QUEUE, go_back)
+		table.insert(battle.effects_queue, go_back)
 	end
 end
 
-function def.scene_update(time_passed, dt, origin, target, scene_data)
+function def.scene_update(state, battle, time_passed, dt, origin, target, scene_data)
 	if (time_passed > duration) then
 		return true
 	end
@@ -102,7 +102,7 @@ function def.scene_update(time_passed, dt, origin, target, scene_data)
 	return false
 end
 
-function def.scene_on_start(origin, target, data)
+function def.scene_on_start(state, battle, origin, target, data)
 	if data.counter == nil then
 		data.counter = 5
 	end

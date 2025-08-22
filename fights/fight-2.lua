@@ -1,24 +1,32 @@
-return function ()
-	RESET_BATTLE()
-	PLAYER_ENTER_BATTLE()
+local battles = require "state.battle"
+local battle = require "state.battle"
+local wolf = require "meta-actors.wolf"
 
-	if WAVE == 1 then
-		local selected_wolf = GENERATE_ACTOR(require "meta-actors.wolf", 1, 1)
-		SELECTED = selected_wolf
-		ENTER_BATTLE(selected_wolf, 1, false)
-		ENTER_BATTLE(GENERATE_ACTOR(require "meta-actors.wolf", 2, 1), 1, false)
-		ENTER_BATTLE(GENERATE_ACTOR(require "meta-actors.wolf", 3, 1), 1, false)
+---@param state GameState
+return function (state)
+	local battle = state.last_battle
+	battles.reset_battle(battle)
+
+	battle.in_progress = true
+	battles.put_player_into_battle(state)
+
+	print("wave", battle.wave)
+
+	if battle.wave == 1 then
+		battles.add_actor_to_battle(battle, battles.new_actor(wolf, 1, 1), false)
+		battles.add_actor_to_battle(battle, battles.new_actor(wolf, 2, 1), false)
+		battles.add_actor_to_battle(battle, battles.new_actor(wolf, 3, 1), false)
 		return true
 	end
 
-	if WAVE == 2 then
-		local boss_wolf = GENERATE_ACTOR(require "meta-actors.wolf-leader", 3, 1)
-		SELECTED = boss_wolf
-		ENTER_BATTLE(GENERATE_ACTOR(require "meta-actors.wolf", 1, 1), 1, false)
-		ENTER_BATTLE(GENERATE_ACTOR(require "meta-actors.wolf", 2, 1), 1, false)
-		ENTER_BATTLE(boss_wolf, 1, false)
-		ENTER_BATTLE(GENERATE_ACTOR(require "meta-actors.wolf", 4, 1), 1, false)
-		ENTER_BATTLE(GENERATE_ACTOR(require "meta-actors.wolf", 5, 1), 1, false)
+	if battle.wave == 2 then
+		local boss_wolf = battles.new_actor(require "meta-actors.wolf-leader", 3, 1)
+
+		battles.add_actor_to_battle(battle, battles.new_actor(require "meta-actors.wolf", 1, 1), false)
+		battles.add_actor_to_battle(battle, battles.new_actor(require "meta-actors.wolf", 2, 1), false)
+		battles.add_actor_to_battle(battle, boss_wolf, false)
+		battles.add_actor_to_battle(battle, battles.new_actor(require "meta-actors.wolf", 4, 1), false)
+		battles.add_actor_to_battle(battle, battles.new_actor(require "meta-actors.wolf", 5, 1), false)
 		return true
 	end
 

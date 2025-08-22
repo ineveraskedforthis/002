@@ -5,25 +5,25 @@ local fill_rect = require "ui.fill-rect"
 local draw_rect = require "ui.draw-rect"
 local fill_image = require "ui.fill-image"
 
-return function ()
-	for key, value in ipairs(BATTLE) do
+---@param battle Battle
+return function (battle)
+	for key, value in ipairs(battle.actors) do
 		if (value.visible) then
-			draw_actor(value.x, value.y, value)
+			draw_actor(battle, value.x, value.y, value)
 		end
 	end
 
 	--- draw battle order
-	love.graphics.setFont(DEFAULT_FONT)
-	love.graphics.setColor(0, 0, 0, 1)
+	style.default_font()
+	style.basic_element_color()
 
 	love.graphics.line(style.base_margin, style.base_margin, style.base_margin, style.base_margin + 500)
-
 
 	local offset_y = style.base_margin
 
 	local first = true
 
-	for key, value in ipairs(BATTLE) do
+	for key, value in ipairs(battle.actors) do
 		if value.visible then
 			local offset_x = style.base_margin + 15
 			local height = style.action_bar_item_height
@@ -72,7 +72,7 @@ return function ()
 				fill_rect(offset_x + width - action_value_width, offset_y + height - action_value_height, action_value_width, action_value_height)
 
 				love.graphics.setColor(0, 0, 0, 1)
-				love.graphics.setFont(DEFAULT_FONT)
+				style.default_font()
 				love.graphics.printf(
 					tostring(value.action_number),
 					offset_x + width - action_value_width, offset_y + height - action_value_height,

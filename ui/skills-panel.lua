@@ -1,3 +1,6 @@
+local STAGE = require "state.battle".BATTLE_STAGE
+
+local style = require "ui._style"
 local spacing = 50
 
 ---comment
@@ -5,7 +8,7 @@ local spacing = 50
 ---@param value ActiveSkill
 local function render_skill(x, y, width, acting_actor, value)
 	love.graphics.rectangle("line", x, y, 50, 20)
-	love.graphics.setFont(DEFAULT_FONT)
+	style.default_font()
 	love.graphics.print("Use", x, y)
 
 	-- prepare text
@@ -17,7 +20,9 @@ local function render_skill(x, y, width, acting_actor, value)
 	love.graphics.printf(text, x, y + 20, width, "left")
 end
 
-local function render()
+---comment
+---@param battle Battle
+local function render(battle)
 	-- draw character art on top
 	local window_size = love.graphics.getWidth()
 	local art_h = 100
@@ -26,9 +31,8 @@ local function render()
 	local padding = 5
 	local x = window_size - width - padding
 
-	if BATTLE[1].team == 0 and SELECTED then
-		local acting_actor = BATTLE[1]
-
+	if battle.actors[1].team == 0 and battle.selected_actor then
+		local acting_actor = battle.actors[1]
 		if (acting_actor.definition.image_skills) then
 			love.graphics.setColor(1, 1, 1, 1)
 			love.graphics.draw(acting_actor.definition.image_skills, x, padding)
@@ -55,7 +59,13 @@ end
 
 
 local rect = require "ui.rect"
-local function on_click(x, y)
+
+---comment
+---@param state GameState
+---@param battle Battle
+---@param x number
+---@param y number
+local function on_click(state, battle, x, y)
 	local window_size = love.graphics.getWidth()
 	local art_h = 100
 	local width = 200
@@ -63,14 +73,14 @@ local function on_click(x, y)
 	local padding = 5
 	local _x = window_size - width - padding
 
-	if BATTLE[1].team == 0 and SELECTED and AWAIT_TURN then
+	if battle.actors[1].team == 0 and battle.selected_actor and battle.stage == STAGE.AWAIT_TURN then
 		local offset_y = art_h + padding
 
-		local acting_actor = BATTLE[1]
+		local acting_actor = battle.actors[1]
 		for key, value in ipairs(acting_actor.definition.inherent_skills) do
 			if rect(_x, offset_y, 50, 20, x, y) then
-				USE_SKILL(acting_actor, SELECTED, value)
-				AWAIT_TURN = false
+				USE_SKILL(state, battle, acting_actor, battle.selected_actor, value)
+				battle.stage = STAGE.PROCESS_EFFECTS_AFTER_TURN
 				return
 			end
 			offset_y = offset_y + spacing
@@ -79,8 +89,8 @@ local function on_click(x, y)
 		if (acting_actor.wrapper) then
 			for key, value in ipairs(acting_actor.wrapper.skills) do
 				if rect(_x, offset_y, 50, 20, x, y) then
-					USE_SKILL(acting_actor, SELECTED, value)
-					AWAIT_TURN = false
+					USE_SKILL(state, battle, acting_actor, battle.selected_actor, value)
+					battle.stage = STAGE.PROCESS_EFFECTS_AFTER_TURN
 					return
 				end
 				---@type number

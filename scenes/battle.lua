@@ -1,300 +1,266 @@
-local effects_manager = require "effects._manager"
-AWAIT_TURN = false
----@type Actor?
-SELECTED = nil
----@type number
-WAVE = 1
-
-
-local function process_turn()
-	local can_proceed = false
-	while not can_proceed do
-		---@type Actor
-		local actor = table.remove(BATTLE, 1)
-		if actor.HP > 0 then
-			print("readd to battle:" .. BATTLE[1].definition.name)
-			ENTER_BATTLE(actor, actor.team, true)
-			can_proceed = true
-		end
-	end
-
-	-- reduce action number
-
-	local offset = -1
-
-	for k, v in ipairs(BATTLE) do
-		if v.HP > 0 and v.action_number < offset or offset == -1 then
-			offset = v.action_number
-		end
-	end
-
-	for k, v in ipairs(BATTLE) do
-		v.action_number = v.action_number - offset
-	end
-
-	-- clear_dead()
-	SORT_BATTLE()
-
-	-- queue all effects on new current character
-	if (BATTLE[1]) then
-		ON_TURN_START(BATTLE[1])
-	end
-end
-
-
-local function update(dt)
-
-	if SELECTED.HP <= 0 or not SELECTED.visible then
-		-- select the first enemy target
-		for index, value in ipairs(BATTLE) do
-			if value.team == 1 and (value.HP > 0 and value.visible) then
-				SELECTED = value
-			end
-		end
-	end
-
-	for key, value in pairs(BATTLE) do
-		if not value.HP_view then
-			value.HP_view = value.HP
-		end
-
-		for index, pending in ipairs(value.pending_damage) do
-			pending.alpha = pending.alpha - dt * 2 * (1 / (1 + index))
-		end
-
-		CLEAR_PENDING_EFFECTS(value)
-	end
-
-	for key, value in ipairs(BATTLE) do
-		if value.HP_view == nil then
-			value.HP_view = value.HP
-		end
-
-		local diff = value.HP - value.HP_view
-		local diff_abs = math.abs(diff)
-		local max_hp = TOTAL_MAX_HP(value.definition, value.wrapper)
-		if (diff_abs < max_hp / 20) then
-			value.HP_view = value.HP
-		else
-			value.HP_view = value.HP_view + math.max(-max_hp, math.min(max_hp, diff / diff_abs * max_hp * dt))
-		end
-	end
-
-	local no_running_effects = true
-
-	do
-		local current_effect = EFFECTS_QUEUE[1]
-		if (current_effect) then
-			no_running_effects = false
-			local def = effects_manager.get(current_effect.def)
-			if not current_effect.started then
-				def.scene_on_start(current_effect.origin, current_effect.target, current_effect.data)
-				current_effect.started = true
-			end
-			current_effect.time_passed = current_effect.time_passed + dt
-			if def.scene_update(current_effect.time_passed, dt, current_effect.origin, current_effect.target, current_effect.data) then
-				table.remove(EFFECTS_QUEUE, 1)
-				if def.multi_target_selection then
-					local targets = def.multi_target_selection(current_effect.origin)
-					for index, value in ipairs(targets) do
-						def.target_effect(current_effect.origin, value, current_effect.data)
-					end
-				else
-					def.target_effect(current_effect.origin, current_effect.target, current_effect.data)
-				end
-			end
-			return
-		end
-	end
-
-	do
-		local current_effect = STATUS_EFFECT_QUEUE[1]
-		if (current_effect) then
-			local def = effects_manager.get(current_effect.def)
-			no_running_effects = false
-			if not current_effect.started then
-				def.scene_on_start(current_effect.origin, current_effect.target, current_effect.data)
-				current_effect.started = true
-			end
-			current_effect.time_passed = current_effect.time_passed + dt
-			if def.scene_update(current_effect.time_passed, dt, current_effect.origin, current_effect.target, current_effect.data) then
-				table.remove(STATUS_EFFECT_QUEUE, 1)
-				def.target_effect(current_effect.origin, current_effect.target, current_effect.data)
-			end
-			return
-		end
-	end
-
-	if no_running_effects and not AWAIT_ON_TURN_START_EFFECTS and not AWAIT_TURN then
-		process_turn()
-		-- turn processing could add new effects on turn starting!
-		AWAIT_ON_TURN_START_EFFECTS = true
-		return
-	end
-
-	if AWAIT_ON_TURN_START_EFFECTS and not AWAIT_TURN then
-		local current_status_effect = STATUS_EFFECT_QUEUE[1]
-		local current_effect = EFFECTS_QUEUE[1]
-		if current_effect or current_status_effect then
-			return
-		end
-		AWAIT_TURN = true
-		AWAIT_ON_TURN_START_EFFECTS = false
-	end
-
-	-- now, when all effects are resolved, we can update the battle state
-
-	local battle_lost = true
-
-	for key, value in ipairs(BATTLE) do
-		if value.team == 0 and (value.HP_view == nil or value.HP_view > 0) then
-			battle_lost = false
-		end
-	end
-
-	if battle_lost then
-		BATTLE_IN_PROGRESS = false
-		love.load()
-	end
-
-	local enemies_alive = false;
-
-	for key, value in ipairs(BATTLE) do
-		if value.team == 1 and (value.HP_view == nil or value.HP_view > 0) then
-			enemies_alive = true
-		end
-	end
-
-	if not enemies_alive then
-		WAVE = WAVE + 1
-		if not GENERATE_WAVE() then
-			BATTLE_IN_PROGRESS = false
-			CURRENT_SCENE = SCENE_BATTLE_SELECTOR
-		end
-		return
-	end
-
-	if BATTLE[1].team == 1 and AWAIT_TURN and BATTLE[1].HP > 0 then
-		print("turn of " .. BATTLE[1].definition.name)
-		-- AI turn
-		-- attack the first target
-
-
-		---@type number?
-		local target = nil
-
-		local used_skill = BATTLE[1].definition.inherent_skills[1]
-
-
-		if used_skill.targeted then
-			---@type number[]
-			local potential_targets = {}
-			local count = 0
-			for key, value in ipairs(BATTLE) do
-				if value.team == 0 then
-					table.insert(potential_targets, key)
-					count = count + 1
-				end
-			end
-			local index = love.math.random(1, count)
-			target = potential_targets[index]
-		end
-
-		if target or (not used_skill.targeted) then
-			for index, effect in ipairs(used_skill.effects_sequence) do
-				local selected_target = nil
-				local def = effects_manager.get(effect)
-				if def.target_selection then
-					selected_target = def.target_selection(BATTLE[1])
-				else
-					selected_target = BATTLE[target]
-				end
-
-				if (selected_target) then
-					---@type Effect
-					local new_effect = {
-						data = {},
-						def = effect,
-						origin = BATTLE[1],
-						target = selected_target,
-						time_passed = 0,
-						started = false,
-						times_activated = 0
-					}
-					table.insert(EFFECTS_QUEUE, new_effect)
-				end
-			end
-		end
-
-		AWAIT_TURN = false
-	end
-end
-
+local manager = require "scenes._manager"
 local style = require "ui._style"
+local battles = require "state.battle"
+local battle_loader = require "fights._loader"
+
+local ids = require "scenes._ids"
+local id = ids.battle
+local def = manager.get(id)
+
 local rect = require "ui.rect"
 local skills_panel = require "ui.skills-panel"
 
-local function handle_click(x, y)
-	local offset_x = 150
-	local offset_y = 50
+local effects_manager = require "effects._manager"
 
-	for key, value in ipairs(BATTLE) do
-		if BATTLE[key].team == 1 and BATTLE[key].HP > 0 and BATTLE[key].visible then
-			local r_x = offset_x + (style.battle_actors_spacing + ACTOR_WIDTH) * (value.pos - 1)
-			if (rect(r_x, offset_y, ACTOR_WIDTH, ACTOR_HEIGHT, x, y)) then
-				SELECTED = value
-			end
+---@param battle Battle
+local function update_selection(battle)
+	local selected = battle.selected_actor
+
+	if selected and selected.HP > 0 and selected.visible then
+		return
+	end
+
+	for index, actor in ipairs(battle.actors) do
+		if actor.team == 1 and actor.HP > 0 and actor.visible then
+			print("select", actor.definition.name)
+			battle.selected_actor = actor
+		end
+	end
+end
+
+---comment
+---@param actor Actor
+---@param dt number
+local function update_hp_view(actor, dt)
+	if not actor.HP_view then
+		actor.HP_view = actor.HP
+	end
+
+	for index, pending in ipairs(actor.pending_damage) do
+		pending.alpha = pending.alpha - dt * 2 * (1 / (1 + index))
+	end
+
+	local count = #actor.pending_damage
+	---@type number[]
+	local to_remove = {}
+	for i = count, 1, -1 do
+		if actor.pending_damage[i].alpha < 0 then
+			table.insert(to_remove, i)
 		end
 	end
 
-	skills_panel.on_click(x, y)
+	for index, value in ipairs(to_remove) do
+		table.remove(actor.pending_damage, value)
+	end
+
+	local diff = actor.HP - actor.HP_view
+	local diff_abs = math.abs(diff)
+	local max_hp = TOTAL_MAX_HP(actor.definition, actor.wrapper)
+	if (diff_abs < max_hp / 20) then
+		actor.HP_view = actor.HP
+	else
+		actor.HP_view = actor.HP_view + math.max(-max_hp, math.min(max_hp, diff / diff_abs * max_hp * dt))
+	end
+end
+
+---comment
+---@param state GameState
+---@param battle Battle
+---@param dt number
+local function update_effects(state, battle, dt)
+	local current_effect = battle.effects_queue[1]
+	if current_effect == nil then
+		return true
+	end
+
+	local def = effects_manager.get(current_effect.def)
+	if not current_effect.started then
+		def.scene_on_start(state, battle, current_effect.origin, current_effect.target, current_effect.data)
+		current_effect.started = true
+	end
+	current_effect.time_passed = current_effect.time_passed + dt
+	if def.scene_update(state, battle, current_effect.time_passed, dt, current_effect.origin, current_effect.target, current_effect.data) then
+		table.remove(battle.effects_queue, 1)
+		if def.multi_target_selection then
+			local targets = def.multi_target_selection(state, battle, current_effect.origin)
+			for index, value in ipairs(targets) do
+				def.target_effect(state, battle, current_effect.origin, value, current_effect.data)
+			end
+		else
+			def.target_effect(state, battle, current_effect.origin, current_effect.target, current_effect.data)
+		end
+	end
+
+	return false
+end
+
+---comment
+---@param state GameState
+---@param battle Battle
+local function update_ai_turn(state, battle)
+	---@type number?
+	local target = nil
+
+	local used_skill = battle.actors[1].definition.inherent_skills[1]
+
+
+	if used_skill.targeted then
+		---@type number[]
+		local potential_targets = {}
+		local count = 0
+		for key, value in ipairs(battle.actors) do
+			if value.team == 0 then
+				table.insert(potential_targets, key)
+				count = count + 1
+			end
+		end
+		local index = love.math.random(1, count)
+		target = potential_targets[index]
+	end
+
+	if target or (not used_skill.targeted) then
+		for index, effect in ipairs(used_skill.effects_sequence) do
+			local selected_target = nil
+			local def = effects_manager.get(effect)
+			if def.target_selection then
+				selected_target = def.target_selection(state, battle, battle.actors[1])
+			else
+				selected_target = battle.actors[target]
+			end
+
+			if (selected_target) then
+				---@type Effect
+				local new_effect = {
+					data = {},
+					def = effect,
+					origin = battle.actors[1],
+					target = selected_target,
+					time_passed = 0,
+					started = false,
+					times_activated = 0
+				}
+				table.insert(battle.effects_queue, new_effect)
+			end
+		end
+	end
+end
+
+function def.update(state, dt)
+	local battle = state.last_battle
+
+	-- select something
+	update_selection(battle)
+
+	for _, value in ipairs(battle.actors) do
+		update_hp_view(value, dt)
+	end
+
+	if battle.stage == battles.BATTLE_STAGE.PROCESS_EFFECTS_AFTER_TURN then
+		if not update_effects(state, battle, dt) then
+			return
+		else
+			battle.stage = battles.BATTLE_STAGE.PROCESS_TURN
+		end
+	end
+
+	if battle.stage == battles.BATTLE_STAGE.PROCESS_TURN then
+		battles.process_turn(state, state.last_battle)
+		battle.stage = battles.BATTLE_STAGE.PROCESS_EFFECTS_BEFORE_TURN
+	end
+
+	if battle.stage == battles.BATTLE_STAGE.PROCESS_EFFECTS_BEFORE_TURN then
+		if not update_effects(state, battle, dt) then
+			return
+		else
+			battle.stage = battles.BATTLE_STAGE.AWAIT_TURN
+		end
+	end
+
+	if battle.stage == battles.BATTLE_STAGE.AWAIT_TURN then
+		local battle_lost = true
+		for key, value in ipairs(battle.actors) do
+			if value.team == 0 and (value.HP_view == nil or value.HP_view > 0) then
+				battle_lost = false
+			end
+		end
+
+		if battle_lost then
+			print("battle lost")
+			battle.in_progress = false
+			love.load()
+		end
+
+		local enemies_alive = false;
+
+		for key, value in ipairs(battle.actors) do
+			if value.team == 1 and (value.HP_view == nil or value.HP_view > 0) then
+				enemies_alive = true
+			end
+		end
+
+		if not enemies_alive then
+			battle.wave = battle.wave + 1
+			if not battle_loader(state, state.current_scripted_fight, false) then
+				battle.in_progress = false
+				battle.wave = 1
+				state.set_scene(state, ids.select_battle)
+			end
+			return
+		end
+
+		local current_actor = battle.actors[1]
+
+		if current_actor.team == 1 and current_actor.HP > 0 then
+			update_ai_turn(state, battle)
+			battle.stage = battles.BATTLE_STAGE.PROCESS_EFFECTS_AFTER_TURN
+		end
+	end
+end
+
+
+function def.on_click(state, x, y)
+	local battle = state.last_battle
+	local offset_x = 150
+	local offset_y = 50
+
+	for key, value in ipairs(battle.actors) do
+		if battle.actors[key].team == 1 and battle.actors[key].HP > 0 and battle.actors[key].visible then
+			local r_x = offset_x + (style.battle_actors_spacing + ACTOR_WIDTH) * (value.pos - 1)
+			if (rect(r_x, offset_y, ACTOR_WIDTH, ACTOR_HEIGHT, x, y)) then
+				battle.selected_actor = value
+			end
+		end
+	end
+	skills_panel.on_click(state, battle, x, y)
 end
 
 local main_render = require "fights.battle-render"
 
+function def.render(state)
+	style.basic_bg_color()
+	style.basic_element_color()
 
-local function render()
-	love.graphics.setBackgroundColor(1, 1, 1, 1)
-	love.graphics.setColor(0, 0, 0, 1)
+	main_render(state.last_battle)
 
-	local current_effect = EFFECTS_QUEUE[1]
-	main_render()
-	if current_effect then
-		local def = effects_manager.get(current_effect.def)
+	local effect = state.last_battle.effects_queue[1]
+	if effect then
+		local def = effects_manager.get(effect.def)
 		def.scene_render(
-			current_effect.time_passed,
-			current_effect.origin,
-			current_effect.target,
-			current_effect.data
+			state, state.last_battle,
+			effect.time_passed,
+			effect.origin,
+			effect.target,
+			effect.data
 		)
 		return
 	end
 
-	if not BATTLE[1] then
-		love.graphics.print("YOU WON!!!", 150, 10)
-		return
-	end
 
-	if BATTLE[1].team == 0 then
-		love.graphics.setFont(DEFAULT_FONT)
+	if state.last_battle.actors[1].team == 0 then
+		style.default_font()
 		love.graphics.print("YOUR TURN", 150, 10)
 	end
 
-
 	-- draw skill buttons
-	skills_panel.render()
+	skills_panel.render(state.last_battle)
 end
-
-local function enter()
-	WAVE = 1
-	GENERATE_WAVE()
-end
-
-local scene = {
-	enter = enter,
-	update = update,
-	render = render,
-	on_click = handle_click
-}
-
-return scene

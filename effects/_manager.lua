@@ -11,19 +11,19 @@ function collection.new_effect(duration)
 	---@type EffectDef
 	local new = {
 		description = "",
-		scene_on_start = function (origin, target, scene_data)
+		scene_on_start = function (state, battle, origin, target, scene_data)
 
 		end,
-		scene_render = function (time_passed, origin, target, scene_data)
+		scene_render = function (state, battle, time_passed, origin, target, scene_data)
 
 		end,
-		scene_update = function (time_passed, dt, origin, target, scene_data)
+		scene_update = function (state, battle, time_passed, dt, origin, target, scene_data)
 			if (time_passed > duration) then
 				return true
 			end
 			return false
 		end,
-		target_effect = function (origin, target, scene_data)
+		target_effect = function (state, battle, origin, target, scene_data)
 
 		end,
 	}

@@ -1,12 +1,18 @@
+local manager = require "scenes._manager"
+local style = require "ui._style"
+
+local ids = require "scenes._ids"
+local id = ids.lineup
+local def = manager.get(id)
 
 local render_meta_actor = require "ui.meta-actor"
 
-local function render()
+function def.render(state)
 	local row = 0
 	local col = 0
 	local cols = 4
 
-	for index, value in ipairs(PLAYABLE_META_ACTORS) do
+	for index, value in ipairs(state.playable_actors) do
 		render_meta_actor(col * (ACTOR_WIDTH + 10) + 40, row * (ACTOR_HEIGHT + 10) + 50, value.def, value.unlocked, value.lineup_position)
 		col = col + 1
 		if col >= cols then
@@ -22,24 +28,24 @@ end
 
 local rect = require "ui.rect"
 
-local function handle_click(x, y)
+function def.on_click(state, x, y)
 	local row = 0
 	local col = 0
 	local cols = 4
 
-	for index, value in ipairs(PLAYABLE_META_ACTORS) do
+	for index, value in ipairs(state.playable_actors) do
 		if value.unlocked and rect(col * (ACTOR_WIDTH + 10) + 40, row * (ACTOR_HEIGHT + 10) + 50, ACTOR_WIDTH, ACTOR_WIDTH, x, y) then
-			local old_actor = PLAYABLE_META_ACTORS[CHARACTER_LINEUP[SELECTED_LINEUP_POSITION]]
+			local old_actor = state.playable_actors[state.current_lineup[state.selected_lineup_position]]
 			if old_actor then
 				old_actor.lineup_position = 0
 			end
-			CHARACTER_LINEUP[SELECTED_LINEUP_POSITION] = index
+			state.current_lineup[state.selected_lineup_position] = index
 			if (value.lineup_position ~= 0) then
-				CHARACTER_LINEUP[value.lineup_position] = 0
+				state.current_lineup[value.lineup_position] = 0
 			end
-			value.lineup_position = SELECTED_LINEUP_POSITION
+			value.lineup_position = state.selected_lineup_position
 
-			CURRENT_SCENE = SCENE_BATTLE_SELECTOR
+			state.set_scene(state, ids.select_battle)
 		end
 		col = col + 1
 		if col >= cols then
@@ -48,11 +54,3 @@ local function handle_click(x, y)
 		end
 	end
 end
-
-local scene = {
-	update = update,
-	render = render,
-	on_click = handle_click
-}
-
-return scene

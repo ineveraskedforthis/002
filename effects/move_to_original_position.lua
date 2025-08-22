@@ -8,7 +8,7 @@ local id, def = manager.new_effect(duration)
 
 def.description = "Move to original position"
 
-function def.scene_update(time_passed, dt, origin, target, scene_data)
+function def.scene_update(state, battle, time_passed, dt, origin, target, scene_data)
 	if (time_passed > duration) then
 		return true
 	end
@@ -20,7 +20,7 @@ function def.scene_update(time_passed, dt, origin, target, scene_data)
 	return false
 end
 
-function def.scene_on_start(origin, target, scene_data)
+function def.scene_on_start(state, battle, origin, target, scene_data)
 	scene_data.start_x = origin.x
 	scene_data.start_y = origin.y
 end

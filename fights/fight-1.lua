@@ -1,31 +1,35 @@
-return function ()
-	RESET_BATTLE()
-	PLAYER_ENTER_BATTLE()
+local battles = require "state.battle"
+local battle = require "state.battle"
 
-	if WAVE == 1 then
-		local chris = GENERATE_ACTOR(require "meta-actors.chris", 1, 1)
+---@param state GameState
+return function (state)
+	local battle = state.last_battle
+	battles.reset_battle(battle)
+	battle.in_progress = true
+	battles.put_player_into_battle(state)
 
-		ENTER_BATTLE(chris, 1, false)
-		SELECTED = chris
+	print("wave", battle.wave)
+
+	if battle.wave == 1 then
+		local chris = battles.new_actor(require "meta-actors.chris", 1, 1)
+		battles.add_actor_to_battle(battle, chris, false)
 		return true
 	end
 
-	if WAVE == 2 then
-		local strong_enemy = GENERATE_ACTOR(require "meta-actors.amogus", 1, 1)
-		local fast_enemy = GENERATE_ACTOR(require "meta-actors.shadow", 2, 1)
+	if battle.wave == 2 then
+		local strong_enemy = battles.new_actor(require "meta-actors.amogus", 1, 1)
+		local fast_enemy = battles.new_actor(require "meta-actors.shadow", 2, 1)
 
-		ENTER_BATTLE(strong_enemy, 1, false)
-		ENTER_BATTLE(fast_enemy, 1, false)
-		SELECTED = strong_enemy
+		battles.add_actor_to_battle(battle, strong_enemy, false)
+		battles.add_actor_to_battle(battle, fast_enemy, false)
 		return true
 	end
 
-	if WAVE == 3 then
+	if battle.wave == 3 then
 		---@type Actor
-		local enemy = GENERATE_ACTOR(require "meta-actors.john", 1, 1)
+		local enemy = battles.new_actor(require "meta-actors.john", 1, 1)
 
-		ENTER_BATTLE(enemy, 1, false)
-		SELECTED = enemy
+		battles.add_actor_to_battle(battle, enemy, false)
 		return true
 	end
 

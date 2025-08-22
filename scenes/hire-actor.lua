@@ -1,3 +1,9 @@
+local manager = require "scenes._manager"
+local style = require "ui._style"
+
+local ids = require "scenes._ids"
+local id = ids.gacha
+local def = manager.get(id)
 
 local pull_in_progress = false
 local pull_progress = 0
@@ -22,7 +28,7 @@ end
 local render_meta_actor = require "ui.meta-actor"
 
 
-local function render()
+function def.render(state)
 	if pull_in_progress then
 		if pull_progress < 1 then
 			love.graphics.rectangle("line", 400 + pull_progress * 120 - ACTOR_WIDTH, 210, ACTOR_WIDTH, ACTOR_HEIGHT)
@@ -35,7 +41,7 @@ local function render()
 			local y = 210 + pull_away_progress * 400
 			if pulled_character ~= 0 then
 				love.graphics.setColor(1, 1, 1, 1)
-				love.graphics.draw(PLAYABLE_META_ACTORS[pulled_character].def.image, x, y, 0, w / ACTOR_WIDTH, 1)
+				love.graphics.draw(state.playable_actors[pulled_character].def.image, x, y, 0, w / ACTOR_WIDTH, 1)
 			end
 			love.graphics.setColor(0, 0, 0, 1)
 			love.graphics.rectangle("line", x, y, w, ACTOR_HEIGHT)
@@ -51,7 +57,7 @@ local function render()
 	love.graphics.print("return", 200, 500)
 end
 
-local function update(dt)
+function def.update(state, dt)
 	if pull_in_progress then
 		if pull_progress < 1 then
 			pull_progress = math.min(1, pull_progress + dt * 2)
@@ -60,13 +66,13 @@ local function update(dt)
 			turn_over_progress = math.min(1, turn_over_progress + dt * 2)
 			-- print(pull_progress, turn_over_progress)
 			if turn_over_progress > 0.5 and pulled_character == 0 then
-				pulled_character = love.math.random(1, #PLAYABLE_META_ACTORS)
+				pulled_character = love.math.random(1, #state.playable_actors)
 				if not pulled then
 					print("pull")
-					if PLAYABLE_META_ACTORS[pulled_character].unlocked then
-						ADD_EXP(PLAYABLE_META_ACTORS[pulled_character], 5)
+					if state.playable_actors[pulled_character].unlocked then
+						ADD_EXP(state.playable_actors[pulled_character], 5)
 					else
-						PLAYABLE_META_ACTORS[pulled_character].unlocked = true
+						state.playable_actors[pulled_character].unlocked = true
 					end
 					pulled = true
 				end
@@ -80,7 +86,7 @@ local function update(dt)
 		if pull_away_progress >= 1 then
 			reset()
 			pull_in_progress = true
-			CURRENCY = CURRENCY - 1
+			state.currency = state.currency - 1
 		end
 	end
 end
@@ -88,28 +94,19 @@ end
 local rect = require "ui.rect"
 
 
-local function handle_click(x, y)
-	if not pull_in_progress and rect(200, 200, 200, 200, x, y) and CURRENCY > 0 then
+function def.on_click(state, x, y)
+	if not pull_in_progress and rect(200, 200, 200, 200, x, y) and state.currency > 0 then
 		pull_in_progress = true
-		---@type number
-		CURRENCY = CURRENCY - 1
+		state.currency = state.currency - 1
 	end
 
-	if pull_in_progress and turn_over_progress == 1 and rect(200, 200, 200, 200, x, y) and CURRENCY > 0  then
+	if pull_in_progress and turn_over_progress == 1 and rect(200, 200, 200, 200, x, y) and state.currency > 0  then
 		pull_away_in_progress = true
 	end
 
 	if pull_in_progress and pull_progress == 1 and turn_over_progress == 1 then
 		if rect(200, 500, 100, 20, x, y) then
-			CURRENT_SCENE = SCENE_BATTLE_SELECTOR
+			state.set_scene(state, ids.select_battle)
 		end
 	end
 end
-
-local scene = {
-	update = update,
-	render = render,
-	on_click = handle_click
-}
-
-return scene

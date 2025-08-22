@@ -1,11 +1,18 @@
-return function ()
-	RESET_BATTLE()
-	PLAYER_ENTER_BATTLE()
+local battles = require "state.battle"
 
-	if WAVE == 1 then
-		SELECTED = GENERATE_ACTOR(require "meta-actors.wolf", 1, 1)
-		ENTER_BATTLE(SELECTED, 1, false)
-		ENTER_BATTLE(GENERATE_ACTOR(require "meta-actors.wolf", 2, 1), 1, false)
+local wolf = require "meta-actors.wolf"
+
+---@param state GameState
+return function (state)
+	local battle = state.last_battle
+	battles.reset_battle(battle)
+
+	battle.in_progress = true
+	battles.put_player_into_battle(state)
+
+	if battle.wave == 1 then
+		battles.add_actor_to_battle(battle, battles.new_actor(wolf, 1, 1), false)
+		battles.add_actor_to_battle(battle, battles.new_actor(wolf, 2, 1), false)
 		return true
 	end
 
