@@ -17,6 +17,7 @@ local def = {
 	STR_per_level = 4,
 	MAG_per_level = 4,
 	SPD_per_level = 1,
+	max_energy = 3
 }
 
 def.alignment[ELEMENT.FIRE] = true

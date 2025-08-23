@@ -14,5 +14,6 @@ return {
 	required_magic = 10,
 	required_strength = 10,
 	cost = 10,
-	allowed_weapons = {}
+	allowed_weapons = {},
+	required_energy = 1
 }

@@ -7,7 +7,7 @@ local header_font = love.graphics.newFont(font_path, 24)
 ---@type love.Font[]
 local font_by_size = {}
 
-local size = 11
+local size = 14
 
 for i = 1, 10, 1 do
 	font_by_size[i] = love.graphics.newFont(font_path, math.floor(size))
@@ -22,6 +22,10 @@ return {
 
 	action_bar_current_item_height = 10 * base_unit,
 	action_bar_current_item_width = 10 / 8 * 13 * base_unit,
+
+	skill_button_size = 70,
+	energy_point_h = 20,
+	energy_point_w = 30,
 
 	basic_bg_color = function ()
 		love.graphics.setBackgroundColor(1, 1, 1, 1)

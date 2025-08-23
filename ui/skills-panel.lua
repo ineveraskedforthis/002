@@ -1,23 +1,54 @@
+local effects = require "effects._manager"
+
 local STAGE = require "state.battle".BATTLE_STAGE
 
 local style = require "ui._style"
-local spacing = 50
+local rect = require "ui.rect"
+local fill_image = require "ui.fill-image"
+local fill_rect = require "ui.fill-rect"
+
+
+local offset_x = style.action_bar_item_width * 2
+
+local description_offset_x = 200
+local description_offset_y = 200
 
 ---comment
+---@param x number
+---@param y number
+---@param width number
 ---@param acting_actor Actor
 ---@param value ActiveSkill
 local function render_skill(x, y, width, acting_actor, value)
-	love.graphics.rectangle("line", x, y, 50, 20)
-	style.default_font()
-	love.graphics.print("Use", x, y)
+	local window_size = love.graphics.getWidth()
 
-	-- prepare text
-	local text = value.name .. "\n"
-	text = text .. value.description(acting_actor) .. "\n"
-	-- for index, effect in ipairs(value.effects_sequence) do
-	-- 	text = text .. tostring(index) .. " ".. effect.description .. "\n"
-	-- end
-	love.graphics.printf(text, x, y + 20, width, "left")
+	local true_size = style.skill_button_size - style.base_margin * 2
+	local true_x = x + style.base_margin
+	local true_y = y + style.base_margin
+	local m_x, m_y = love.mouse.getPosition()
+
+	local hovered = false
+
+	if value.icon then
+		fill_image(value.icon, true_x, true_y, true_size, true_size)
+	else
+		love.graphics.rectangle("line", true_x, true_y, true_size, true_size)
+		style.default_font()
+		love.graphics.printf(value.name, true_x, true_y, true_size, "center")
+	end
+
+	if rect(true_x, true_y, true_size, true_size, m_x, m_y) then
+		hovered = true
+		local text = value.name .. "\n"
+		text = text .. value.description(acting_actor) .. "\n"
+		for index, effect in ipairs(value.effects_sequence) do
+			local effect_def = effects.get(effect)
+			text = text .. tostring(index) .. " ".. effect_def.description .. "\n"
+		end
+		love.graphics.printf(text, window_size - description_offset_x, description_offset_y, description_offset_x - style.base_margin, "left")
+	end
+
+	return hovered
 end
 
 ---comment
@@ -25,6 +56,7 @@ end
 local function render(battle)
 	-- draw character art on top
 	local window_size = love.graphics.getWidth()
+	local window_h = love.graphics.getHeight()
 	local art_h = 100
 	local width = 200
 
@@ -41,24 +73,49 @@ local function render(battle)
 		love.graphics.setColor(0, 0, 0, 1)
 		love.graphics.rectangle("line", x, 0 + padding, width, art_h)
 
-		local offset_y = art_h + padding
-		for key, value in ipairs(acting_actor.definition.inherent_skills) do
-			render_skill(x, offset_y, width, acting_actor, value)
-			offset_y = offset_y + spacing
+		local reserve_points = 0
+
+		do
+			local offset_y = style.skill_button_size + style.base_margin
+			local current_x = offset_x
+			for key, value in ipairs(acting_actor.definition.inherent_skills) do
+				if render_skill(current_x, window_h - offset_y, width, acting_actor, value) then
+					reserve_points = value.required_energy
+				end
+				current_x = current_x + style.skill_button_size
+			end
+			if (acting_actor.wrapper) then
+				for key, value in ipairs(acting_actor.wrapper.skills) do
+					if render_skill(current_x, window_h - offset_y, width, acting_actor, value) then
+						reserve_points = value.required_energy
+					end
+					---@type number
+					current_x = current_x + style.skill_button_size
+				end
+			end
 		end
-		if (acting_actor.wrapper) then
-			for key, value in ipairs(acting_actor.wrapper.skills) do
-				render_skill(x, offset_y, width, acting_actor, value)
-				---@type number
-				offset_y = offset_y + spacing
+
+		-- draw energy points
+		do
+			local current_x = offset_x
+			local current_y = window_h - style.skill_button_size - style.base_margin - style.energy_point_h - style.base_margin
+
+			for i = 1, acting_actor.energy do
+				local expand = 0
+				if i <= reserve_points then
+					love.graphics.setColor(1, 0, 0, 1)
+					expand = 2
+				else
+					love.graphics.setColor(0, 0.5, 1, 1)
+				end
+
+				fill_rect(current_x - expand, current_y - expand, style.energy_point_w + expand * 2, style.energy_point_h + expand * 2)
+				current_x = current_x + style.energy_point_w + style.base_margin
 			end
 		end
 	end
+
 end
-
-
-
-local rect = require "ui.rect"
 
 ---comment
 ---@param state GameState
@@ -67,6 +124,7 @@ local rect = require "ui.rect"
 ---@param y number
 local function on_click(state, battle, x, y)
 	local window_size = love.graphics.getWidth()
+	local window_h = love.graphics.getHeight()
 	local art_h = 100
 	local width = 200
 
@@ -74,27 +132,31 @@ local function on_click(state, battle, x, y)
 	local _x = window_size - width - padding
 
 	if battle.actors[1].team == 0 and battle.selected_actor and battle.stage == STAGE.AWAIT_TURN then
-		local offset_y = art_h + padding
+		local offset_y = style.skill_button_size + style.base_margin
+		local current_x = offset_x
+		local true_size = style.skill_button_size - style.base_margin * 2
 
 		local acting_actor = battle.actors[1]
 		for key, value in ipairs(acting_actor.definition.inherent_skills) do
-			if rect(_x, offset_y, 50, 20, x, y) then
+			local can_use = CAN_USE_SKILL(state, battle, acting_actor, battle.selected_actor, value)
+			if rect(current_x + style.base_margin, window_h - offset_y + style.base_margin, true_size, true_size, x, y) and can_use then
 				USE_SKILL(state, battle, acting_actor, battle.selected_actor, value)
 				battle.stage = STAGE.PROCESS_EFFECTS_AFTER_TURN
 				return
 			end
-			offset_y = offset_y + spacing
+			current_x = current_x + style.skill_button_size
 		end
 
 		if (acting_actor.wrapper) then
 			for key, value in ipairs(acting_actor.wrapper.skills) do
-				if rect(_x, offset_y, 50, 20, x, y) then
+				local can_use = CAN_USE_SKILL(state, battle, acting_actor, battle.selected_actor, value)
+				if rect(current_x + style.base_margin, window_h - offset_y + style.base_margin, true_size, true_size, x, y) and can_use then
 					USE_SKILL(state, battle, acting_actor, battle.selected_actor, value)
 					battle.stage = STAGE.PROCESS_EFFECTS_AFTER_TURN
 					return
 				end
 				---@type number
-				offset_y = offset_y + spacing
+				current_x = current_x + style.skill_button_size
 			end
 		end
 	end

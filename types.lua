@@ -31,6 +31,7 @@ ELEMENT = {
 ---@field DEF number
 ---@field weapon WEAPON
 ---@field weapon_mastery number
+---@field max_energy number
 ---@field alignment table<ELEMENT, boolean|nil>
 ---@field name string
 ---@field image love.Image
@@ -63,6 +64,7 @@ ELEMENT = {
 ---@field visible boolean
 ---@field HP number
 ---@field HP_view number?
+---@field energy number
 ---@field SHIELD number
 ---@field pos number
 ---@field pending_damage PendingDamage[]
@@ -104,10 +106,12 @@ ELEMENT = {
 ---@class ActiveSkill
 ---@field name string
 ---@field description fun(actor: Actor): string
+---@field icon love.Image?
 ---@field effects_sequence number[]
 ---@field targeted boolean
 ---@field required_strength number
 ---@field required_magic number
 ---@field required_elements ELEMENT[]
 ---@field allowed_weapons WEAPON[]
+---@field required_energy number
 ---@field cost number

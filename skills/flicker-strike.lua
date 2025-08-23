@@ -1,3 +1,4 @@
+---@type ActiveSkill
 return {
 	name = "Flicker strike",
 	description = function (actor)
@@ -11,5 +12,6 @@ return {
 	required_magic = 25,
 	required_elements = {ELEMENT.LIGHT},
 	cost = 5,
-	allowed_weapons = {WEAPON.SWORD}
+	allowed_weapons = {WEAPON.SWORD},
+	required_energy = 5
 }

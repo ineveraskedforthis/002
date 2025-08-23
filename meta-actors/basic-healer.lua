@@ -5,6 +5,7 @@ local def = {
 	alignment = {},
 	weapon = WEAPON.NONE,
 	weapon_mastery = 0,
+	max_energy = 4,
 	STR = 4,
 	DEF = 0,
 	SPD = 120,

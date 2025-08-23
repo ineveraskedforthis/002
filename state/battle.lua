@@ -43,7 +43,8 @@ function namespace.new_actor(def, pos, team, wrapper)
 		x = 0,
 		y = 0,
 		visible = false,
-		wrapper = wrapper
+		wrapper = wrapper,
+		energy = def.max_energy
 	}
 
 	temp.x = get_x(temp)

@@ -5,6 +5,7 @@ local def = {
 	STR_per_level = 0,
 	MAG_per_level = 0,
 	SPD_per_level = 0,
+	max_energy = 1,
 	DEF = 0,
 	SPD = 100,
 	name = "Strong Enemy",

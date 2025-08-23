@@ -12,5 +12,6 @@ return {
 	required_magic = 10,
 	required_elements = {ELEMENT.CHAOS},
 	cost = 5,
-	allowed_weapons = {}
+	allowed_weapons = {},
+	required_energy = 1
 }

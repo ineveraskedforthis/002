@@ -15,6 +15,7 @@ local def = {
 	STR_per_level = 2,
 	MAG_per_level = 4,
 	SPD_per_level = 5,
+	max_energy = 7
 }
 
 def.alignment[ELEMENT.LIGHT] = true

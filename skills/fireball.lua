@@ -12,5 +12,6 @@ return {
 	required_magic = 20,
 	required_elements = {ELEMENT.FIRE},
 	cost = 5,
-	allowed_weapons = {}
+	allowed_weapons = {},
+	required_energy = 3
 }

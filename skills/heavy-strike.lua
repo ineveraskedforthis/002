@@ -1,3 +1,4 @@
+---@type ActiveSkill
 return {
 	name = "Heavy strike",
 	description = function (actor)
@@ -13,5 +14,6 @@ return {
 	required_magic = 0,
 	required_elements = {},
 	cost = 5,
-	allowed_weapons = {WEAPON.SWORD}
+	allowed_weapons = {WEAPON.SWORD},
+	required_energy = 0
 }

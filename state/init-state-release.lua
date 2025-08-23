@@ -24,7 +24,7 @@ return function (state)
 			experience = 0,
 			additional_weapon_mastery = 0,
 			level = 0,
-			skill_points = 10,
+			skill_points = 0,
 			skills = {},
 			gemstones = {}
 		},

@@ -1,3 +1,4 @@
+---@type ActiveSkill
 return {
 	name = "Flame sweep",
 	description = function (actor)
@@ -13,5 +14,6 @@ return {
 	required_magic = 15,
 	required_elements = {},
 	cost = 5,
-	allowed_weapons = {WEAPON.SWORD}
+	allowed_weapons = {WEAPON.SWORD},
+	required_energy = 3
 }

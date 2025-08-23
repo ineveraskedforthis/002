@@ -128,9 +128,12 @@ end
 ---@param battle Battle
 ---@param origin Actor
 ---@param target Actor
----@param value ActiveSkill
-function USE_SKILL(state, battle, origin, target, value)
-	for index, effect in ipairs(value.effects_sequence) do
+---@param skill ActiveSkill
+function USE_SKILL(state, battle, origin, target, skill)
+	assert(origin.energy >= skill.required_energy)
+	origin.energy = origin.energy - skill.required_energy
+
+	for index, effect in ipairs(skill.effects_sequence) do
 		local def = effects.get(effect)
 		if def.target_selection then
 			target = def.target_selection(state, battle, origin)
@@ -151,6 +154,18 @@ end
 
 ---@param state GameState
 ---@param battle Battle
+---@param origin Actor
+---@param target Actor
+---@param skill ActiveSkill
+function CAN_USE_SKILL(state, battle, origin, target, skill)
+	if skill.required_energy > origin.energy then
+		return false
+	end
+	return true
+end
+
+---@param state GameState
+---@param battle Battle
 ---@param a Actor
 ---@param b Actor
 ---@param actual_damage number
@@ -167,6 +182,7 @@ end
 ---@param battle Battle
 ---@param a Actor
 function ON_TURN_START(state, battle, a)
+	a.energy = math.min(a.definition.max_energy, a.energy + 1)
 	for _, value in ipairs(a.status_effects) do
 		table.insert(battle.effects_queue, value)
 	end

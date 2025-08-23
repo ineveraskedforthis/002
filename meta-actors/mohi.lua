@@ -15,6 +15,7 @@ local def = {
 	STR_per_level = 1,
 	MAG_per_level = 6,
 	SPD_per_level = 4,
+	max_energy = 5
 }
 
 def.alignment[ELEMENT.BLOOD] = true

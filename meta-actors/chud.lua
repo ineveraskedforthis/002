@@ -15,6 +15,7 @@ local def = {
 	STR_per_level = 3,
 	MAG_per_level = 3,
 	SPD_per_level = 3,
+	max_energy = 2,
 }
 
 def.alignment[ELEMENT.CHAOS] = true
