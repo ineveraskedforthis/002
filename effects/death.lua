@@ -16,7 +16,7 @@ function def.target_effect(state, battle, origin, target, data)
 end
 
 function def.scene_render(state, battle, time_passed, origin, target, scene_data)
-	draw_actor(battle, origin.x, origin.y, target, 1 - time_passed / duration)
+	draw_actor.render(battle, origin.x, origin.y, target, 1 - time_passed / duration)
 end
 
 function def.scene_update(state, battle, time_passed, dt, origin, target, scene_data)

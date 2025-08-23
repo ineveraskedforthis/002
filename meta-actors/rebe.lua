@@ -11,6 +11,7 @@ local def = {
 	name = "Rebe",
 	inherent_skills = {require "skills.wait", require "skills.attack", require "skills.flicker-strike"},
 	image = love.graphics.newImage("assets/rebe.png"),
+	image_battle = love.graphics.newImage("assets/rebe-big.png"),
 	image_action_bar = love.graphics.newImage("assets/rebe-h.png"),
 	STR_per_level = 2,
 	MAG_per_level = 4,

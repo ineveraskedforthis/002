@@ -9,7 +9,7 @@ local fill_image = require "ui.fill-image"
 return function (battle)
 	for key, value in ipairs(battle.actors) do
 		if (value.visible) then
-			draw_actor(battle, value.x, value.y, value)
+			draw_actor.render(battle, value.x, value.y, value)
 		end
 	end
 

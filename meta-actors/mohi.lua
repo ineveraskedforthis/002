@@ -11,6 +11,7 @@ local def = {
 	name = "Mohi",
 	inherent_skills = {require "skills.wait", require "skills.magic-arrow", require "skills.blood-spear"},
 	image = love.graphics.newImage("assets/mohi.png"),
+	image_battle = love.graphics.newImage("assets/mohi-square.png"),
 	image_action_bar = love.graphics.newImage("assets/mohi-h.png"),
 	STR_per_level = 1,
 	MAG_per_level = 6,

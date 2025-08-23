@@ -109,7 +109,7 @@ local function update_ai_turn(state, battle)
 		local potential_targets = {}
 		local count = 0
 		for key, value in ipairs(battle.actors) do
-			if value.team == 0 then
+			if value.team == 0 and value.HP > 0 then
 				table.insert(potential_targets, key)
 				count = count + 1
 			end
@@ -145,9 +145,17 @@ local function update_ai_turn(state, battle)
 	end
 end
 
+local battle_actor_widget = require "ui.actor"
+
 function def.update(state, dt)
 	local battle = state.last_battle
 	skills_panel.update(state, dt)
+
+	for key, value in ipairs(battle.actors) do
+		if (value.visible) then
+			battle_actor_widget.update(state, battle, dt)
+		end
+	end
 
 	-- select something
 	update_selection(battle)
@@ -226,8 +234,8 @@ function def.on_click(state, x, y)
 
 	for key, value in ipairs(battle.actors) do
 		if battle.actors[key].team == 1 and battle.actors[key].HP > 0 and battle.actors[key].visible then
-			local r_x = offset_x + (style.battle_actors_spacing + ACTOR_WIDTH) * (value.pos - 1)
-			if (rect(r_x, offset_y, ACTOR_WIDTH, ACTOR_HEIGHT, x, y)) then
+			local rx, ry, w, h = battle_actor_widget.get_rect(state, battle, value.x, value.y, value)
+			if (rect(rx, ry, w, h, x, y)) then
 				battle.selected_actor = value
 			end
 		end

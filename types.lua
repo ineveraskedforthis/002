@@ -35,6 +35,7 @@ ELEMENT = {
 ---@field alignment table<ELEMENT, boolean|nil>
 ---@field name string
 ---@field image love.Image
+---@field image_battle love.Image?
 ---@field image_action_bar love.Image?
 ---@field image_skills love.Image?
 ---@field attack_sound love.Source?
@@ -59,6 +60,8 @@ ELEMENT = {
 ---@class Actor
 ---@field x number
 ---@field y number
+---@field w number
+---@field h number
 ---@field definition MetaActor
 ---@field wrapper MetaActorWrapper|nil
 ---@field visible boolean
@@ -71,6 +74,8 @@ ELEMENT = {
 ---@field status_effects Effect[]
 ---@field action_number number
 ---@field team number
+---@field battle_order number
+---@field battle_id number
 
 ---@class EffectDef
 ---@field description string

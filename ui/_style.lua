@@ -15,7 +15,7 @@ for i = 1, 10, 1 do
 end
 
 return {
-	battle_actors_spacing = 20,
+	battle_actors_spacing = 80,
 	base_margin = base_unit,
 	action_bar_item_height = 8 * base_unit,
 	action_bar_item_width = 13 * base_unit,

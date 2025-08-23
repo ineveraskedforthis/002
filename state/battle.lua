@@ -24,6 +24,8 @@ function namespace.reset_battle(battle)
 	battle.stage = namespace.BATTLE_STAGE.PROCESS_TURN
 end
 
+local available_id = 0
+
 ---comment
 ---@param def MetaActor
 ---@param pos number
@@ -44,8 +46,14 @@ function namespace.new_actor(def, pos, team, wrapper)
 		y = 0,
 		visible = false,
 		wrapper = wrapper,
-		energy = def.max_energy
+		energy = def.max_energy,
+		battle_id = available_id,
+		battle_order = 0,
+		w = 0,
+		h = 0,
 	}
+
+	available_id = available_id + 1
 
 	temp.x = get_x(temp)
 	temp.y = get_y(temp)
@@ -80,6 +88,10 @@ local function sort_battle(battle)
 		end
 		return a.action_number < b.action_number
 	end)
+
+	for index, value in ipairs(battle.actors) do
+		value.battle_order = index
+	end
 end
 
 ---comment

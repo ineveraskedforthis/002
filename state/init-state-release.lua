@@ -1,9 +1,12 @@
 local ids = require "scenes._ids"
+local battles = require "state.battle"
 
 ---@param state GameState
 return function (state)
 	state.currency = 5
 	state.set_scene(state, ids.select_battle)
+	state.last_battle.wave = 1
+	battles.reset_battle(state.last_battle)
 
 	state.playable_actors = {
 		{
@@ -52,7 +55,7 @@ return function (state)
 		},
 		{
 			def = require "meta-actors.rebe",
-			unlocked = false,
+			unlocked = true,
 			lineup_position = 0,
 			experience = 0,
 			additional_weapon_mastery = 0,
@@ -63,7 +66,7 @@ return function (state)
 		},
 		{
 			def = require "meta-actors.mohi",
-			unlocked = false,
+			unlocked = true,
 			lineup_position = 0,
 			experience = 0,
 			additional_weapon_mastery = 0,
