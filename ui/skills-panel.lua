@@ -6,12 +6,23 @@ local style = require "ui._style"
 local rect = require "ui.rect"
 local fill_image = require "ui.fill-image"
 local fill_rect = require "ui.fill-rect"
+local draw_rect = require "ui.draw-rect"
 
 
 local offset_x = style.action_bar_item_width * 2
-
 local description_offset_x = 200
 local description_offset_y = 200
+
+local internal_timer = 0
+---@type number[]
+local transition = {}
+---@type boolean[]
+local active_cells = {}
+
+for i = 0, 100 do
+	transition[i] = 0
+	active_cells[i] = false
+end
 
 ---comment
 ---@param x number
@@ -100,16 +111,72 @@ local function render(battle)
 			local current_x = offset_x
 			local current_y = window_h - style.skill_button_size - style.base_margin - style.energy_point_h - style.base_margin
 
-			for i = 1, acting_actor.energy do
-				local expand = 0
-				if i <= reserve_points then
-					love.graphics.setColor(1, 0, 0, 1)
-					expand = 2
+			for i = 1, 20 do
+				local shrink = 0
+				local shift_y = 0
+				local fill = false
+
+				local shift = math.max(0, acting_actor.energy - reserve_points)
+
+				local reserved = i > shift and i - shift <= reserve_points
+				local current = i <= acting_actor.energy
+
+				local t = SMOOTHERSTEP(transition[i])
+
+				local r = 0.2
+				local g = 0.8
+				local b = 1
+
+				love.graphics.setColor(r, g, b, 1)
+
+				if reserved and current then
+					fill = true
+					active_cells[i] = true
+				elseif reserved then
+					fill = false
+					active_cells[i] = true
+				elseif current then
+					fill = true
+					active_cells[i] = false
 				else
-					love.graphics.setColor(0, 0.5, 1, 1)
+					love.graphics.setColor(0, 0, 0, 1)
+					fill = false
+					active_cells[i] = false
 				end
 
-				fill_rect(current_x - expand, current_y - expand, style.energy_point_w + expand * 2, style.energy_point_h + expand * 2)
+				shrink = 5 * t
+				shift_y = -3 * (1.5 + math.cos(internal_timer * 2 + i / 2)) * t
+
+				if fill then
+					fill_rect(
+						current_x,
+						current_y+ shift_y,
+						style.energy_point_w,
+						style.energy_point_h
+					)
+
+					if shrink > 0 then
+
+
+						love.graphics.setColor(r * (1 - t), g * (1 - t) + 0.1 * t, b * (1 - t) + 0.5 * t, 1)
+						fill_rect(
+							current_x + shrink,
+							current_y+ shift_y + shrink,
+							style.energy_point_w - shrink * 2,
+							style.energy_point_h - shrink * 2
+						)
+					end
+				end
+
+				love.graphics.setColor(0, 0, 0, 1)
+
+				draw_rect(
+					current_x,
+					current_y + shift_y,
+					style.energy_point_w,
+					style.energy_point_h
+				)
+
 				current_x = current_x + style.energy_point_w + style.base_margin
 			end
 		end
@@ -164,5 +231,17 @@ end
 
 return {
 	render = render,
-	on_click = on_click
+	on_click = on_click,
+	update = function (state, dt)
+		---@type number
+		internal_timer = internal_timer + dt
+
+		for index, value in ipairs(transition) do
+			if active_cells[index] then
+				transition[index] = math.min(1, transition[index] + dt)
+			else
+				transition[index] = math.max(0, transition[index] - dt)
+			end
+		end
+	end
 }

@@ -147,6 +147,7 @@ end
 
 function def.update(state, dt)
 	local battle = state.last_battle
+	skills_panel.update(state, dt)
 
 	-- select something
 	update_selection(battle)
