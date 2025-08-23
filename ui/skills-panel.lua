@@ -145,7 +145,7 @@ local function render(battle)
 				end
 
 				shrink = 5 * t
-				shift_y = -3 * (1.5 + math.cos(internal_timer * 2 + i / 2)) * t
+				shift_y = -3 * (4 + math.cos(internal_timer * 2 + i / 2)) * t
 
 				if fill then
 					fill_rect(
