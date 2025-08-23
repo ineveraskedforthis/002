@@ -82,10 +82,15 @@ return function (state)
 		{
 			actor = 0,
 			def = require "gemstones.scavenger"
+		},
+		{
+			actor = 0,
+			def = require "gemstones.stoneheart"
 		}
 	}
 
 	state.set_gemstone_owner(state, 1, 1)
+	state.set_gemstone_owner(state, 1, 2)
 
 	state.current_lineup = {
 		1,

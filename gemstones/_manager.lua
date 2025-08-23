@@ -12,6 +12,7 @@ function collection.new_gemstone(name)
 		description = "",
 		additional_hp = 0,
 		additional_mag = 0,
+		base_shield = 0,
 		on_damage_dealt_effect = function (origin, target, damage_dealt)
 
 		end,
@@ -19,6 +20,9 @@ function collection.new_gemstone(name)
 
 		end,
 		on_turn_start = function (origin)
+
+		end,
+		on_damage_received_effect = function (state, battle, origin, target, damage_dealt)
 
 		end
 	}

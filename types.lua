@@ -94,9 +94,11 @@ ELEMENT = {
 ---@field description string
 ---@field on_kill_effect fun(state: GameState, battle: Battle, origin: Actor, target: Actor)
 ---@field on_damage_dealt_effect fun(state: GameState, battle: Battle, origin: Actor, target: Actor, damage_dealt: number)
+---@field on_damage_received_effect fun(state: GameState, battle: Battle, origin: Actor, target: Actor, damage_dealt: number)
 ---@field on_turn_start fun(state: GameState, battle: Battle, origin: Actor)
 ---@field additional_hp number
 ---@field additional_mag number
+---@field base_shield number
 
 ---@class Effect
 ---@field def number

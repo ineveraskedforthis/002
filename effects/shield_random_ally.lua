@@ -19,7 +19,7 @@ end
 
 function def.target_effect (state, battle, origin, target)
 	if target then
-		ADD_SHIELD(origin, target, 0.05, 0, 2)
+		ADD_SHIELD(origin, target, 0.05 * TOTAL_MAX_HP_ACTOR(origin))
 	end
 end
 

@@ -176,6 +176,12 @@ function ON_DAMAGE_DEALT(state, battle, a, b, actual_damage)
 			def.on_damage_dealt_effect(state, battle, a, b, actual_damage)
 		end
 	end
+	if b.wrapper then
+		for index, value in ipairs(b.wrapper.gemstones) do
+			local def = gemstones.get(value)
+			def.on_damage_received_effect(state, battle, a, b, actual_damage)
+		end
+	end
 end
 
 ---@param state GameState
@@ -276,15 +282,9 @@ end
 
 ---@param origin Actor
 ---@param target Actor
----@param origin_hp_ratio number
----@param origin_defense_ratio number
----@param max_hp_ratio number
-function ADD_SHIELD(origin, target, origin_hp_ratio, origin_defense_ratio, max_hp_ratio)
-	local origin_max_hp = TOTAL_MAX_HP(origin.definition, origin.wrapper)
-	local target_max_hp = TOTAL_MAX_HP(target.definition, target.wrapper)
-	local add = math.floor(origin_max_hp * origin_hp_ratio + origin.definition.DEF * origin_defense_ratio)
-	local mult = math.min(1, max_hp_ratio * target_max_hp / target.SHIELD)
-	target.SHIELD = target.SHIELD + math.floor(add * mult)
+---@param amount number
+function ADD_SHIELD(origin, target, amount)
+	target.SHIELD = target.SHIELD + math.floor(amount)
 end
 
 ---@param state GameState
