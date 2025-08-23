@@ -206,7 +206,7 @@ function widget.render(battle, x, y, actor, alpha)
 
 	for index, value in ipairs(actor.pending_damage) do
 		local a = value.alpha
-		style.font(math.log10(a))
+		style.font(math.log(value.value, 3))
 		love.graphics.setColor(0, 0, 0, a)
 		local text_border = 1
 		love.graphics.print(tostring(value.value), x - text_border, y - 50 * (1 - a))

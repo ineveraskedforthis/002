@@ -18,6 +18,7 @@ ELEMENT = {
 	PROTECTION = 3,
 	LIGHT = 4,
 	BLOOD = 5,
+	ELECTRO = 6
 }
 
 ---@class MetaActor

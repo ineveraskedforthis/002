@@ -28,7 +28,7 @@ return {
 	energy_point_w = 30,
 
 	basic_bg_color = function ()
-		love.graphics.setBackgroundColor(1, 1, 1, 1)
+		love.graphics.setBackgroundColor(0.5, 0.5, 0.5, 1)
 	end,
 
 	basic_element_color = function ()
@@ -44,6 +44,6 @@ return {
 	end,
 
 	font = function (x)
-		love.graphics.setFont(font_by_size[math.max(1, math.min(x, 10))])
+		love.graphics.setFont(font_by_size[math.max(1, math.min(math.floor(x), 10))])
 	end
 }
