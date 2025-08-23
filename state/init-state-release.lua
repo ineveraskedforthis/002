@@ -55,7 +55,7 @@ return function (state)
 		},
 		{
 			def = require "meta-actors.rebe",
-			unlocked = true,
+			unlocked = false,
 			lineup_position = 0,
 			experience = 0,
 			additional_weapon_mastery = 0,
@@ -66,7 +66,7 @@ return function (state)
 		},
 		{
 			def = require "meta-actors.mohi",
-			unlocked = true,
+			unlocked = false,
 			lineup_position = 0,
 			experience = 0,
 			additional_weapon_mastery = 0,
