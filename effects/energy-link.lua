@@ -1,8 +1,9 @@
 local manager = require "effects._manager"
-local duration = 0.2
+local duration = 0.4
 local id, def = manager.new_effect(duration)
 
 local move_back = require "effects.move_to_original_position"
+local actor_image = require "ui.actor"
 
 def.description = "Beam of energy jumps 10 times dealing 50% more damage at every step. Starting damage is [25% of MAG]."
 
@@ -85,8 +86,9 @@ function def.scene_on_start(state, battle, origin, target, data)
 
 	if data.counter == nil then
 		data.counter = 10
-		data.x = origin.x
-		data.y = origin.y
+		local sx, sy, sw, sh = actor_image.get_rect(state, battle, origin.x, origin.y, origin)
+		data.x = sx + sw / 2
+		data.y = sy + sh / 2
 		data.damage = TOTAL_MAG_ACTOR(origin) * 0.25
 	else
 		data.damage = data.damage * 1.5
@@ -97,11 +99,14 @@ function def.scene_on_start(state, battle, origin, target, data)
 
 	-- generate 5 segments
 
+
 	local start_x = data.x
 	local start_y = data.y
 
-	local end_x = target.x
-	local end_y = target.y
+	local sx, sy, sw, sh = actor_image.get_rect(state, battle, target.x, target.y, target)
+
+	local end_x = sx + sw / 2
+	local end_y = sy + sh / 2
 
 	for i = 0, 5 do
 		local t = i / 5

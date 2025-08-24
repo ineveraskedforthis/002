@@ -212,11 +212,11 @@ function widget.render(state, battle, x, y, actor, alpha)
 				rgb = {0, 1, 0}
 			end
 			state.vfx.new_text(
-				tostring(value.value), rgb,
+				tostring(math.abs(value.value)), rgb,
 				x, y,
 				love.math.randomNormal() * 20,
 				-20,
-				math.log(value.value, 3),
+				math.log(math.abs(value.value) + 1, 3),
 				4
 			)
 			value.particle_exist = true
@@ -246,7 +246,7 @@ end
 ---@return number
 ---@return number
 function widget.get_rect(state, battle, x, y, actor)
-	if actor.definition.image_battle then
+	if actor.definition.image_battle and actor.battle_id ~= 0 then
 		local t = SMOOTHERSTEP(quad_progress[actor.battle_id])
 		local current_scale = scale + t * 1 / 12
 

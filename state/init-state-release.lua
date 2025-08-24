@@ -77,7 +77,7 @@ return function (state)
 		},
 		{
 			def = require "meta-actors.trong",
-			unlocked = true,
+			unlocked = false,
 			lineup_position = 0,
 			experience = 0,
 			additional_weapon_mastery = 0,
