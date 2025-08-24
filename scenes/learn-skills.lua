@@ -20,7 +20,9 @@ local skills_to_learn = {
 	require "skills.firestorm",
 	require "skills.magic-arrow",
 	require "skills.flame-sweep",
-	require "skills.blood-spear"
+	require "skills.blood-spear",
+	require "skills.energy-link",
+	require "skills.flicker-strike"
 }
 
 ---comment
@@ -40,6 +42,10 @@ local function can_learn(value, actor)
 		if value2.name == value.name then
 			return false
 		end
+	end
+
+	if actor.def.max_energy < value.required_energy then
+		return false
 	end
 
 	if TOTAL_STR(actor.def, actor) < value.required_strength then
