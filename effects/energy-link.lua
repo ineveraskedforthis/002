@@ -41,6 +41,10 @@ function def.target_effect(state, battle, origin, target, data)
 
 	DEAL_DAMAGE(state, battle, origin, target, data.damage)
 
+	if target.HP <= 0 then
+		origin.energy = origin.energy + 2
+	end
+
 	-- select random target
 
 	---@type Actor[]

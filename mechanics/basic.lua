@@ -125,9 +125,9 @@ function TOTAL_SPD(a, w)
 end
 
 ---@param state GameState
----@param battle Battle
+---@param battle BattleState
 ---@param origin Actor
----@param target Actor
+---@param target Actor?
 ---@param skill ActiveSkill
 function USE_SKILL(state, battle, origin, target, skill)
 	assert(origin.energy >= skill.required_energy)
@@ -138,6 +138,9 @@ function USE_SKILL(state, battle, origin, target, skill)
 		if def.target_selection then
 			target = def.target_selection(state, battle, origin)
 		end
+
+		assert(target ~= nil)
+
 		---@type Effect
 		local new_effect = {
 			data = {},
@@ -153,7 +156,7 @@ function USE_SKILL(state, battle, origin, target, skill)
 end
 
 ---@param state GameState
----@param battle Battle
+---@param battle BattleState
 ---@param origin Actor
 ---@param target Actor
 ---@param skill ActiveSkill
@@ -165,7 +168,7 @@ function CAN_USE_SKILL(state, battle, origin, target, skill)
 end
 
 ---@param state GameState
----@param battle Battle
+---@param battle BattleState
 ---@param a Actor
 ---@param b Actor
 ---@param actual_damage number
@@ -185,7 +188,7 @@ function ON_DAMAGE_DEALT(state, battle, a, b, actual_damage)
 end
 
 ---@param state GameState
----@param battle Battle
+---@param battle BattleState
 ---@param a Actor
 function ON_TURN_START(state, battle, a)
 	a.energy = math.min(a.definition.max_energy, a.energy + 1)
@@ -201,7 +204,7 @@ function ON_TURN_START(state, battle, a)
 end
 
 ---@param state	GameState
----@param battle Battle
+---@param battle BattleState
 ---@param a Actor
 ---@param b Actor
 function ON_KILL(state, battle, a, b)
@@ -215,7 +218,7 @@ end
 
 ---comment
 ---@param state GameState
----@param battle Battle
+---@param battle BattleState
 ---@param a Actor
 ---@param b Actor
 ---@param damage number
@@ -289,7 +292,7 @@ function ADD_SHIELD(origin, target, amount)
 end
 
 ---@param state GameState
----@param battle Battle
+---@param battle BattleState
 ---@param origin Actor
 ---@param target Actor
 ---@param amount number

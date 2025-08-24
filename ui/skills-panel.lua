@@ -1,6 +1,6 @@
 local effects = require "effects._manager"
 
-local STAGE = require "state.battle".BATTLE_STAGE
+local STAGE = require "fights._stages"
 
 local style = require "ui._style"
 local rect = require "ui.rect"
@@ -63,7 +63,7 @@ local function render_skill(x, y, width, acting_actor, value)
 end
 
 ---comment
----@param battle Battle
+---@param battle BattleState
 local function render(battle)
 	-- draw character art on top
 	local window_size = love.graphics.getWidth()
@@ -74,7 +74,7 @@ local function render(battle)
 	local padding = 5
 	local x = window_size - width - padding
 
-	if battle.actors[1].team == 0 and battle.selected_actor then
+	if battle.actors[1] and battle.actors[1].team == 0 and battle.selected_actor then
 		local acting_actor = battle.actors[1]
 		if (acting_actor.definition.image_skills) then
 			love.graphics.setColor(1, 1, 1, 1)
@@ -186,7 +186,7 @@ end
 
 ---comment
 ---@param state GameState
----@param battle Battle
+---@param battle BattleState
 ---@param x number
 ---@param y number
 local function on_click(state, battle, x, y)

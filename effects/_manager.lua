@@ -7,7 +7,6 @@ local available_id = 1
 local collection = {}
 
 function collection.new_effect(duration)
-	-- print("new effect ", available_id)
 	---@type EffectDef
 	local new = {
 		description = "",
@@ -35,7 +34,6 @@ end
 ---@param id number
 ---@return EffectDef
 function collection.get(id)
-	-- print("get effect", id)
 	return data[id]
 end
 

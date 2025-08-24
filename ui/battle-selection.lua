@@ -49,17 +49,17 @@ end
 ---@param y number
 function widget.on_click(state, x, y)
 	if circle(fight_easy_1_x, fight_easy_1_y, 50, x ,y) then
-		start_scripted_battle(state, BATTLES.EASY_1)
+		start_scripted_battle(state, BATTLES.EASY_1, true)
 		state.set_scene(state, scenes.battle)
 	end
 
 	if circle(fight_1_x, fight_1_y, 50, x ,y) then
-		start_scripted_battle(state, BATTLES.NORMAL_1)
+		start_scripted_battle(state, BATTLES.NORMAL_1, true)
 		state.set_scene(state, scenes.battle)
 	end
 
 	if circle(fight_2_x, fight_2_y, 50, x ,y) then
-		start_scripted_battle(state, BATTLES.NORMAL_2)
+		start_scripted_battle(state, BATTLES.NORMAL_2, true)
 		state.set_scene(state, scenes.battle)
 	end
 end

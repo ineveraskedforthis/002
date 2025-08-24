@@ -8,7 +8,7 @@ local scenes_manager = require "scenes._manager"
 ---@field currency number
 ---@field current_scene number
 ---@field current_scripted_fight SCRIPTED_BATTLE
----@field last_battle Battle
+---@field last_battle BattleState
 local state = {
 	currency = 0,
 	current_lineup = {},
@@ -20,7 +20,7 @@ local state = {
 		in_progress = false,
 		processing_effects = false,
 		selected_actor = nil,
-		stage = require "state.battle".BATTLE_STAGE.PROCESS_EFFECTS_BEFORE_TURN,
+		stage = require "fights._stages".STOPPED,
 		wave = 1
 	},
 	playable_actors = {},

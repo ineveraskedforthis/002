@@ -6,7 +6,7 @@ local draw_rect = require "ui.draw-rect"
 local fill_image = require "ui.fill-image"
 
 ---@param state GameState
----@param battle Battle
+---@param battle BattleState
 return function (state, battle)
 	for key, value in ipairs(battle.actors) do
 		if (value.visible) then

@@ -1,0 +1,13 @@
+---@enum BATTLE_SYSTEM_RESPONSE
+local enum = {
+	BATTLE_WON = 1,
+	BATTLE_LOST = 2,
+	BATTLE_RETREAT = 3,
+	BATTLE_STOP = 4,
+	OK = 5,
+	ERROR = 6,
+	AWAIT_USER_INPUT = 7,
+	REQUEST_NEW_WAVE = 8
+}
+
+return enum

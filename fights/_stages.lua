@@ -1,0 +1,11 @@
+---@enum BATTLE_STAGE
+local enum = {
+	PROCESS_EFFECTS_BEFORE_TURN = 1,
+	AWAIT_TURN = 2,
+	PROCESS_EFFECTS_AFTER_TURN = 3,
+	PROCESS_TURN = 4,
+	NEW_WAVE = 5,
+	STOPPED = 6
+}
+
+return enum

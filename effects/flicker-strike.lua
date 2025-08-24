@@ -20,6 +20,19 @@ end
 
 function def.target_effect(state, battle, origin, target, data)
 	if target.HP <= 0 then
+		---@type Effect
+		local go_back = {
+			data = {
+				counter = data.counter - 1,
+			},
+			def = move_back,
+			origin = origin,
+			target = origin,
+			started = false,
+			time_passed = 0,
+			times_activated = 0
+		}
+		table.insert(battle.effects_queue, go_back)
 		return
 	end
 
@@ -31,6 +44,8 @@ function def.target_effect(state, battle, origin, target, data)
 		---@type number
 		data.counter = data.counter + 5
 	end
+
+	local go_back = false
 
 	if (data.counter > 0) then
 		-- select random target
@@ -63,10 +78,15 @@ function def.target_effect(state, battle, origin, target, data)
 			}
 
 			table.insert(battle.effects_queue, next_attack)
+		else
+			go_back = true
 		end
 	else
-		---@type Effect
-		local go_back = {
+		go_back = true
+	end
+
+	if go_back then
+		table.insert(battle.effects_queue, {
 			data = {
 				counter = data.counter - 1,
 			},
@@ -76,8 +96,7 @@ function def.target_effect(state, battle, origin, target, data)
 			started = false,
 			time_passed = 0,
 			times_activated = 0
-		}
-		table.insert(battle.effects_queue, go_back)
+		})
 	end
 end
 

@@ -3,6 +3,8 @@ local manager = require "effects._manager"
 local duration = 0.1
 local id, def = manager.new_effect(duration)
 
+def.description = "death"
+
 function def.target_effect(state, battle, origin, target, data)
 	if target.team == 1 then
 		for _, value in ipairs(battle.actors) do

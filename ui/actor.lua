@@ -137,7 +137,7 @@ end
 
 ---comment
 ---@param state GameState
----@param battle Battle
+---@param battle BattleState
 ---@param x number
 ---@param y number
 ---@param actor Actor
@@ -237,7 +237,7 @@ end
 
 ---comment
 ---@param state GameState
----@param battle Battle
+---@param battle BattleState
 ---@param x number
 ---@param y number
 ---@param actor Actor
