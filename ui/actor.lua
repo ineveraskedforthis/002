@@ -136,11 +136,12 @@ for i = 1, 30 do
 end
 
 ---comment
+---@param state GameState
 ---@param battle Battle
 ---@param x number
 ---@param y number
 ---@param actor Actor
-function widget.render(battle, x, y, actor, alpha)
+function widget.render(state, battle, x, y, actor, alpha)
 	local mouse_x, mouse_y = love.mouse.getPosition()
 	if not alpha then
 		alpha = 1
@@ -205,20 +206,21 @@ function widget.render(battle, x, y, actor, alpha)
 	end
 
 	for index, value in ipairs(actor.pending_damage) do
-		local a = value.alpha
-		style.font(math.log(value.value, 3))
-		love.graphics.setColor(0, 0, 0, a)
-		local text_border = 1
-		love.graphics.print(tostring(value.value), x - text_border, y - 50 * (1 - a))
-		love.graphics.print(tostring(value.value), x, y - 50 * (1 - a) + text_border)
-		love.graphics.print(tostring(value.value), x + text_border, y - 50 * (1 - a))
-		love.graphics.print(tostring(value.value), x, y - 50 * (1 - a) - text_border)
-		if value.value > 0 then
-			love.graphics.setColor(1, 0, 0, a)
-		else
-			love.graphics.setColor(0, 1, 0, a)
+		if not value.particle_exist then
+			local rgb = {1, 0, 0}
+			if value.value <= 0 then
+				rgb = {0, 1, 0}
+			end
+			state.vfx.new_text(
+				tostring(value.value), rgb,
+				x, y,
+				love.math.randomNormal() * 20,
+				-20,
+				math.log(value.value, 3),
+				4
+			)
+			value.particle_exist = true
 		end
-		love.graphics.print(tostring(value.value), x, y - 50 * (1 - a))
 	end
 end
 

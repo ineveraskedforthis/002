@@ -10,40 +10,25 @@ function def.scene_render(state, battle, time_passed, origin, target, scene_data
 	---@type EnergyLinkData
 	scene_data = scene_data
 
-	love.graphics.setColor(0, 0, 0, 1)
-	love.graphics.setLineWidth(20)
-	love.graphics.line(scene_data.path)
+	local alpha = time_passed / duration
+	local progress = SMOOTHERSTEP(1 - math.abs(1 - alpha * 2))
 
-	local progress = SMOOTHERSTEP(time_passed / duration)
-	love.graphics.setBlendMode("add")
+	love.graphics.setColor(0, 0, 0, progress)
+	love.graphics.setLineWidth(5)
+	love.graphics.line(scene_data.path)
 	love.graphics.setColor(1, 1, 1, progress)
-	love.graphics.setLineWidth(4)
+	love.graphics.setLineWidth(3)
 	love.graphics.line(scene_data.path)
+
 	love.graphics.setLineWidth(1)
-
-	for index, value in ipairs(scene_data.additional_effects) do
-		local x = target.x + math.cos(value.angle) * value.speed * progress
-		local y = target.y + math.sin(value.angle) * value.speed * progress
-		love.graphics.setColor(1, 1, 1, 0.4 * (1 - progress))
-		love.graphics.circle("fill", x, y, value.size)
-	end
-
-	love.graphics.setBlendMode("alpha")
 end
-
----@class EnergyLinkVFX
----@field angle number
----@field size number
----@field speed number
 
 ---@class EnergyLinkData
 ---@field damage number
 ---@field counter number
----@field additional_effects EnergyLinkVFX[]
 ---@field path number[]
 ---@field x number
 ---@field y number
-
 
 function def.target_effect(state, battle, origin, target, data)
 	---@type EnergyLinkData
@@ -90,6 +75,7 @@ function def.scene_update(state, battle, time_passed, dt, origin, target, scene_
 	if (time_passed > duration) then
 		return true
 	end
+
 	return false
 end
 
@@ -102,7 +88,6 @@ function def.scene_on_start(state, battle, origin, target, data)
 		data.x = origin.x
 		data.y = origin.y
 		data.damage = TOTAL_MAG_ACTOR(origin) * 0.25
-		data.additional_effects = {}
 	else
 		data.damage = data.damage * 1.5
 		data.counter = data.counter - 1
@@ -120,19 +105,26 @@ function def.scene_on_start(state, battle, origin, target, data)
 
 	for i = 0, 5 do
 		local t = i / 5
-		table.insert(data.path, start_x * t + end_x * (1 - t) + love.math.randomNormal() * 5)
-		table.insert(data.path, start_y * t + end_y * (1 - t) + love.math.randomNormal() * 5)
+		local cx = start_x * t + end_x * (1 - t) + love.math.randomNormal() * 4
+		local cy = start_y * t + end_y * (1 - t) + love.math.randomNormal() * 4
+		table.insert(data.path, cx)
+		table.insert(data.path, cy)
+
+
+
+		for i = 0, 5 do
+			local angle = love.math.random() * math.pi * 2
+
+			state.vfx.new_particle(
+				cx, cy, math.cos(angle) * 100, math.sin(angle) * 100,
+				math.abs(love.math.randomNormal() * 5),
+				math.abs(love.math.randomNormal() * 100)
+			)
+		end
 	end
 
-	for i = 0, 500 do
-		---@type EnergyLinkVFX
-		local vfx = {
-			angle = love.math.random() * math.pi * 2,
-			size = math.abs(love.math.randomNormal() * 5),
-			speed = math.abs(love.math.randomNormal() * 100)
-		}
-		table.insert(data.additional_effects, vfx)
-	end
+	table.insert(data.path, end_x)
+	table.insert(data.path, end_y)
 
 	data.x = end_x
 	data.y = end_y

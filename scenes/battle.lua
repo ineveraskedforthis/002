@@ -249,7 +249,7 @@ function def.render(state)
 	style.basic_bg_color()
 	style.basic_element_color()
 
-	main_render(state.last_battle)
+	main_render(state, state.last_battle)
 
 	local effect = state.last_battle.effects_queue[1]
 	if effect then

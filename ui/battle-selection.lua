@@ -25,21 +25,22 @@ local widget = {}
 ---@param state GameState
 function widget.render(state)
 	style.basic_element_color()
+	style.default_font()
 
 	love.graphics.circle("line", fight_easy_1_x, fight_easy_1_y, 50)
 	love.graphics.printf("Enter easy battle 1", fight_easy_1_x - 40, fight_easy_1_y - 10, 80, "center")
 
 	love.graphics.circle("line", fight_1_x, fight_1_y, 50)
-	love.graphics.print("Enter battle 1", fight_1_x - 40, fight_1_y - 10)
+	love.graphics.printf("Enter battle 1", fight_1_x - 40, fight_1_y - 10, 80, "center")
 
 	love.graphics.circle("line", fight_2_x, fight_2_y, 50)
-	love.graphics.print("Enter battle 2", fight_2_x - 40, fight_2_y - 10)
+	love.graphics.printf("Enter battle 2", fight_2_x - 40, fight_2_y - 10, 80, "center")
 
 	love.graphics.circle("line", fight_3_x, fight_3_y, 50)
-	love.graphics.print("Enter battle 3", fight_3_x - 40, fight_3_y - 10)
+	love.graphics.printf("Enter battle 3", fight_3_x - 40, fight_3_y - 10, 80, "center")
 
 	love.graphics.circle("line", fight_4_x, fight_4_y, 50)
-	love.graphics.print("Enter battle 4", fight_4_x - 40, fight_4_y - 10)
+	love.graphics.printf("Enter battle 4", fight_4_x - 40, fight_4_y - 10, 80, "center")
 end
 
 ---comment

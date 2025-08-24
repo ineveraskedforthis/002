@@ -3,6 +3,7 @@
 ---@class PendingDamage
 ---@field value number
 ---@field alpha number
+---@field particle_exist boolean
 
 ---@enum WEAPON
 WEAPON = {

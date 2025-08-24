@@ -251,7 +251,8 @@ function DEAL_DAMAGE(state, battle, a, b, damage)
 	---@type PendingDamage
 	local pending = {
 		alpha = 1,
-		value = damage
+		value = damage,
+		particle_exist = false
 	}
 	table.insert(b.pending_damage, pending)
 	ON_DAMAGE_DEALT(state, battle, a, b, actual_damage)

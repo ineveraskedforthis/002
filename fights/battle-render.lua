@@ -5,11 +5,12 @@ local fill_rect = require "ui.fill-rect"
 local draw_rect = require "ui.draw-rect"
 local fill_image = require "ui.fill-image"
 
+---@param state GameState
 ---@param battle Battle
-return function (battle)
+return function (state, battle)
 	for key, value in ipairs(battle.actors) do
 		if (value.visible) then
-			draw_actor.render(battle, value.x, value.y, value)
+			draw_actor.render(state, battle, value.x, value.y, value)
 		end
 	end
 

@@ -23,7 +23,8 @@ local state = {
 		stage = require "state.battle".BATTLE_STAGE.PROCESS_EFFECTS_BEFORE_TURN,
 		wave = 1
 	},
-	playable_actors = {}
+	playable_actors = {},
+	vfx = require "scenes._vfx_manager"
 }
 
 function state.load()
