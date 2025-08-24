@@ -1,5 +1,5 @@
 local manager = require "effects._manager"
-local duration = 0.4
+local duration = 0.2
 local id, def = manager.new_effect(duration)
 
 local move_back = require "effects.move_to_original_position"

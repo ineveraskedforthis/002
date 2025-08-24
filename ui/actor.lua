@@ -246,8 +246,9 @@ end
 ---@return number
 ---@return number
 function widget.get_rect(state, battle, x, y, actor)
-	if actor.definition.image_battle and actor.battle_id ~= 0 then
-		local t = SMOOTHERSTEP(quad_progress[actor.battle_id])
+	local quad_index = actor.battle_id % 30 + 1
+	if actor.definition.image_battle then
+		local t = SMOOTHERSTEP(quad_progress[quad_index])
 		local current_scale = scale + t * 1 / 12
 
 		local actual_height = base_height_total * t + base_height * (1 - t)
