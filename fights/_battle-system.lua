@@ -65,9 +65,9 @@ end
 ---@return BATTLE_SYSTEM_RESPONSE
 local function process_new_wave(state, battle, dt)
 	if update_effects(state, battle, dt) then
-		battle.stage = BATTLE_STAGE.PROCESS_EFFECTS_AFTER_TURN
+		manager.process_turn(state, battle, true)
+		battle.stage = BATTLE_STAGE.PROCESS_EFFECTS_BEFORE_TURN
 	end
-
 	return BATTLE_SYSTEM_RESPONSE.OK
 end
 
@@ -159,14 +159,15 @@ end
 
 ---@param state GameState
 ---@param battle BattleState
+---@param do_not_remove_first_actor boolean
 ---@return BATTLE_SYSTEM_RESPONSE
-local function process_turn(state, battle)
+function manager.process_turn(state, battle, do_not_remove_first_actor)
 	print("process turn")
 
-	local can_proceed = false
+	local can_proceed = do_not_remove_first_actor
 	while not can_proceed do
-		---@type Actor
-		local actor = table.remove(battle.actors, 1)
+		local actor = battle.actors[1]
+		table.remove(battle.actors, 1)
 		if actor.HP > 0 then
 			print("readd to battle:" .. actor.definition.name)
 			manager.add_actor_to_battle(battle, actor, true)
@@ -352,7 +353,7 @@ function manager.update_battle_state(state, battle, dt)
 	end
 
 	if battle.stage == BATTLE_STAGE.PROCESS_TURN then
-		return process_turn(state, state.last_battle)
+		return manager.process_turn(state, state.last_battle, false)
 	end
 
 	if battle.stage == BATTLE_STAGE.PROCESS_EFFECTS_BEFORE_TURN then

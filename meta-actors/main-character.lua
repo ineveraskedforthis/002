@@ -7,6 +7,7 @@ local def = {
 	name = "(You)",
 	inherent_skills = {require "skills.wait", require "skills.attack"},
 	image = love.graphics.newImage("assets/main-character.png"),
+	image_battle = love.graphics.newImage("assets/main-character-square.png"),
 	image_action_bar = love.graphics.newImage("assets/main-character-h.png"),
 	image_skills = love.graphics.newImage("assets/main-character-skills.png"),
 	MAG = 5,
