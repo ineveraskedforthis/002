@@ -301,7 +301,8 @@ function RESTORE_HP(state, battle, origin, target, amount)
 	---@type PendingDamage
 	local pending = {
 		alpha = 1,
-		value = -amount
+		value = -amount,
+		particle_exist = false
 	}
 	table.insert(target.pending_damage, pending)
 end
