@@ -5,9 +5,9 @@ local def = {
 	DEF = 0,
 	SPD = 110,
 	name = "Chud",
-	inherent_skills = {require "skills.wait", require "skills.attack"},
+	inherent_skills = {require "skills.wait", require "skills.magic-arrow", require "skills.attack"},
 	image = love.graphics.newImage("assets/chud.png"),
-	MAG = 10,
+	MAG = 25,
 	STR = 10,
 	alignment = {},
 	weapon = WEAPON.NONE,
@@ -15,7 +15,7 @@ local def = {
 	STR_per_level = 3,
 	MAG_per_level = 3,
 	SPD_per_level = 3,
-	max_energy = 2,
+	max_energy = 6,
 }
 
 def.alignment[ELEMENT.CHAOS] = true

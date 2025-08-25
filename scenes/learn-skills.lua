@@ -15,6 +15,7 @@ local skills_to_learn = {
 	require "skills.heal-allies",
 	require "skills.heavy-strike",
 	require "skills.poison-strike",
+	require "skills.apply-poison",
 	require "skills.shield-random-allies",
 	require "skills.fireball",
 	require "skills.firestorm",
@@ -22,7 +23,8 @@ local skills_to_learn = {
 	require "skills.flame-sweep",
 	require "skills.blood-spear",
 	require "skills.energy-link",
-	require "skills.flicker-strike"
+	require "skills.flicker-strike",
+	require "skills.poison-attack"
 }
 
 ---comment

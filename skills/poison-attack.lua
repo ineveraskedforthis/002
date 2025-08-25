@@ -1,10 +1,10 @@
-local attack = require "effects.poison-strike"
+local attack = require "effects.poison-attack"
 
 ---@type ActiveSkill
 return {
-	name = "Explode poison",
+	name = "Poison attack",
 	description = function (actor)
-		return "Explodes all poison applied to enemy"
+		return "Attack the target enemy"
 	end,
 	effects_sequence = {
 		require "effects.move_to_target",
@@ -13,9 +13,9 @@ return {
 	},
 	targeted = true,
 	required_strength = 15,
-	required_magic = 5,
+	required_magic = 0,
 	required_elements = {ELEMENT.CHAOS},
-	cost = 10,
+	cost = 2,
 	allowed_weapons = {WEAPON.DAGGER, WEAPON.SWORD},
-	required_energy = 4,
+	required_energy = 0,
 }

@@ -77,7 +77,7 @@ return function (state)
 		},
 		{
 			def = require "meta-actors.trong",
-			unlocked = true,
+			unlocked = false,
 			lineup_position = 0,
 			experience = 0,
 			additional_weapon_mastery = 0,
@@ -85,7 +85,29 @@ return function (state)
 			skill_points = 0,
 			skills = {},
 			gemstones = {}
-		}
+		},
+		{
+			def = require "meta-actors.flower",
+			unlocked = false,
+			lineup_position = 0,
+			experience = 0,
+			additional_weapon_mastery = 0,
+			level = 0,
+			skill_points = 0,
+			skills = {},
+			gemstones = {}
+		},
+		{
+			def = require "meta-actors.font",
+			unlocked = false,
+			lineup_position = 0,
+			experience = 0,
+			additional_weapon_mastery = 0,
+			level = 0,
+			skill_points = 0,
+			skills = {},
+			gemstones = {}
+		},
 	}
 
 	---@type GemstoneWrapper[]

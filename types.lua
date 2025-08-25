@@ -8,7 +8,8 @@
 ---@enum WEAPON
 WEAPON = {
 	NONE = 0,
-	SWORD = 1
+	SWORD = 1,
+	DAGGER = 2,
 }
 
 ---@enum ELEMENT
