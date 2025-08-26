@@ -1,9 +1,8 @@
 ---@type MetaActor
 local def = {
 	MAX_HP = 120,
-	ATK = 10,
 	DEF = 0,
-	SPD = 40,
+	SPD = 50,
 	name = "Krist Wilfather",
 	inherent_skills = {require "skills.attack"},
 	image = love.graphics.newImage("assets/cris.png"),

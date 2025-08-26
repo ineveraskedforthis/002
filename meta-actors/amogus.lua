@@ -1,7 +1,7 @@
 ---@type MetaActor
 local def = {
 	MAX_HP = 100,
-	STR = 30,
+	STR = 10,
 	STR_per_level = 0,
 	MAG_per_level = 0,
 	SPD_per_level = 0,

@@ -4,7 +4,7 @@ return {
 	description = function (actor)
 		return "Strikes all enemies"
 	end,
-	effects_sequence = {
+	on_skill_used_sequence = {
 		require "effects.move_to_target",
 		require "effects.flame-sweep",
 		require "effects.move_to_original_position"
@@ -14,6 +14,7 @@ return {
 	required_magic = 15,
 	required_elements = {},
 	cost = 5,
-	allowed_weapons = {WEAPON.SWORD},
-	required_energy = 3
+	allowed_weapons = {{weapon = WEAPON.SWORD, mastery = 0}},
+	required_energy = 3,
+	is_attack = true
 }

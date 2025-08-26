@@ -4,7 +4,7 @@ return {
 	description = function (actor)
 		return "Deals a lot of aoe damage"
 	end,
-	effects_sequence = {
+	on_skill_used_sequence = {
 		require "effects.firestorm-stage",
 		require "effects.firestorm-stage",
 		require "effects.firestorm-stage",
@@ -22,5 +22,6 @@ return {
 	required_elements = {ELEMENT.FIRE},
 	cost = 75,
 	allowed_weapons = {},
-	required_energy = 5
+	required_energy = 5,
+	is_attack = true
 }

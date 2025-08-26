@@ -52,9 +52,18 @@ local function render_skill(x, y, width, acting_actor, value)
 		hovered = true
 		local text = value.name .. "\n"
 		text = text .. value.description(acting_actor) .. "\n"
-		for index, effect in ipairs(value.effects_sequence) do
-			local effect_def = effects.get(effect)
-			text = text .. tostring(index) .. " ".. effect_def.description .. "\n"
+		if value.on_skill_used_sequence then
+			for index, effect in ipairs(value.on_skill_used_sequence) do
+				local effect_def = effects.get(effect)
+				text = text .. tostring(index) .. " ".. effect_def.description .. "\n"
+			end
+		end
+		text = text .. "When you are attacked:\n"
+		if value.on_being_attacked_sequence then
+			for index, effect in ipairs(value.on_being_attacked_sequence) do
+				local effect_def = effects.get(effect)
+				text = text .. tostring(index) .. " ".. effect_def.description .. "\n"
+			end
 		end
 		love.graphics.printf(text, window_size - description_offset_x, description_offset_y, description_offset_x - style.base_margin, "left")
 	end

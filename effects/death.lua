@@ -4,6 +4,7 @@ local duration = 0.1
 local id, def = manager.new_effect(duration)
 
 def.description = "death"
+def.do_not_skip = true
 
 function def.target_effect(state, battle, origin, target, data)
 	if target.team == 1 then

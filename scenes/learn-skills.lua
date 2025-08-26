@@ -66,9 +66,9 @@ local function can_learn(value, actor)
 
 	local allowed_weapon = false
 	local weapon_check_exists = false
-	for _, weapon in ipairs(value.allowed_weapons) do
+	for _, req in ipairs(value.allowed_weapons) do
 		weapon_check_exists = true
-		if actor.def.weapon == weapon then
+		if actor.def.weapon == req.weapon and WEAPON_MASTERY(actor.def, actor) >= req.mastery then
 			allowed_weapon = true
 		end
 	end

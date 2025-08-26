@@ -99,7 +99,7 @@ return function (state)
 		},
 		{
 			def = require "meta-actors.font",
-			unlocked = false,
+			unlocked = true,
 			lineup_position = 0,
 			experience = 0,
 			additional_weapon_mastery = 0,

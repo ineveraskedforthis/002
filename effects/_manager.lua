@@ -25,6 +25,7 @@ function collection.new_effect(duration)
 		target_effect = function (state, battle, origin, target, scene_data)
 
 		end,
+		do_not_skip = false
 	}
 	table.insert(data, new)
 	available_id = available_id + 1

@@ -12,6 +12,10 @@ WEAPON = {
 	DAGGER = 2,
 }
 
+---@class WEAPON_REQUIREMENT
+---@field weapon WEAPON
+---@field mastery number
+
 ---@enum ELEMENT
 ELEMENT = {
 	FIRE = 0,
@@ -91,6 +95,7 @@ ELEMENT = {
 ---@field target_selection (fun(state: GameState, battle: BattleState, origin: Actor): Actor)?
 ---@field multi_target_selection (fun(state: GameState, battle: BattleState, origin: Actor) : Actor[])?
 ---@field ignore_description boolean?
+---@field do_not_skip boolean
 
 ---@class GemstoneDefinition
 ---@field name string
@@ -117,11 +122,13 @@ ELEMENT = {
 ---@field name string
 ---@field description fun(actor: Actor): string
 ---@field icon love.Image?
----@field effects_sequence number[]
+---@field on_skill_used_sequence (number[])|nil
+---@field on_being_attacked_sequence (number[])|nil
+---@field is_attack boolean
 ---@field targeted boolean
 ---@field required_strength number
 ---@field required_magic number
 ---@field required_elements ELEMENT[]
----@field allowed_weapons WEAPON[]
+---@field allowed_weapons WEAPON_REQUIREMENT[]
 ---@field required_energy number
 ---@field cost number

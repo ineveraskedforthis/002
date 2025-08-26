@@ -7,6 +7,7 @@ local manager = require "effects._manager"
 local id, def = manager.new_effect(duration)
 
 def.description = "Move to original position"
+def.do_not_skip = true
 
 function def.scene_update(state, battle, time_passed, dt, origin, target, scene_data)
 	if (time_passed > duration) then

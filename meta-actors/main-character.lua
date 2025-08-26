@@ -1,6 +1,6 @@
 ---@type MetaActor
 local def = {
-	MAX_HP = 150,
+	MAX_HP = 100,
 	ATK = 50,
 	DEF = 0,
 	SPD = 100,
@@ -10,15 +10,15 @@ local def = {
 	image_battle = love.graphics.newImage("assets/main-character-square.png"),
 	image_action_bar = love.graphics.newImage("assets/main-character-h.png"),
 	image_skills = love.graphics.newImage("assets/main-character-skills.png"),
-	MAG = 15,
-	STR = 15,
+	MAG = 10,
+	STR = 10,
 	alignment = {},
 	weapon = WEAPON.SWORD,
 	weapon_mastery = 0,
-	STR_per_level = 4,
-	MAG_per_level = 4,
+	STR_per_level = 1,
+	MAG_per_level = 1,
 	SPD_per_level = 1,
-	max_energy = 3
+	max_energy = 8
 }
 
 def.alignment[ELEMENT.FIRE] = true

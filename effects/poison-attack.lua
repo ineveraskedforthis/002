@@ -1,11 +1,13 @@
 local manager = require "effects._manager"
 local duration = 0.2
 local id, def = manager.new_effect(duration)
-def.description = "Deal [150% of STR] damage. Apply dot."
+def.description = "Deal [150% of STR] x [weapon damage] x [1 + weapon mastery] damage. Apply dot."
 local actual_dot = require "effects.basic_dot"
 
 function def.target_effect(state, battle, origin, target)
-	local damage = TOTAL_STR_ACTOR(origin) * 1.5
+	local mastery = WEAPON_MASTERY_ACTOR(origin)
+	local from_weapon = WEAPON_ADD_DAMAGE(origin.definition.weapon)
+	local damage = TOTAL_STR_ACTOR(origin) * 1.5 * from_weapon * (1 + mastery)
 	local negated_damage = target.definition.DEF
 	local final_damage = math.max(0, damage - negated_damage)
 	DEAL_DAMAGE(state, battle, origin, target, final_damage)

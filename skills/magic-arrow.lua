@@ -4,7 +4,7 @@ return {
 	description = function (actor)
 		return "Deals a bit of damage to target"
 	end,
-	effects_sequence = {
+	on_skill_used_sequence = {
 		require "effects.magic-arrow"
 	},
 	targeted = true,
@@ -13,5 +13,6 @@ return {
 	required_elements = {},
 	cost = 5,
 	allowed_weapons = {},
-	required_energy = 1
+	required_energy = 1,
+	is_attack = true
 }

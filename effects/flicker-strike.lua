@@ -4,7 +4,7 @@ local id, def = manager.new_effect(duration)
 
 local move_back = require "effects.move_to_original_position"
 
-def.description = "Launches 5 attacks against random targets. If one of them dies, add 5 more attacks"
+def.description = "Deal [100% of MAG] x [weapon damage] x [1 + weapon mastery] damage to 5 random targets. If one of them dies, add 5 more attacks"
 
 function def.scene_render(state, battle, time_passed, origin, target, scene_data)
 	local progress = SMOOTHERSTEP(time_passed / duration)
@@ -36,7 +36,9 @@ function def.target_effect(state, battle, origin, target, data)
 		return
 	end
 
-	local damage = TOTAL_MAG_ACTOR(origin) + TOTAL_STR_ACTOR(origin) * 0.25
+	local mastery = WEAPON_MASTERY_ACTOR(origin)
+	local from_weapon = WEAPON_ADD_DAMAGE(origin.definition.weapon)
+	local damage = TOTAL_MAG_ACTOR(origin) * from_weapon * (1 + mastery)
 
 	DEAL_DAMAGE(state, battle, origin, target, damage)
 

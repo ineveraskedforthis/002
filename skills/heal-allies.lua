@@ -4,7 +4,7 @@ return {
 	description = function (actor)
 		return "Heal all allies"
 	end,
-	effects_sequence = {
+	on_skill_used_sequence = {
 		require "effects.heal_allies",
 	},
 	targeted = false,
@@ -13,5 +13,6 @@ return {
 	required_elements = {ELEMENT.RESTORATION},
 	cost = 5,
 	allowed_weapons = {},
-	required_energy = 1
+	required_energy = 1,
+	is_attack = false
 }

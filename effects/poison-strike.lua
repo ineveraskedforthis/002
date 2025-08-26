@@ -1,7 +1,7 @@
 local manager = require "effects._manager"
 local duration = 1
 local id, def = manager.new_effect(duration)
-def.description = "Deal [100% of STR] damage to target for every active dot."
+def.description = "Deal [200% of STR] x [1 + weapon mastery] damage to target for every active dot."
 local actual_dot = require "effects.basic_dot"
 
 function def.target_effect(state, battle, origin, target)
@@ -12,7 +12,7 @@ function def.target_effect(state, battle, origin, target)
 			count_dots = count_dots + 1
 		end
 	end
-	local damage = TOTAL_STR_ACTOR(origin) * count_dots
+	local damage = TOTAL_STR_ACTOR(origin) * 2 * (1 + WEAPON_MASTERY_ACTOR(origin)) * count_dots
 	DEAL_DAMAGE(state, battle, origin, target, damage)
 end
 

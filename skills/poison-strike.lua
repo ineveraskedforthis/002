@@ -6,7 +6,7 @@ return {
 	description = function (actor)
 		return "Explodes all poison applied to enemy"
 	end,
-	effects_sequence = {
+	on_skill_used_sequence = {
 		require "effects.move_to_target",
 		attack,
 		require "effects.move_to_original_position"
@@ -16,6 +16,7 @@ return {
 	required_magic = 5,
 	required_elements = {ELEMENT.CHAOS},
 	cost = 10,
-	allowed_weapons = {WEAPON.DAGGER, WEAPON.SWORD},
+	allowed_weapons = {{weapon = WEAPON.DAGGER, mastery = 0}, {weapon = WEAPON.SWORD, mastery = 0}},
 	required_energy = 4,
+	is_attack = true
 }

@@ -4,7 +4,7 @@ return {
 	description = function (actor)
 		return "Deals aoe damage"
 	end,
-	effects_sequence = {
+	on_skill_used_sequence = {
 		require "effects.fireball"
 	},
 	targeted = true,
@@ -13,5 +13,6 @@ return {
 	required_elements = {ELEMENT.FIRE},
 	cost = 5,
 	allowed_weapons = {},
-	required_energy = 3
+	required_energy = 3,
+	is_attack = true
 }

@@ -1,12 +1,12 @@
 local manager = require "effects._manager"
 local duration = 0.6
 local id, def = manager.new_effect(duration)
-def.description = "Deal [100% of STR] x [weapon damage] x [1 + weapon mastery] damage."
+def.description = "Deal [1000% of STR] x [weapon damage] x [1 + weapon mastery] damage."
 
 function def.target_effect(state, battle, origin, target, scene_data)
 	local mastery = WEAPON_MASTERY_ACTOR(origin)
 	local from_weapon = WEAPON_ADD_DAMAGE(origin.definition.weapon)
-	local damage = TOTAL_STR_ACTOR(origin) * from_weapon * (1 + mastery)
+	local damage = 10 * TOTAL_STR_ACTOR(origin) * from_weapon * (1 + mastery)
 	local negated_damage = target.definition.DEF
 	local final_damage = math.max(0, damage - negated_damage)
 

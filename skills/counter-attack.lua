@@ -1,12 +1,14 @@
+local attack = require "effects.basic_attack"
+
 ---@type ActiveSkill
 return {
-	name = "Heavy strike",
+	name = "Counter Attack",
 	description = function (actor)
-		return "Stun the enemy and deal heavy damage"
+		return "Attack enemy which attempted to attack you"
 	end,
-	on_skill_used_sequence = {
+	on_being_attacked_sequence = {
 		require "effects.move_to_target",
-		require "effects.heavy_atttack",
+		attack,
 		require "effects.move_to_original_position"
 	},
 	targeted = true,
@@ -14,7 +16,7 @@ return {
 	required_magic = 0,
 	required_elements = {},
 	cost = 5,
-	allowed_weapons = {{weapon = WEAPON.SWORD, mastery = 0}},
+	allowed_weapons = {{weapon = WEAPON.SWORD, mastery = 1}, {weapon = WEAPON.DAGGER, mastery = 1}},
 	required_energy = 0,
 	is_attack = true
 }

@@ -49,9 +49,18 @@ local function update_effects(state, battle, dt)
 
 	current_effect.time_passed = current_effect.time_passed + dt
 
+	if not def.do_not_skip then
+		local origin_dead = current_effect.origin.HP <= 0
+		local target_dead = current_effect.target.HP <= 0
+
+		if origin_dead or target_dead then
+			table.remove(battle.effects_queue, 1)
+			return false
+		end
+	end
+
 	if def.scene_update(state, battle, current_effect.time_passed, dt, current_effect.origin, current_effect.target, current_effect.data) then
 		-- effect time run out, we can perform actual effect and delete effect from queue
-
 		table.remove(battle.effects_queue, 1)
 		handle_singular_effect(state, battle, current_effect)
 	end

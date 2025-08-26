@@ -2,10 +2,12 @@ local manager = require "effects._manager"
 local duration = 0.5
 local id, def = manager.new_effect(duration)
 
-def.description = "Deal [100% of STR + 100% of MAG] AOE damage"
+def.description = "Deal [100% of STR + 100% of MAG] x [weapon damage] x [1 + mastery] AOE damage"
 
 function def.target_effect(state, battle, origin, target)
-	local damage = TOTAL_STR_ACTOR(origin) + TOTAL_MAG_ACTOR(origin)
+	local mastery = WEAPON_MASTERY_ACTOR(origin)
+	local from_weapon = WEAPON_ADD_DAMAGE(origin.definition.weapon)
+	local damage = (TOTAL_STR_ACTOR(origin) + TOTAL_MAG_ACTOR(origin)) * from_weapon * (1 + mastery)
 	for index, value in ipairs(battle.actors) do
 		if target.team == value.team then
 			DEAL_DAMAGE(state, battle, origin, value, damage)

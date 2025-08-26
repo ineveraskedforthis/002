@@ -4,7 +4,7 @@ return {
 	description = function (actor)
 		return "Apply shield to allies"
 	end,
-	effects_sequence = {
+	on_skill_used_sequence = {
 		require "effects.shield_random_ally",
 		require "effects.shield_random_ally",
 		require "effects.shield_random_ally",
@@ -15,5 +15,6 @@ return {
 	required_strength = 10,
 	cost = 10,
 	allowed_weapons = {},
-	required_energy = 1
+	required_energy = 1,
+	is_attack = false
 }

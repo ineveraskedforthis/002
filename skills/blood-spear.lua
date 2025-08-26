@@ -4,7 +4,7 @@ return {
 	description = function (actor)
 		return "Deals massive damage to target while consuming actor's HP"
 	end,
-	effects_sequence = {
+	on_skill_used_sequence = {
 		require "effects.blood-spear"
 	},
 	targeted = true,
@@ -13,5 +13,6 @@ return {
 	required_elements = {ELEMENT.BLOOD},
 	cost = 5,
 	allowed_weapons = {},
-	required_energy = 0
+	required_energy = 0,
+	is_attack = true
 }

@@ -6,7 +6,7 @@ return {
 	description = function (actor)
 		return "Attack the target enemy"
 	end,
-	effects_sequence = {
+	on_skill_used_sequence = {
 		require "effects.move_to_target",
 		attack, attack,
 		require "effects.move_to_original_position"
@@ -18,4 +18,5 @@ return {
 	cost = 2,
 	allowed_weapons = {},
 	required_energy = 0,
+	is_attack = true
 }

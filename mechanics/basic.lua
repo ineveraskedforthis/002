@@ -45,15 +45,34 @@ function WEAPON_DMG_MULT(w)
 	end
 end
 
----@param a Actor
-function WEAPON_MASTERY(a)
-	local mastery = a.definition.weapon_mastery
+---@param a MetaActor
+---@param w MetaActorWrapper?
+function WEAPON_MASTERY(a, w)
+	local mastery = a.weapon_mastery
 
-	if a.wrapper then
-		mastery = mastery + a.wrapper.additional_weapon_mastery
+	if w then
+		mastery = mastery + w.additional_weapon_mastery
 	end
 
 	return mastery
+end
+
+---@param a Actor
+function WEAPON_MASTERY_ACTOR(a)
+	return WEAPON_MASTERY(a.definition, a.wrapper)
+end
+
+---@param weapon WEAPON
+function WEAPON_ADD_DAMAGE(weapon)
+	if weapon == WEAPON.NONE then
+		return 1
+	end
+	if weapon == WEAPON.SWORD then
+		return 4
+	end
+	if weapon == WEAPON.DAGGER then
+		return 2
+	end
 end
 
 ---@param a MetaActor
@@ -97,7 +116,12 @@ end
 ---@param a MetaActor
 ---@param w MetaActorWrapper?
 function TOTAL_MAX_HP(a, w)
+	---@type number
 	local x = a.MAX_HP
+	if a.alignment[ELEMENT.BLOOD] then
+		x = x + 200
+	end
+	x = x + TOTAL_STR(a, w) * 10
 	if w then
 		x = x + w.level * 10
 		for index, value in ipairs(w.gemstones) do
@@ -128,31 +152,65 @@ end
 ---@param battle BattleState
 ---@param origin Actor
 ---@param target Actor?
----@param skill ActiveSkill
-function USE_SKILL(state, battle, origin, target, skill)
-	assert(origin.energy >= skill.required_energy)
-	origin.energy = origin.energy - skill.required_energy
-
-	for index, effect in ipairs(skill.effects_sequence) do
+---@param sequence number[]
+local function add_sequence_of_effects(state, battle, origin, target, sequence)
+	if sequence == nil then
+		return
+	end
+	for index, effect in ipairs(sequence) do
 		local def = effects.get(effect)
 		if def.target_selection then
 			target = def.target_selection(state, battle, origin)
+		else
+			assert(target ~= nil)
 		end
-
-		assert(target ~= nil)
-
-		---@type Effect
-		local new_effect = {
-			data = {},
-			def = effect,
-			origin = origin,
-			target = target,
-			time_passed = 0,
-			started = false,
-			times_activated = 0
-		}
-		table.insert(battle.effects_queue, new_effect)
+		if target ~= nil then
+			---@type Effect
+			local new_effect = {
+				data = {},
+				def = effect,
+				origin = origin,
+				target = target,
+				time_passed = 0,
+				started = false,
+				times_activated = 0
+			}
+			table.insert(battle.effects_queue, new_effect)
+		end
 	end
+end
+
+---@param state GameState
+---@param battle BattleState
+---@param origin Actor
+---@param target Actor
+function ON_BEING_ATTACKED(state, battle, origin, target)
+	-- find all skills which run on attack
+	for index, value in ipairs(target.definition.inherent_skills) do
+		add_sequence_of_effects(state, battle, target, origin, value.on_being_attacked_sequence)
+	end
+	if target.wrapper then
+		for index, value in ipairs(target.wrapper.skills) do
+			add_sequence_of_effects(state, battle, target, origin, value.on_being_attacked_sequence)
+		end
+	end
+end
+
+---@param state GameState
+---@param battle BattleState
+---@param origin Actor
+---@param target Actor?
+---@param skill ActiveSkill
+function USE_SKILL(state, battle, origin, target, skill)
+	assert(skill.on_skill_used_sequence ~= nil)
+	assert(origin.energy >= skill.required_energy)
+	origin.energy = origin.energy - skill.required_energy
+
+	if skill.is_attack and target then
+		ON_BEING_ATTACKED(state, battle, origin, target)
+	end
+
+	add_sequence_of_effects(state, battle, origin, target, skill.on_skill_used_sequence)
 end
 
 ---@param state GameState
@@ -161,6 +219,9 @@ end
 ---@param target Actor
 ---@param skill ActiveSkill
 function CAN_USE_SKILL(state, battle, origin, target, skill)
+	if skill.on_skill_used_sequence == nil then
+		return false
+	end
 	if skill.required_energy > origin.energy then
 		return false
 	end
