@@ -178,12 +178,26 @@ function widget.render(state, battle, x, y, actor, alpha)
 			actor.HP, actor.HP_view or actor.HP, max_hp, actor.SHIELD,
 			actor.team
 		)
-		love.graphics.setColor(0, 0, 0, alpha)
 		style.header_font()
+		local ty = y + base_height * scale - 60
 		if (actor.SHIELD > 0) then
-			love.graphics.printf(tostring(math.floor(actor.HP)) .. " + " .. tostring(actor.SHIELD), x, y + base_height * scale - 30, ACTOR_WIDTH, "center")
+			local text = tostring(math.floor(actor.HP)) .. " + " .. tostring(actor.SHIELD)
+			love.graphics.setColor(1, 1, 1, alpha)
+			love.graphics.printf(text, x-1, ty, ACTOR_WIDTH, "center")
+			love.graphics.printf(text, x+1, ty, ACTOR_WIDTH, "center")
+			love.graphics.printf(text, x, ty-1, ACTOR_WIDTH, "center")
+			love.graphics.printf(text, x, ty+1, ACTOR_WIDTH, "center")
+			love.graphics.setColor(0, 0, 0, alpha)
+			love.graphics.printf(text, x, ty, ACTOR_WIDTH, "center")
 		else
-			love.graphics.printf(tostring(math.floor(actor.HP)), x, y + base_height * scale - 30, ACTOR_WIDTH, "center")
+			local text = tostring(math.floor(actor.HP))
+			love.graphics.setColor(1, 1, 1, alpha)
+			love.graphics.printf(text, x-1, ty, ACTOR_WIDTH, "center")
+			love.graphics.printf(text, x+1, ty, ACTOR_WIDTH, "center")
+			love.graphics.printf(text, x, ty-1, ACTOR_WIDTH, "center")
+			love.graphics.printf(text, x, ty+1, ACTOR_WIDTH, "center")
+			love.graphics.setColor(0, 0, 0, alpha)
+			love.graphics.printf(text, x, y + base_height * scale - 60, ACTOR_WIDTH, "center")
 		end
 
 		actor.w = base_width * scale

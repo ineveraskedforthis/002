@@ -62,6 +62,11 @@ function widget.on_click(state, x, y)
 		start_scripted_battle(state, BATTLES.NORMAL_2, true)
 		state.set_scene(state, scenes.battle)
 	end
+
+	if circle(fight_3_x, fight_3_y, 50, x ,y) then
+		start_scripted_battle(state, BATTLES.NORMAL_3, true)
+		state.set_scene(state, scenes.battle)
+	end
 end
 
 

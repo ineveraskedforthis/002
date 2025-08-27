@@ -19,4 +19,7 @@ return function (state, index, reset_wave)
 	if index == BATTLES.NORMAL_2 then
 		return require "fights.fight-2"(state)
 	end
+	if index == BATTLES.NORMAL_3 then
+		return require "fights.fight-3"(state)
+	end
 end
