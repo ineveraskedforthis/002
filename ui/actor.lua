@@ -38,12 +38,24 @@ local hp_gradient_enemy = gradient_h({{0.95, 0.1, 0.05}, {1, 0.11, 0.05}})
 ---@param max_hp number
 ---@param shield number
 ---@param team number
-local function hp_bar(x, y, w, h, hp, hp_view, max_hp, shield, team)
+---@param level number?
+local function hp_bar(x, y, w, h, hp, hp_view, max_hp, shield, team, level)
 	local outerouter = 1
 	local outer = 1
 	local shield_offset = 1
 	local fill = 1
 	local inner = 1
+
+	if level then
+		love.graphics.setColor(0, 0, 0)
+		love.graphics.circle("fill", x - h, y + h / 2, h + 2)
+		love.graphics.setColor(1, 1, 1)
+		love.graphics.circle("fill", x - h, y + h / 2, h)
+		style.default_font()
+		style.basic_element_color()
+		local font_height = style.default_font_height()
+		love.graphics.printf(tostring(level), x - h * 2, y + h / 2 - font_height / 2, h * 2, "center")
+	end
 
 	-- outer outer border
 	love.graphics.setColor(0, 0, 0)
@@ -102,6 +114,24 @@ local function hp_bar(x, y, w, h, hp, hp_view, max_hp, shield, team)
 			love.graphics.rectangle("fill", _x + _w * hp_ratio_view, _y, _w * (hp_ratio_actual - hp_ratio_view), _h)
 		end
 	end
+
+	-- inner border
+	do
+		love.graphics.setColor(0.1, 0.15, 0.1)
+		local margin = outer + fill
+		local _x = x + margin
+		local _y = y + margin
+		local _w = w - 2 * margin
+		local _h = h - 2 * margin
+
+		-- draw inner border color lines to show hp blocks for every X hp:
+		local blocks = max_hp / 200
+		local block_size = _w / blocks
+		for i = 1, blocks do
+			love.graphics.rectangle("fill", _x + i * block_size, _y, 1, _h)
+		end
+	end
+
 end
 
 local function image_classic(battle, x, y, actor, alpha)
@@ -173,10 +203,16 @@ function widget.render(state, battle, x, y, actor, alpha)
 			quad_active[quad_index] = false
 		end
 
+		local level = nil
+
+		if actor.wrapper then
+			level = actor.wrapper.level
+		end
+
 		hp_bar(
 			x, y + base_height * scale, 500 * scale, 12,
 			actor.HP, actor.HP_view or actor.HP, max_hp, actor.SHIELD,
-			actor.team
+			actor.team, level
 		)
 		style.header_font()
 		local ty = y + base_height * scale - 60

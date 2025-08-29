@@ -15,7 +15,7 @@ for i = 1, 10, 1 do
 end
 
 return {
-	battle_actors_spacing = 80,
+	battle_actors_spacing = 120,
 	base_margin = base_unit,
 	action_bar_item_height = 8 * base_unit,
 	action_bar_item_width = 13 * base_unit,
@@ -37,6 +37,10 @@ return {
 
 	default_font = function ()
 		love.graphics.setFont(default_font)
+	end,
+
+	default_font_height = function ()
+		return default_font:getHeight( )
 	end,
 
 	header_font = function ()

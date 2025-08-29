@@ -31,6 +31,7 @@ local state = require "state.state"
 
 function love.load()
 	require "state.init-state-release"(state)
+	love.window.setMode( 1280, 720, {msaa = 16} )
 end
 
 function love.update(dt)
