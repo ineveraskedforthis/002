@@ -27,6 +27,8 @@ function widget.render(state)
 	style.basic_element_color()
 	style.default_font()
 
+	love.graphics.circle("line", 20, 20, 20)
+
 	love.graphics.circle("line", fight_easy_1_x, fight_easy_1_y, 50)
 	love.graphics.printf("Enter easy battle 1", fight_easy_1_x - 40, fight_easy_1_y - 10, 80, "center")
 
@@ -48,6 +50,10 @@ end
 ---@param x number
 ---@param y number
 function widget.on_click(state, x, y)
+	if circle(20, 20, 20, x, y) then
+		state.set_scene(state, scenes.location)
+	end
+
 	if circle(fight_easy_1_x, fight_easy_1_y, 50, x ,y) then
 		start_scripted_battle(state, BATTLES.EASY_1, true)
 		state.set_scene(state, scenes.battle)

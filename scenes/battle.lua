@@ -75,22 +75,35 @@ function def.update(state, dt)
 		await_input = false
 	end
 	if res == BATTLE_SYSTEM_RESPONSE.REQUEST_NEW_WAVE then
+		print("new wave")
 		battle.wave = battle.wave + 1
 		local battle_in_progress = battle_loader(
 			state, state.current_scripted_fight, false
 		)
 		if not battle_in_progress then
 			battle_manager.stop_battle(state, battle)
-			state.set_scene(state, ids.select_battle)
+			if (state.enemy_pack) then
+				state.enemy_pack.alive = false
+				state.set_scene(state, ids.location)
+			else
+				state.set_scene(state, ids.select_battle)
+			end
 		else
 			battle_manager.begin_new_wave(state, battle)
 		end
 	end
 	if res == BATTLE_SYSTEM_RESPONSE.BATTLE_WON then
+		print("win")
 		battle_manager.stop_battle(state, battle)
-		state.set_scene(state, ids.select_battle)
+		if (state.enemy_pack) then
+			state.enemy_pack.alive = false
+			state.set_scene(state, ids.location)
+		else
+			state.set_scene(state, ids.select_battle)
+		end
 	end
 	if res == BATTLE_SYSTEM_RESPONSE.BATTLE_LOST then
+		print("lose")
 		battle_manager.stop_battle(state, battle)
 		love.load()
 	end

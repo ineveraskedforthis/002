@@ -1,4 +1,5 @@
 require "scenes.battle-select"
+require "scenes.location"
 require "scenes.battle"
 require "scenes.choose-gemstones"
 require "scenes.edit-lineup"

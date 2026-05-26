@@ -6,7 +6,8 @@ local scenes = {
 	gemstones = manager.new_scene("Gemstones"),
 	lineup = manager.new_scene("Lineup"),
 	gacha = manager.new_scene("Hiring"),
-	learning = manager.new_scene("Learning")
+	learning = manager.new_scene("Learning"),
+	location = manager.new_scene("Location")
 }
 
 return scenes

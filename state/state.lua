@@ -8,7 +8,11 @@ local scenes_manager = require "scenes._manager"
 ---@field currency number
 ---@field current_scene number
 ---@field current_scripted_fight SCRIPTED_BATTLE
+---@field current_location_x number
+---@field current_location_y number
 ---@field last_battle BattleState
+---@field wandering boolean
+---@field enemy_pack EnemyPack?
 local state = {
 	currency = 0,
 	current_lineup = {},
@@ -24,6 +28,9 @@ local state = {
 		wave = 1
 	},
 	playable_actors = {},
+	current_location_x = 0,
+	current_location_y = 0,
+	wandering = false,
 	vfx = require "scenes._vfx_manager"
 }
 

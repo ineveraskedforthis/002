@@ -117,6 +117,20 @@ ELEMENT = {
 ---@field started boolean
 ---@field times_activated number
 
+---@class Location
+---@field name string
+
+---@class LocationAdjacency
+---@field origin number
+---@field target number
+---@field distance number
+
+---@class PartyLocation
+---@field position number
+---@field party number
+
+---@class Party
+---@field name string
 
 ---@class ActiveSkill
 ---@field name string
