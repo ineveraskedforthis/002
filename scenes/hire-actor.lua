@@ -106,7 +106,7 @@ function def.on_click(state, x, y)
 
 	if not pull_in_progress or (pull_in_progress and pull_progress == 1 and turn_over_progress == 1) then
 		if rect(200, 500, 100, 20, x, y) then
-			state.set_scene(state, ids.select_battle)
+			state.set_scene(state, ids.location)
 		end
 	end
 end

@@ -86,7 +86,7 @@ function def.update(state, dt)
 				state.enemy_pack.alive = false
 				state.set_scene(state, ids.location)
 			else
-				state.set_scene(state, ids.select_battle)
+				state.set_scene(state, ids.location)
 			end
 		else
 			battle_manager.begin_new_wave(state, battle)
@@ -99,7 +99,7 @@ function def.update(state, dt)
 			state.enemy_pack.alive = false
 			state.set_scene(state, ids.location)
 		else
-			state.set_scene(state, ids.select_battle)
+			state.set_scene(state, ids.location)
 		end
 	end
 	if res == BATTLE_SYSTEM_RESPONSE.BATTLE_LOST then

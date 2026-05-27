@@ -29,6 +29,8 @@ end
 ---@type GameState
 local state = require "state.state"
 
+local style = require "ui._style"
+
 function love.load()
 	require "state.init-state-release"(state)
 	love.window.setMode( 1280, 720, {msaa = 16} )
@@ -40,6 +42,7 @@ function love.update(dt)
 end
 
 function love.draw()
+	style.basic_bg_color()
 	scene_manager.get(state.current_scene).render(state)
 	state.vfx.render()
 	love.graphics.print(state.currency .. " points", 5, 700)

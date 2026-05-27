@@ -4,7 +4,7 @@ local battles_manager = require "fights._battle-system"
 ---@param state GameState
 return function (state)
 	state.currency = 5
-	state.set_scene(state, ids.select_battle)
+	state.set_scene(state, ids.location)
 	state.last_battle.wave = 1
 	battles_manager.stop_battle(state, state.last_battle)
 

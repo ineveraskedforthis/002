@@ -9,6 +9,7 @@ local id = ids.location
 local def = manager.get(id)
 
 local rect = require "ui.rect"
+local button = require "ui.button"
 
 local MAP = {}
 
@@ -45,6 +46,14 @@ end
 register_pack(1, 1)
 register_pack(3, 5)
 register_pack(-5, 1)
+
+---comment
+---@param render boolean
+local function interface(state, render, click, mx, my)
+	if button(render, click, "Gemstones", 800, 20, 80, 30, mx, my) then
+		state.set_scene(state, ids.gemstones)
+	end
+end
 
 function def.render(state)
 	local center_x = math.floor(camera_center_x / cell_width)
@@ -87,6 +96,9 @@ function def.render(state)
 			love.graphics.rectangle("fill", tile_x + margin *3, tile_y + margin * 3, cell_width - margin * 3 *2, cell_height - margin * 3 * 2)
 		end
 	end
+
+	local mx, my = love.mouse.getPosition();
+	interface(state, true, false, mx, my)
 end
 
 
@@ -130,4 +142,6 @@ function def.on_click(state, x, y)
 		end
 
 	end
+
+	interface(state, false, true, x, y)
 end

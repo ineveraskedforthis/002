@@ -45,7 +45,7 @@ function def.on_click(state, x, y)
 			end
 			value.lineup_position = state.selected_lineup_position
 
-			state.set_scene(state, ids.select_battle)
+			state.set_scene(state, ids.location)
 		end
 		col = col + 1
 		if col >= cols then

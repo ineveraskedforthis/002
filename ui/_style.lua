@@ -35,8 +35,24 @@ return {
 		love.graphics.setColor(0, 0, 0, 1)
 	end,
 
+	active_element_border = function ()
+		love.graphics.setColor(0.9, 0.4, 0.1, 1)
+	end,
+
+	active_element_bg_passive = function ()
+		love.graphics.setColor(0.95, 0.95, 0.95, 1)
+	end,
+
+	active_element_bg_hover = function ()
+		love.graphics.setColor(0.95, 0.95, 0.5, 1)
+	end,
+
 	default_font = function ()
 		love.graphics.setFont(default_font)
+	end,
+
+	default_font_color = function ()
+		love.graphics.setColor(0, 0, 0, 1)
 	end,
 
 	default_font_height = function ()

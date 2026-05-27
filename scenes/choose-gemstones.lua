@@ -57,7 +57,7 @@ local rect = require "ui.rect"
 function def.on_click(state, x, y)
 
 	if rect(300, 50, 80, 30, x, y) then
-		state.set_scene(state, ids.select_battle)
+		state.set_scene(state, ids.location)
 	end
 	local row = 0
 	local col = 0
