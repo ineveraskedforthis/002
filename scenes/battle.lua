@@ -14,6 +14,7 @@ local main_render = require "fights.battle-render"
 local battle_loader = require "fights._loader"
 
 local BATTLE_SYSTEM_RESPONSE = require "fights._response"
+local learn_skill = require "effects-campaign.learn-skills"
 
 ---comment
 ---@param actor Actor
@@ -80,6 +81,11 @@ function def.update(state, dt)
 		local battle_in_progress = battle_loader(
 			state, state.current_scripted_fight, false
 		)
+		for index, value in ipairs(state.playable_actors) do
+			if (value.unlocked) then
+				learn_skill(value)
+			end
+		end
 		if not battle_in_progress then
 			battle_manager.stop_battle(state, battle)
 			if (state.enemy_pack) then
@@ -95,6 +101,11 @@ function def.update(state, dt)
 	if res == BATTLE_SYSTEM_RESPONSE.BATTLE_WON then
 		print("win")
 		battle_manager.stop_battle(state, battle)
+		for index, value in ipairs(state.playable_actors) do
+			if (value.unlocked) then
+				learn_skill(value)
+			end
+		end
 		if (state.enemy_pack) then
 			state.enemy_pack.alive = false
 			state.set_scene(state, ids.location)
