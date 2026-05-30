@@ -7,7 +7,9 @@ local scenes = {
 	lineup = manager.new_scene("Lineup"),
 	gacha = manager.new_scene("Hiring"),
 	learning = manager.new_scene("Learning"),
-	location = manager.new_scene("Location")
+	location = manager.new_scene("Location"),
+	game_over = manager.new_scene("Game over"),
+	dialog = manager.new_scene("dialog")
 }
 
 return scenes

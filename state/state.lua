@@ -4,6 +4,7 @@ local scenes_manager = require "scenes._manager"
 ---@field current_lineup number[]
 ---@field selected_lineup_position number
 ---@field playable_actors MetaActorWrapper[]
+---@field current_dialog_actor number
 ---@field collected_gemstones GemstoneWrapper[]
 ---@field currency number
 ---@field current_scene number
@@ -13,6 +14,8 @@ local scenes_manager = require "scenes._manager"
 ---@field last_battle BattleState
 ---@field wandering boolean
 ---@field enemy_pack EnemyPack?
+---@field current_story_atom string
+---@field story_atoms table<string, StoryAtom>
 local state = {
 	currency = 0,
 	current_lineup = {},
@@ -31,7 +34,9 @@ local state = {
 	current_location_x = 0,
 	current_location_y = 0,
 	wandering = false,
-	vfx = require "scenes._vfx_manager"
+	current_story_atom = "greeting",
+	vfx = require "scenes._vfx_manager",
+	story_atoms = {}
 }
 
 function state.load()

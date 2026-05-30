@@ -16,6 +16,24 @@ function def.target_effect(state, battle, origin, target)
 	DEAL_DAMAGE(state, battle, origin, target, damage)
 end
 
+function def.utility(state, battle, origin, target, scene_data)
+	local mult = 1
+	if target.team == origin.team then
+		mult = -1
+	end
+
+	local count_dots = 0
+	for _, value in ipairs(target.status_effects) do
+		local dot_definition = manager.get(value.def)
+		if value.def == actual_dot then
+			count_dots = count_dots + 1
+		end
+	end
+	local damage = TOTAL_STR_ACTOR(origin) * 2 * (1 + WEAPON_MASTERY_ACTOR(origin)) * count_dots
+
+	return mult * damage
+end
+
 function def.scene_render(state, battle, time_passed, origin, target, scene_data)
 	local progress = SMOOTHERSTEP(time_passed / duration * time_passed / duration)
 

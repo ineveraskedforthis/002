@@ -14,6 +14,17 @@ function def.target_effect(state, battle, origin, target, scene_data)
 	APPLY_EFFECT(origin, target, actual_dot)
 end
 
+function def.utility(state, battle, origin, target, scene_data)
+	local dot_count = 1
+	for _, value in ipairs(target.status_effects) do
+		if value.def == actual_dot then
+			dot_count = dot_count + 1
+		end
+	end
+	local dot = manager.get(actual_dot)
+	return dot.utility(state, battle, origin, target, scene_data) * dot_count
+end
+
 function def.scene_render(state, battle, time_passed, origin, target, scene_data)
 	local progress = time_passed / duration
 	local x = progress * target.x + (1 - progress) * origin.x

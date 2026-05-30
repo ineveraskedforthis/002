@@ -18,4 +18,23 @@ function def.target_effect(state, battle, origin, target)
 	RESTORE_HP(state, battle, origin, target, 1.5 * TOTAL_MAG_ACTOR(origin))
 end
 
+function def.utility(state, battle, origin, target, scene_data)
+	local mult = 1
+	if target.team ~= origin.team then
+		mult = -1
+	end
+
+	local total = 0
+
+	local damage = 1.5 * TOTAL_MAG_ACTOR(origin)
+
+	for index, value in ipairs(battle.actors) do
+		if value.team == origin.team then
+			total = total + damage
+		end
+	end
+
+	return mult * damage
+end
+
 return id

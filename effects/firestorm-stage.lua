@@ -12,6 +12,24 @@ function def.target_effect(state, battle, origin, target, data)
 	end
 end
 
+function def.utility(state, battle, origin, target, scene_data)
+	local mult = 1
+	if target.team == origin.team then
+		mult = -1
+	end
+
+	local damage = TOTAL_MAG_ACTOR(origin) * 0.5
+	local total = 0
+
+	for _, value in ipairs(battle.actors) do
+		if target.team == value.team then
+			total = total + damage
+		end
+	end
+
+	return mult * total
+end
+
 function def.scene_render(state, battle, time_passed, origin, target, scene_data)
 	local progress = time_passed / duration
 	local fall = 300 + SMOOTHERSTEP(progress * progress) * (-300)

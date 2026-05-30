@@ -5,7 +5,9 @@ local id, def = manager.new_effect(duration)
 local move_back = require "effects.move_to_original_position"
 local actor_image = require "ui.actor"
 
-def.description = "Beam of energy jumps 10 times dealing 50% more damage at every step. Starting damage is [25% of MAG]."
+local jumps = 10
+
+def.description = "Beam of energy jumps " .. tostring(jumps) .. " times dealing 50% more damage at every step. Starting damage is [25% of MAG]."
 
 function def.scene_render(state, battle, time_passed, origin, target, scene_data)
 	---@type EnergyLinkData
@@ -76,6 +78,22 @@ function def.target_effect(state, battle, origin, target, data)
 	end
 end
 
+function def.utility(state, battle, origin, target, scene_data)
+	local mult = 1
+	if target.team == origin.team then
+		mult = -1
+	end
+
+	local damage = TOTAL_MAG_ACTOR(origin) * 0.25
+	local total = damage
+	for i = 1, jumps do
+		damage = damage * 1.5
+		total = total + damage
+	end
+
+	return mult * total
+end
+
 function def.scene_update(state, battle, time_passed, dt, origin, target, scene_data)
 	if (time_passed > duration) then
 		return true
@@ -89,7 +107,7 @@ function def.scene_on_start(state, battle, origin, target, data)
 	data = data
 
 	if data.counter == nil then
-		data.counter = 10
+		data.counter = jumps
 		local sx, sy, sw, sh = actor_image.get_rect(state, battle, origin.x, origin.y, origin)
 		data.x = sx + sw / 2
 		data.y = sy + sh / 2

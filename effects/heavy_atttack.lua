@@ -14,6 +14,23 @@ function def.target_effect(state, battle, origin, target)
 	target.action_number = target.action_number + SPEED_TO_ACTION_OFFSET(target.definition.SPD)
 end
 
+function def.utility(state, battle, origin, target, scene_data)
+	local mult = 1
+	if target.team == origin.team then
+		mult = -1
+	end
+
+	local total = 0
+
+	local mastery = WEAPON_MASTERY_ACTOR(origin)
+	local from_weapon = WEAPON_ADD_DAMAGE(origin.definition.weapon)
+	local damage = TOTAL_STR_ACTOR(origin) * 1.5 * from_weapon * (1 + mastery)
+	local negated_damage = target.definition.DEF
+	local final_damage = math.max(0, damage - negated_damage)
+
+	return mult * final_damage * 1.5
+end
+
 function def.scene_render(state, battle, time_passed, origin, target, scene_data)
 	local progress = SMOOTHERSTEP(time_passed / duration * time_passed / duration)
 

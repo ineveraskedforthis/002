@@ -22,5 +22,11 @@ function def.target_effect (state, battle, origin, target)
 		ADD_SHIELD(origin, target, 0.05 * TOTAL_MAX_HP_ACTOR(origin))
 	end
 end
-
+function def.utility(state, battle, origin, target, scene_data)
+	local mult = -1
+	if target.team == origin.team then
+		mult = 1
+	end
+	return mult * 0.05 * TOTAL_MAX_HP_ACTOR(origin)
+end
 return id

@@ -4,7 +4,9 @@ local battles_manager = require "fights._battle-system"
 ---@param state GameState
 return function (state)
 	state.currency = 5
-	state.set_scene(state, ids.location)
+	state.set_scene(state, ids.dialog)
+	state.current_dialog_actor = 9
+	state.current_story_atom = "greeting"
 	state.last_battle.wave = 1
 	battles_manager.stop_battle(state, state.last_battle)
 
@@ -18,7 +20,8 @@ return function (state)
 			level = 0,
 			skill_points = 0,
 			skills = {},
-			gemstones = {}
+			gemstones = {},
+			trust = 100
 		},
 		{
 			def = require "meta-actors.chud",
@@ -29,7 +32,8 @@ return function (state)
 			level = 0,
 			skill_points = 0,
 			skills = {},
-			gemstones = {}
+			gemstones = {},
+			trust = 0
 		},
 		{
 			def = require "meta-actors.basic-healer",
@@ -40,7 +44,8 @@ return function (state)
 			level = 0,
 			skill_points = 0,
 			skills = {},
-			gemstones = {}
+			gemstones = {},
+			trust = 0
 		},
 		{
 			def = require "meta-actors.fire-mage",
@@ -51,7 +56,8 @@ return function (state)
 			level = 0,
 			skill_points = 0,
 			skills = {},
-			gemstones = {}
+			gemstones = {},
+			trust = 0
 		},
 		{
 			def = require "meta-actors.rebe",
@@ -62,7 +68,8 @@ return function (state)
 			level = 0,
 			skill_points = 0,
 			skills = {},
-			gemstones = {}
+			gemstones = {},
+			trust = 0
 		},
 		{
 			def = require "meta-actors.mohi",
@@ -73,7 +80,8 @@ return function (state)
 			level = 0,
 			skill_points = 0,
 			skills = {},
-			gemstones = {}
+			gemstones = {},
+			trust = 0
 		},
 		{
 			def = require "meta-actors.trong",
@@ -84,7 +92,8 @@ return function (state)
 			level = 0,
 			skill_points = 0,
 			skills = {},
-			gemstones = {}
+			gemstones = {},
+			trust = 0
 		},
 		{
 			def = require "meta-actors.flower",
@@ -95,7 +104,8 @@ return function (state)
 			level = 0,
 			skill_points = 0,
 			skills = {},
-			gemstones = {}
+			gemstones = {},
+			trust = 0
 		},
 		{
 			def = require "meta-actors.font",
@@ -106,7 +116,8 @@ return function (state)
 			level = 0,
 			skill_points = 0,
 			skills = {},
-			gemstones = {}
+			gemstones = {},
+			trust = 0
 		},
 	}
 

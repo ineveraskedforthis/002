@@ -287,20 +287,74 @@ end
 ---@param state GameState
 ---@param battle BattleState
 local function update_ai_turn(state, battle)
-	---@type number?
-	local target_index = 0
+	local origin = battle.actors[1]
 
-	local used_skill = battle.actors[1].definition.inherent_skills[1]
-	if used_skill.targeted then
-		target_index = get_skill_target(state, battle, used_skill)
+
+	local best_skill = 1
+	local best_skill_utility = 0
+	local best_target_index = 0
+
+	for index, value in ipairs(origin.definition.inherent_skills) do
+		local total_utility = 0
+
+		local current_best_target_index = 0
+		local target_utility = 0
+
+		if value.on_skill_used_sequence then
+			if value.targeted then
+				for target_index, target in ipairs(battle.actors) do
+					local current_target_utility = 0
+					for _, effect_index in ipairs(value.on_skill_used_sequence) do
+						local effect = effects_manager.get(effect_index)
+						current_target_utility = current_target_utility + effect.utility(state, battle, origin, target, {})
+					end
+
+					if current_target_utility > target_utility then
+						current_best_target_index = target_index
+						target_utility = current_target_utility
+					end
+				end
+				total_utility = target_utility
+			else
+				for _, effect_index in ipairs(value.on_skill_used_sequence) do
+					local effect = effects_manager.get(effect_index)
+					total_utility = total_utility + effect.utility(state, battle, origin, 0, {})
+				end
+			end
+		end
+
+		if (value.on_being_attacked_sequence) then
+			for _, effect_index in ipairs(value.on_being_attacked_sequence) do
+				local effect = effects_manager.get(effect_index)
+				for _, target in ipairs(battle.actors) do
+					if target.team ~= origin.team then
+						total_utility = total_utility + effect.utility(state, battle, origin, target, {})
+					end
+				end
+			end
+		end
+
+		local utilty = (total_utility / math.max(value.cost, 1))
+
+		if (utilty > best_skill_utility) then
+			best_skill_utility = utilty
+			best_skill = index
+			best_target_index = current_best_target_index
+		end
 	end
 
-	if target_index == 0 and used_skill.targeted then
+	local used_skill = battle.actors[1].definition.inherent_skills[best_skill]
+
+	if best_target_index == 0 and used_skill.targeted then
 		return
 	end
 
-	local origin = battle.actors[1]
-	local target = battle.actors[target_index]
+	print("SELECTED TARGET " .. tostring(best_target_index) .. "\n")
+	print("SELECTED SKILL " .. used_skill.description(origin) .. "\n")
+	print("SELECTED SKILL UTILITY " .. best_skill_utility .. "\n")
+
+	local target = battle.actors[best_target_index]
+
 	USE_SKILL(state, battle, origin, target, used_skill)
 end
 

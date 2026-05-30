@@ -15,6 +15,24 @@ function def.target_effect(state, battle, origin, target, data)
 	end
 end
 
+function def.utility(state, battle, origin, target, scene_data)
+	local mult = 1
+	if target.team == origin.team then
+		mult = -1
+	end
+
+	local damage = TOTAL_MAG_ACTOR(origin) * 2
+	local aoe_damage = TOTAL_MAG_ACTOR(origin) * 0.75
+	local total = damage
+
+	for index, value in ipairs(battle.actors) do
+		if target.team == value.team then
+			total = total + aoe_damage
+		end
+	end
+	return mult * total
+end
+
 function def.scene_render(state, battle, time_passed, origin, target, scene_data)
 	local progress = time_passed / duration
 

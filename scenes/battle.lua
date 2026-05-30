@@ -116,7 +116,7 @@ function def.update(state, dt)
 	if res == BATTLE_SYSTEM_RESPONSE.BATTLE_LOST then
 		print("lose")
 		battle_manager.stop_battle(state, battle)
-		love.load()
+		state.set_scene(state, ids.game_over)
 	end
 end
 

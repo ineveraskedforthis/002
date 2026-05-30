@@ -1,18 +1,20 @@
 local base_unit = 5
 
 local font_path = "assets/alte-din-1451-mittelschrift/din1451alt.ttf"
-local default_font = love.graphics.newFont(font_path, 14)
-local header_font = love.graphics.newFont(font_path, 24)
 
 ---@type love.Font[]
 local font_by_size = {}
 
-local size = 14
+local size = 16
 
 for i = 1, 10, 1 do
 	font_by_size[i] = love.graphics.newFont(font_path, math.floor(size))
 	size = size * 1.618
 end
+
+
+local default_font = font_by_size[1]
+local header_font = font_by_size[2]
 
 return {
 	battle_actors_spacing = 120,
@@ -41,6 +43,10 @@ return {
 
 	active_element_bg_passive = function ()
 		love.graphics.setColor(0.95, 0.95, 0.95, 1)
+	end,
+
+	panel_bg = function ()
+		love.graphics.setColor(0.95, 0.95, 0.95, 0.95)
 	end,
 
 	active_element_bg_hover = function ()

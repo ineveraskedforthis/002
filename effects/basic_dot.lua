@@ -8,4 +8,13 @@ function def.target_effect(state, battle, origin, target, scene_data)
 	DEAL_DAMAGE(state, battle, origin, target, damage)
 end
 
+function def.utility(state, battle, origin, target, scene_data)
+	local mult = 1
+	if target.team == origin.team then
+		mult = -1
+	end
+	local damage = TOTAL_MAG_ACTOR(origin)
+	return damage * mult * 5
+end
+
 return id

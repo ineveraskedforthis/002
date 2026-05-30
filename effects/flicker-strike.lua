@@ -102,6 +102,21 @@ function def.target_effect(state, battle, origin, target, data)
 	end
 end
 
+function def.utility(state, battle, origin, target, scene_data)
+	local mult = 1
+	if target.team == origin.team then
+		mult = -1
+	end
+
+	local total = 0
+
+	local mastery = WEAPON_MASTERY_ACTOR(origin)
+	local from_weapon = WEAPON_ADD_DAMAGE(origin.definition.weapon)
+	local damage = TOTAL_MAG_ACTOR(origin) * from_weapon * (1 + mastery)
+
+	return mult * damage * 7
+end
+
 function def.scene_update(state, battle, time_passed, dt, origin, target, scene_data)
 	if (time_passed > duration) then
 		return true

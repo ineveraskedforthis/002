@@ -54,6 +54,7 @@ ELEMENT = {
 ---@field unlocked boolean
 ---@field lineup_position number
 ---@field experience number
+---@field trust number
 ---@field level number
 ---@field skill_points number
 ---@field additional_weapon_mastery number
@@ -96,6 +97,7 @@ ELEMENT = {
 ---@field multi_target_selection (fun(state: GameState, battle: BattleState, origin: Actor) : Actor[])?
 ---@field ignore_description boolean?
 ---@field do_not_skip boolean
+---@field utility fun(state: GameState, battle: BattleState, origin: Actor, target: Actor, scene_data: table): number
 
 ---@class GemstoneDefinition
 ---@field name string

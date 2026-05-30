@@ -7,6 +7,17 @@ function def.target_effect(state, battle, origin, target)
 	DEAL_DAMAGE(state, battle, origin, target, TOTAL_MAG_ACTOR(origin) * 0.5)
 end
 
+function def.utility(state, battle, origin, target, scene_data)
+	local mult = 1
+	if target.team == origin.team then
+		mult = -1
+	end
+
+	local total = TOTAL_MAG_ACTOR(origin) * 0.5
+
+	return mult * total * 1.5
+end
+
 function def.scene_render(state, battle, time_passed, origin, target, scene_data)
 	local progress = time_passed / duration
 
