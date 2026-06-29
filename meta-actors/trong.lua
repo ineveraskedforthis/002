@@ -17,6 +17,7 @@ local def = {
 	MAG_per_level = 4,
 	SPD_per_level = 0,
 	max_energy = 12,
+	gender = GENDER.FEMALE
 }
 
 def.alignment[ELEMENT.ELECTRO] = true

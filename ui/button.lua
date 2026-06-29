@@ -10,7 +10,8 @@ local style = require "ui._style"
 ---@param rh number
 ---@param x number
 ---@param y number
-return function (render, click, text, rx, ry, rw, rh, x, y)
+---@param conversation? boolean
+return function (render, click, text, rx, ry, rw, rh, x, y, conversation)
 	local detected = rect_detection(rx, ry, rw, rh, x, y)
 	if (render) then
 		style.active_element_border()
@@ -24,7 +25,11 @@ return function (render, click, text, rx, ry, rw, rh, x, y)
 		end
 		love.graphics.rectangle("fill", rx + 3, ry + 3, rw - 6, rh - 6, 2, 2)
 		style.default_font_color()
-		style.default_font()
+		if conversation then
+			style.conversation_font()
+		else
+			style.default_font()
+		end
 		local height = style.default_font_height()
 		love.graphics.printf(text, rx, ry + rh / 2 - height / 2, rw, "center")
 	end

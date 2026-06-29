@@ -16,7 +16,8 @@ local def = {
 	MAG = 0,
 	alignment = {},
 	weapon = WEAPON.NONE,
-	weapon_mastery = 0
+	weapon_mastery = 0,
+	gender = GENDER.NONE
 }
 
 return def

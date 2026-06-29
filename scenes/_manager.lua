@@ -1,9 +1,9 @@
 ---@class Scene
 ---@field name string
----@field reset fun(state: GameState)
----@field render fun(state: GameState)
----@field update fun(state: GameState, dt: number)
----@field on_click fun(state: GameState, x: number, y: number)
+---@field reset fun(state: GameState, journal: Journal)
+---@field render fun(state: GameState, journal: Journal)
+---@field update fun(state: GameState, journal: Journal, dt: number)
+---@field on_click fun(state: GameState, journal: Journal, x: number, y: number)
 
 local manager = {}
 
@@ -15,13 +15,13 @@ function manager.new_scene(name)
 	---@type Scene
 	local def = {
 		name = name,
-		reset = function (state)
+		reset = function (state, journal)
 		end,
-		on_click = function (state, x, y)
+		on_click = function (state, journal, x, y)
 		end,
-		render = function (state )
+		render = function (state, journal)
 		end,
-		update = function (state, dt)
+		update = function (state, journal, dt)
 		end
 	}
 	table.insert(scenes, def)

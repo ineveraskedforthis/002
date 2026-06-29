@@ -22,6 +22,7 @@ local def = {
 	MAG_per_level = 0,
 	SPD_per_level = 1,
 	max_energy = 10,
+	gender = GENDER.FEMALE
 }
 
 return def

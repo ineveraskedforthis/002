@@ -2,6 +2,8 @@ local base_unit = 5
 
 local font_path = "assets/alte-din-1451-mittelschrift/din1451alt.ttf"
 
+local readable_font = "assets/Baskervville/static/Baskervville-Regular.ttf"
+
 ---@type love.Font[]
 local font_by_size = {}
 
@@ -12,9 +14,10 @@ for i = 1, 10, 1 do
 	size = size * 1.618
 end
 
-
-local default_font = font_by_size[1]
-local header_font = font_by_size[2]
+-- local default_font = font_by_size[1]
+local default_font = love.graphics.newFont(readable_font, 16)
+local conversation_font = love.graphics.newFont("assets/Baskervville/static/Baskervville-Italic.ttf", 16)
+local header_font = love.graphics.newFont(readable_font, math.floor(16 * 1.618))
 
 return {
 	battle_actors_spacing = 120,
@@ -42,11 +45,11 @@ return {
 	end,
 
 	active_element_bg_passive = function ()
-		love.graphics.setColor(0.95, 0.95, 0.95, 1)
+		love.graphics.setColor(0.9, 0.9, 0.9, 0.95)
 	end,
 
 	panel_bg = function ()
-		love.graphics.setColor(0.95, 0.95, 0.95, 0.95)
+		love.graphics.setColor(0.9, 0.9, 0.9, 0.95)
 	end,
 
 	active_element_bg_hover = function ()
@@ -55,6 +58,10 @@ return {
 
 	default_font = function ()
 		love.graphics.setFont(default_font)
+	end,
+
+	conversation_font = function ()
+		love.graphics.setFont(conversation_font)
 	end,
 
 	default_font_color = function ()

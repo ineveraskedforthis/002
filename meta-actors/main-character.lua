@@ -18,7 +18,8 @@ local def = {
 	STR_per_level = 1,
 	MAG_per_level = 1,
 	SPD_per_level = 1,
-	max_energy = 8
+	max_energy = 8,
+	gender = GENDER.FUTANARI
 }
 
 def.alignment[ELEMENT.FIRE] = true

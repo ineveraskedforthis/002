@@ -15,6 +15,7 @@ local def = {
 	STR_per_level = 1,
 	MAG_per_level = 1,
 	SPD_per_level = 1,
+	gender = GENDER.FEMALE
 }
 
 def.alignment[ELEMENT.RESTORATION] = true

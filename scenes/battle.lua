@@ -55,7 +55,7 @@ local battle_actor_widget = require "ui.actor"
 
 local await_input = false
 
-function def.update(state, dt)
+function def.update(state, journal, dt)
 	local battle = state.last_battle
 	skills_panel.update(state, dt)
 
@@ -121,7 +121,7 @@ function def.update(state, dt)
 end
 
 
-function def.on_click(state, x, y)
+function def.on_click(state, journal, x, y)
 	local battle = state.last_battle
 	local offset_x = 150
 	local offset_y = 50
@@ -139,7 +139,7 @@ end
 
 
 
-function def.render(state)
+function def.render(state, journal)
 	style.basic_bg_color()
 	style.basic_element_color()
 

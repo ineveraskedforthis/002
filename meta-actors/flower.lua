@@ -21,6 +21,7 @@ local def = {
 	MAG_per_level = 1,
 	SPD_per_level = 1,
 	max_energy = 8,
+	gender = GENDER.FEMALE
 }
 
 def.alignment[ELEMENT.CHAOS] = true

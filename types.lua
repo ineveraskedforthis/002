@@ -24,7 +24,8 @@ ELEMENT = {
 	PROTECTION = 3,
 	LIGHT = 4,
 	BLOOD = 5,
-	ELECTRO = 6
+	ELECTRO = 6,
+	RUPTURE = 7
 }
 
 ---@class MetaActor
@@ -48,6 +49,55 @@ ELEMENT = {
 ---@field attack_sound love.Source?
 ---@field damaged_sound love.Source?
 ---@field inherent_skills ActiveSkill[]
+---@field gender GENDER
+
+---@enum GENDER
+GENDER = {
+	MALE = 1,
+	FEMALE = 2,
+	FUTANARI = 3,
+	NONE = 4
+}
+
+function GENDER_TO_STRING (x)
+	if x == GENDER.MALE then
+		return "Male"
+	elseif x == GENDER.FEMALE then
+		return "Female"
+	elseif x == GENDER.FUTANARI then
+		return "Futa"
+	end
+end
+
+---@enum FACTION
+FACTION = {
+	CITY_GUARD = 0,
+	CARAVAN_MERCHANTS = 1,
+	MAGE_GUILD = 2,
+	ORDER_OF_LIGHT = 3,
+	HIGHWAY_JESTERS = 4,
+	ROGUE_MAGES = 5
+}
+
+---@enum COMMODITY
+COMMODITY = {
+	LUXURY_CLOTH = 0
+}
+
+---comment
+---@param c COMMODITY?
+function COMMODITY_STRING (c)
+	if c == COMMODITY.LUXURY_CLOTH then
+		return "Luxury Cloth"
+	else
+		return "Unknown"
+	end
+end
+
+---@class ItemForSell
+---@field commodity COMMODITY
+---@field amount number
+---@field price number
 
 ---@class MetaActorWrapper
 ---@field def MetaActor
@@ -60,6 +110,10 @@ ELEMENT = {
 ---@field additional_weapon_mastery number
 ---@field skills ActiveSkill[]
 ---@field gemstones number[]
+---@field factions FACTION[]
+---@field location LOCATION
+---@field occupation OCCUPATION_TYPE
+---@field wares? ItemForSell[]
 
 ---@class GemstoneWrapper
 ---@field def number

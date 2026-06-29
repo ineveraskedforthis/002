@@ -1,21 +1,37 @@
 local scenes_manager = require "scenes._manager"
 
+--@class MetaActorIndex
+--@field value number
+--@field index_brand_ nil
+
+---@enum OPTIONS_STATE
+OPTIONS_STATE = {
+	NONE = 0,
+	MOVE = 1,
+	TALK = 2
+}
+
 ---@class GameState
 ---@field current_lineup number[]
 ---@field selected_lineup_position number
 ---@field playable_actors MetaActorWrapper[]
----@field current_dialog_actor number
+---@field current_text string
+---@field available_guards number[]
+---@field current_guard number
+---@field caravan_master number
+---@field current_dialog_actor number?
+---@field options_state OPTIONS_STATE
 ---@field collected_gemstones GemstoneWrapper[]
 ---@field currency number
 ---@field current_scene number
 ---@field current_scripted_fight SCRIPTED_BATTLE
 ---@field current_location_x number
 ---@field current_location_y number
+---@field current_location LOCATION
 ---@field last_battle BattleState
 ---@field wandering boolean
 ---@field enemy_pack EnemyPack?
 ---@field current_story_atom string
----@field story_atoms table<string, StoryAtom>
 local state = {
 	currency = 0,
 	current_lineup = {},
@@ -34,10 +50,24 @@ local state = {
 	current_location_x = 0,
 	current_location_y = 0,
 	wandering = false,
-	current_story_atom = "greeting",
+	current_story_atom = "invalid",
 	vfx = require "scenes._vfx_manager",
-	story_atoms = {}
+	story_atoms = {},
+	options_state = OPTIONS_STATE.NONE
 }
+
+---comment
+---@param state GameState
+---@param atom string
+function SET_STORY_ATOM(state, atom)
+	state.current_story_atom = atom
+	if (state.story_atoms[state.current_story_atom] == nil) then
+		print("UNKNOWN STORY ATOM:", atom)
+	end
+	if state.story_atoms[state.current_story_atom].initial_effect then
+		state.story_atoms[state.current_story_atom].initial_effect(state, state.playable_actors[state.current_dialog_actor])
+	end
+end
 
 function state.load()
 	assert(false)
@@ -52,7 +82,7 @@ end
 ---@param scene number
 function state.set_scene(state, scene)
 	local def = scenes_manager.get(scene)
-	print("Enter scene:", def.name)
+	print("Enter scene:\n", def.name)
 	state.current_scene = scene
 end
 
