@@ -278,7 +278,7 @@ local wares = {
 		local actor_object = state.playable_actors[actor_index]
 		for index, value in ipairs(actor_object.wares) do
 			local commodity_journal_index = ENCOUNTER_COMMODITY(journal, value.commodity)
-			NEW_TOPIC_INSTANCE(state, journal, "buy_commodity",  {actor_journal_index, commodity_journal_index})
+			NEW_TOPIC_INSTANCE(state, journal, "buy_commodity",  {actor_journal_index, commodity_journal_index, value.price})
 		end
 	end,
 	text = function (state, journal, param)
@@ -349,7 +349,7 @@ local enter_the_city_info = {
 	effect = function (state, journal, params)
 		local location = journal.objects[params[1]]
 		local group = journal.objects[params[2]]
-		state.current_text = "Knights, lords and citizens. Esteemed guests as well."
+		state.current_text = "Knights, lords and citizens can enter. Esteemed guests as well."
 
 		LEARN_ABOUT_LOCATION(journal, LOCATION.CITY)
 		LEARN_ABOUT_SOCIAL_STATUS(journal, SOCIAL_STATUS.CITIZEN)
@@ -434,6 +434,37 @@ local enter_location_info = {
 }
 
 ---@type Topic
+local job_suggestion_guard = {
+	severity = SEVERITY.NONE,
+	kind = TOPIC_KIND.TALK,
+	name = "job_suggestion_guard",
+	params_description = {
+		{
+			description = "Guard",
+			is_actor = true
+		}
+	},
+	repeatable = false,
+	trigger_on_meeting_character = function (state, journal, object_index)
+		if state.current_guard == object_index then
+			return true
+		end
+		return false
+	end,
+	text = function (state, journal, params)
+		return "Do you have any jobs for me?"
+	end,
+	effect = function (state, journal, params)
+		state.current_text = "No. Get lost."
+		state.playable_actors[state.current_guard].trust = state.playable_actors[state.current_guard].trust - 10
+	end,
+	has_journal_note = true,
+	journal_text = function (state, journal, params, param_index)
+		return "They don't have any jobs for me."
+	end
+}
+
+---@type Topic
 local enter_the_city_aggression = {
 	severity = SEVERITY.NONE,
 	kind = TOPIC_KIND.TALK,
@@ -512,13 +543,13 @@ local enter_the_city_aggression_attack = {
 		battle_manager.start_battle(state, state.last_battle)
 		battle_manager.put_player_into_battle(state)
 		local enemy = battle_manager.new_actor(actor_object.def, 1, 1)
-		-- battle_manager.add_actor_to_battle(state.last_battle, enemy, false)
+		battle_manager.add_actor_to_battle(state.last_battle, enemy, false)
 
 		do
-			local enemy = require "meta-actors.creation"
-			battle_manager.add_actor_to_battle(state.last_battle, battle_manager.new_actor(enemy, 1, 1), false)
-			battle_manager.add_actor_to_battle(state.last_battle, battle_manager.new_actor(enemy, 2, 1), false)
-			battle_manager.add_actor_to_battle(state.last_battle, battle_manager.new_actor(enemy, 3, 1), false)
+			-- local enemy = require "meta-actors.creation"
+			-- battle_manager.add_actor_to_battle(state.last_battle, battle_manager.new_actor(enemy, 1, 1), false)
+			-- battle_manager.add_actor_to_battle(state.last_battle, battle_manager.new_actor(enemy, 2, 1), false)
+			-- battle_manager.add_actor_to_battle(state.last_battle, battle_manager.new_actor(enemy, 3, 1), false)
 		end
 
 
@@ -529,6 +560,141 @@ local enter_the_city_aggression_attack = {
 		-- local location = journal.objects[params[1]]
 		-- local group = journal.objects[params[2]]
 		return string.format("I have attacked them")
+	end
+}
+
+---@type Topic
+local caravan_at_gates = {
+	severity = SEVERITY.MILD,
+	has_journal_note = true,
+	kind = TOPIC_KIND.TALK,
+	name = "caravan_at_gates",
+	repeatable = false,
+	params_description = {
+		{
+			description = "Trader",
+			is_actor = true
+		}
+	},
+	trigger_on_meeting_character = function (state, journal, object_index)
+		return object_index == state.caravan_master
+	end,
+	effect = function (state, journal, params)
+		state.current_text = "They would not let me into the city... And even if I could enter, I don't have the license for trade."
+		NEW_TOPIC_INSTANCE(state, journal, "caravan_at_gates_issue", params)
+		NEW_TOPIC_INSTANCE(state, journal, "caravan_at_gates_job", params)
+	end,
+	journal_text = function (state, journal, params, param_index)
+		return "They are unable to enter the city"
+	end,
+	text = function (state, journal, params)
+		return "Why is your caravan standing here, at the gates?"
+	end
+}
+
+---@type Topic
+local caravan_at_gates_issue = {
+	severity = SEVERITY.MILD,
+	has_journal_note = true,
+	kind = TOPIC_KIND.TALK,
+	name = "caravan_at_gates_issue",
+	repeatable = false,
+	params_description = {
+		{
+			description = "Trader",
+			is_actor = true
+		}
+	},
+	trigger_on_meeting_character = function (state, journal, object_index)
+		return false
+	end,
+	effect = function (state, journal, params)
+		state.current_text = "I want to sell my high quality cloth there. But I need a middleman who has connections with local guilds. For now I am just waiting there, but if I will not find a fitting person, I will just leave."
+	end,
+	journal_text = function (state, journal, params, param_index)
+		return "They need a middleman who has connections in the city"
+	end,
+	text = function (state, journal, params)
+		return "So, what are you going to do?"
+	end
+}
+
+local caravan_at_gates_job = {
+	severity = SEVERITY.MILD,
+	has_journal_note = false,
+	kind = TOPIC_KIND.TALK,
+	name = "caravan_at_gates_job",
+	repeatable = false,
+	params_description = {
+		{
+			description = "Trader",
+			is_actor = true
+		}
+	},
+	trigger_on_meeting_character = function (state, journal, object_index)
+		return false
+	end,
+	effect = function (state, journal, params)
+		state.current_text = "I don't think you can help me personally, but folks in the forest could use some help."
+		local forest = LEARN_ABOUT_LOCATION(journal, LOCATION.FOREST_VILLAGE, params[1])
+		local gates = LEARN_ABOUT_LOCATION(journal, LOCATION.AT_CITY_GATES, params[1])
+		NEW_TOPIC_INSTANCE(state, journal, "travel", {forest, gates})
+		NEW_TOPIC_INSTANCE(state, journal, "travel", {gates, forest})
+	end,
+	journal_text = function (state, journal, params, param_index)
+		return "They told me that people in the forest could use some help."
+	end,
+	text = function (state, journal, params)
+		return "Do you need any help?"
+	end
+}
+
+---@type Topic
+local travel = {
+	severity = SEVERITY.NONE,
+	has_journal_note = true,
+	kind = TOPIC_KIND.MOVEMENT,
+	name = "travel",
+	repeatable = true,
+	has_journal_note_even_if_not_done = true,
+	params_description = {
+		{
+			description = "From",
+			is_location = true
+		},
+		{
+			description = "To",
+			is_location = true
+		}
+	},
+	trigger_on_meeting_character = function (state, journal, object_index)
+		return false
+	end,
+	effect =function (state, journal, params)
+		local from = journal.objects[params[1]].location
+		local to = journal.objects[params[2]].location
+		print(from, LOCATION.AT_CITY_GATES)
+		print(to, LOCATION.CITY)
+		if (from ==LOCATION.AT_CITY_GATES) and (to == LOCATION.CITY) then
+			battle_manager.start_battle(state, state.last_battle)
+			battle_manager.put_player_into_battle(state)
+			local guard = state.playable_actors[state.current_guard]
+			local enemy = battle_manager.new_actor(guard.def, 1, 1)
+			battle_manager.add_actor_to_battle(state.last_battle, enemy, false)
+			state.set_scene(state, scenes.battle)
+		end
+		VISIT_JOURNAL_LOCATION(state, journal, params[2])
+		state.current_text = string.format("You have arrived to %s", SHORT_DESCRIPTION(state, journal, journal.objects[params[2]]))
+	end,
+	journal_text = function (state, journal, params, param_index)
+		if param_index == 1 then
+			return string.format("I can travel to %s.", SHORT_DESCRIPTION(state, journal, journal.objects[params[2]]))
+		else
+			return string.format("I can travel here from %s.", SHORT_DESCRIPTION(state, journal, journal.objects[params[1]]))
+		end
+	end,
+	text = function (state, journal, params)
+		return string.format("Travel to the %s", SHORT_DESCRIPTION_INDEX(state, journal, params[2]))
 	end
 }
 
@@ -548,4 +714,9 @@ return function (journal)
 	REGISTER_TOPIC(journal, enter_the_city_aggression)
 	REGISTER_TOPIC(journal, enter_the_city_aggression_attack)
 	REGISTER_TOPIC(journal, enter_location_info)
+	REGISTER_TOPIC(journal, caravan_at_gates)
+	REGISTER_TOPIC(journal, caravan_at_gates_issue)
+	REGISTER_TOPIC(journal, job_suggestion_guard)
+	REGISTER_TOPIC(journal, travel)
+	REGISTER_TOPIC(journal, caravan_at_gates_job)
 end

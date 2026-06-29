@@ -87,7 +87,16 @@ local function interface(state, journal, render, click, mx, my)
 		if state.options_state == OPTIONS_STATE.NONE then
 			options =utility_options_base
 		elseif state.options_state == OPTIONS_STATE.MOVE then
-			options = {back_to_utility}
+			for index, value in ipairs(journal.topics) do
+				local functor = journal.topic_functors[value.name]
+				if
+					functor.kind ==TOPIC_KIND.MOVEMENT
+					and value.params[1] == journal.location_index_to_object_index[state.current_location]
+				then
+					table.insert(options, value)
+				end
+			end
+			table.insert(options, back_to_utility)
 		elseif state.options_state == OPTIONS_STATE.TALK then
 			for index, value in ipairs(state.playable_actors) do
 				if value.location == state.current_location then
@@ -102,6 +111,7 @@ local function interface(state, journal, render, click, mx, my)
 					table.insert(options, new_option)
 				end
 			end
+			table.insert(options, back_to_utility)
 		end
 	else
 		-- topics relevant to this actor
@@ -228,7 +238,7 @@ local function interface(state, journal, render, click, mx, my)
 		for index, value in ipairs(journal.topics) do
 			local functor = journal.topic_functors[value.name]
 			if (functor == nil) then
-				error("MISSING " .. value.name .. "TOPIC FUNCTOR")
+				error("MISSING " .. value.name .. " TOPIC FUNCTOR")
 			end
 			if functor.has_journal_note and (value.done or functor.has_journal_note_even_if_not_done)  then
 				local relevant = false

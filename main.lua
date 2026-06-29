@@ -72,8 +72,10 @@ function love.load()
 
 	require "story.issues"(journal)
 
-	VISIT_LOCATION(state, journal, LOCATION.AT_CITY_GATES)
-	LEARN_ABOUT_LOCATION(journal, LOCATION.CITY)
+	local city = LEARN_ABOUT_LOCATION(journal, LOCATION.CITY)
+	local gates = VISIT_LOCATION(state, journal, LOCATION.AT_CITY_GATES)
+	NEW_TOPIC_INSTANCE(state, journal, "travel", {gates, city})
+	NEW_TOPIC_INSTANCE(state, journal, "travel", {city, gates})
 end
 
 function love.update(dt)

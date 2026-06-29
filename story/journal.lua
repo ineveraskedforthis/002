@@ -49,7 +49,8 @@ SOCIAL_STATUS = {
 ---@enum LOCATION
 LOCATION = {
 	CITY = 1,
-	AT_CITY_GATES = 2
+	AT_CITY_GATES = 2,
+	FOREST_VILLAGE = 3
 }
 
 
@@ -110,6 +111,8 @@ function SHORT_DESCRIPTION(state, journal, object)
 			return "Old Fortress City"
 		elseif  object.location == LOCATION.AT_CITY_GATES then
 			return "outside of the gates of Old Fortress City"
+		elseif object.location ==LOCATION.FOREST_VILLAGE then
+			return "Forest Village"
 		end
 	end
 
@@ -152,6 +155,15 @@ function SHORT_DESCRIPTION(state, journal, object)
 	end
 
 	return "???"
+end
+
+---@param state GameState
+---@param journal Journal
+---@param object_index number
+---@return string
+function SHORT_DESCRIPTION_INDEX(state, journal, object_index)
+	local obj = journal.objects[object_index]
+	return SHORT_DESCRIPTION(state, journal, obj)
 end
 
 ---@type table<string, TextGenerator>
@@ -355,16 +367,27 @@ end
 
 ---@param state GameState
 ---@param journal Journal
+---@param location LOCATION
 function VISIT_LOCATION (state, journal, location)
 	state.current_location = location
 
-	LEARN_ABOUT_LOCATION(journal, location)
+	local value = LEARN_ABOUT_LOCATION(journal, location)
 	for index, value in ipairs(state.playable_actors) do
 		if value.location == location then
 			local actor_index_journal = MEET_ACTOR(state, journal, index, location)
 			journal.objects[actor_index_journal].occupation = value.occupation
 		end
 	end
+	return value
+end
+
+---@param state GameState
+---@param journal Journal
+---@param location number
+function VISIT_JOURNAL_LOCATION (state, journal, location)
+	local obj = journal.objects[location]
+	print(state.current_location, "MOVE TO", obj.location)
+	return VISIT_LOCATION(state, journal, obj.location)
 end
 
 ---comment
