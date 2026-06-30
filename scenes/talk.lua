@@ -11,27 +11,40 @@ local panel = require "ui.panel"
 
 local bg = love.graphics.newImage("assets/bg/default.jpg")
 
----@type TopicInstance[]
+---@type IndexedTopicInstance[]
 local utility_options_base = {
 	{
-		done = false,
-		name = "UTILITY_move",
-		params = {}
+		param_index = 1,
+		topic = {
+			done = false,
+			name = "UTILITY_move",
+			params = {}
+		},
 	},
-
 	{
+		param_index = 1,
+		topic = {
+			done = false,
+			name = "UTILITY_talk",
+			params = {}
+		}
+	}
+
+}
+
+---@type IndexedTopicInstance
+local back_to_utility = {
+	param_index = 1,
+	topic = {
 		done = false,
-		name = "UTILITY_talk",
+		name = "UTILITY_back_to_action",
 		params = {}
 	}
 }
 
----@type TopicInstance
-local back_to_utility = {
-	done = false,
-	name = "UTILITY_back_to_action",
-	params = {}
-}
+---@class IndexedTopicInstance
+---@field topic TopicInstance
+---@field param_index number
 
 ---comment
 ---@param state GameState
@@ -41,6 +54,9 @@ local back_to_utility = {
 ---@param mx number
 ---@param my number
 local function interface(state, journal, render, click, mx, my)
+	local status_bar_height = 25
+	local status_bar_heigth_with_margins = status_bar_height + style.base_margin * 2
+
 	if (state.current_dialog_actor == 0) then
 		state.set_scene(state, scenes.location)
 		return
@@ -62,7 +78,7 @@ local function interface(state, journal, render, click, mx, my)
 	end
 
 
-	panel(render, win_w / 2 - 200, win_h - 200, 400, 200 - style.base_margin)
+	panel(render, win_w / 2 - 200, win_h - 200, 400, 200 - style.base_margin - status_bar_heigth_with_margins)
 
 	style.default_font_color()
 	style.conversation_font()
@@ -84,7 +100,7 @@ local function interface(state, journal, render, click, mx, my)
 		-- error(state.current_story_atom .. "lacks options")
 	-- end
 
-	---@type TopicInstance[]
+	---@type IndexedTopicInstance[]
 	local options = {}
 
 	if (state.last_battle_awaits_topic_resolution) then
@@ -110,7 +126,7 @@ local function interface(state, journal, render, click, mx, my)
 					and topic.kind ==TOPIC_KIND.ATTACK
 					and value.params[1] == journal.location_index_to_object_index[state.playable_actors[state.main_character].location]
 				then
-					table.insert(options, value)
+					table.insert(options, {topic = value, param_index = 1})
 				end
 			end
 		elseif state.options_state == OPTIONS_STATE.MOVE then
@@ -120,7 +136,7 @@ local function interface(state, journal, render, click, mx, my)
 					functor.kind ==TOPIC_KIND.MOVEMENT
 					and value.params[1] == journal.location_index_to_object_index[state.playable_actors[state.main_character].location]
 				then
-					table.insert(options, value)
+					table.insert(options, {topic = value, param_index = 1})
 				end
 			end
 			table.insert(options, back_to_utility)
@@ -132,11 +148,14 @@ local function interface(state, journal, render, click, mx, my)
 				then
 					local object_index = journal.actor_index_to_object_index[index]
 					local object = journal.objects[object_index]
-					---@type TopicInstance
+					---@type IndexedTopicInstance
 					local new_option = {
-						done = false,
-						name = "UTILITY_talk_select",
-						params = {object_index}
+						param_index = 1,
+						topic = {
+							done = false,
+							name = "UTILITY_talk_select",
+							params = {object_index}
+						}
 					}
 					table.insert(options, new_option)
 				end
@@ -147,14 +166,18 @@ local function interface(state, journal, render, click, mx, my)
 		-- topics relevant to this actor
 		local actor_journal_index = journal.actor_index_to_object_index[state.current_dialog_actor]
 		for index, value in ipairs(journal.topics) do
+			local topic = journal.topic_functors[value.name]
 			if not value.done then
-				local topic = journal.topic_functors[value.name]
 				if topic == nil then
 					error ("Missing topic " .. value.name)
 				end
 				for param_index, param in ipairs(value.params) do
-					if param == actor_journal_index and topic.params_description[param_index].is_actor then
-						table.insert(options, value)
+					if
+						param == actor_journal_index
+						and topic.params_description[param_index].is_actor
+						and topic.has_option(state, journal, value.params, param)
+					then
+						table.insert(options, {topic = value, param_index = param_index})
 						goto continue
 					end
 				end
@@ -167,22 +190,34 @@ local function interface(state, journal, render, click, mx, my)
 	-- print(#options)
 
 	for index, value in ipairs(options) do
-		local topic_f = journal.topic_functors[value.name]
+		local topic_f = journal.topic_functors[value.topic.name]
 		if (topic_f == nil) then
-			error("Missing " .. value.name .. " topic functor")
+			error("Missing " .. value.topic.name .. " topic functor")
 		end
-		local option_text = topic_f.text(state, journal, value.params)
+		local option_text = topic_f.option_text(state, journal, value.topic.params, value.param_index)
 		if button(render, click, option_text, win_w / 2 - 200, h + index * 60, 400, 50, mx, my, true) then
-			topic_f.effect(state, journal, value.params)
+			topic_f.effect(state, journal, value.topic.params, value.param_index)
 			if not topic_f.repeatable then
-				value.done = true
+				value.topic.done = true
 			end
 		end
 	end
 
+
+	-- Status bar
+
+	local status_x = style.base_margin
+	local status_y = win_h - status_bar_heigth_with_margins
+
+	panel(render, status_x, status_y, win_w - style.base_margin * 2, status_bar_height)
+
+	local status_string = string.format("%d coins. %s", state.currency, TIME_STRING(state.current_time))
+
+	love.graphics.print(status_string, status_x + style.base_margin, status_y)
+
 	-- LOG
 
-	panel(render, style.base_margin, style.base_margin, win_w / 2 - 200 - 2 * style.base_margin, win_h - 2 * style.base_margin)
+	panel(render, style.base_margin, style.base_margin, win_w / 2 - 200 - 2 * style.base_margin, win_h - 2 * style.base_margin - status_bar_heigth_with_margins)
 	style.default_font_color()
 	style.default_font()
 

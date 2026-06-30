@@ -103,6 +103,7 @@ function TOTAL_MAG(a, w)
 			---@type number
 			x = x + def.additional_mag
 		end
+		x = x + w.additional_MAG
 	end
 	return x
 end

@@ -1,7 +1,6 @@
 ---@type MetaActor
 local def = {
 	MAX_HP = 100,
-	ATK = 50,
 	DEF = 0,
 	SPD = 100,
 	name = "(You)",
@@ -11,7 +10,7 @@ local def = {
 	image_action_bar = love.graphics.newImage("assets/main-character-h.png"),
 	image_skills = love.graphics.newImage("assets/main-character-skills.png"),
 	MAG = 10,
-	STR = 10,
+	STR = 15,
 	alignment = {},
 	weapon = WEAPON.SWORD,
 	weapon_mastery = 0,

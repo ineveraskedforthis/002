@@ -26,7 +26,9 @@ local function register_actor(
 		factions = factions,
 		location = LOCATION.CITY,
 		occupation = OCCUPATION_TYPE.NONE,
-		wares = {}
+		wares = {},
+		additional_MAG = 0,
+		dead = false
 	}
 
 	table.insert(state.playable_actors, added)
@@ -54,6 +56,7 @@ return function (state)
 	state.last_battle.wave = 1
 	state.available_guards = {}
 	state.current_guard = 1
+	state.current_time =0
 
 	state.options_state = OPTIONS_STATE.NONE
 
@@ -104,6 +107,14 @@ return function (state)
 		{FACTION.MAGE_GUILD}
 	)
 
+	local forest_guard, forest_guard_index = register_actor (
+		state,
+		require "meta-actors.guard-forest",
+		{FACTION.MERCENARIES}
+	)
+	state.forest_guard =forest_guard_index
+	forest_guard.location = LOCATION.ESTATE_LORD_B_GUARDHOUSE_NEAR_FOREST
+
 	local great_mage, qq = register_actor(
 		state,
 		require "meta-actors.trong",
@@ -111,13 +122,14 @@ return function (state)
 	)
 	great_mage.lineup_position = 3
 
-	local poisoner = register_actor(
+	local poisoner, poisoner_index = register_actor(
 		state,
 		require "meta-actors.flower",
 		{FACTION.HIGHWAY_JESTERS}
 	)
 	poisoner.location = LOCATION.FOREST_VILLAGE
 	poisoner.occupation = OCCUPATION_TYPE.FOREST_VILLAGER
+	state.village_girl = poisoner_index
 
 	local poisoner_2, poisoner_2_index = register_actor(
 		state,

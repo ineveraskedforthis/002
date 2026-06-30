@@ -76,7 +76,8 @@ FACTION = {
 	MAGE_GUILD = 2,
 	ORDER_OF_LIGHT = 3,
 	HIGHWAY_JESTERS = 4,
-	ROGUE_MAGES = 5
+	ROGUE_MAGES = 5,
+	MERCENARIES = 6
 }
 
 ---@enum COMMODITY
@@ -108,12 +109,14 @@ end
 ---@field level number
 ---@field skill_points number
 ---@field additional_weapon_mastery number
+---@field additional_MAG number
 ---@field skills ActiveSkill[]
 ---@field gemstones number[]
 ---@field factions FACTION[]
 ---@field location LOCATION
 ---@field occupation OCCUPATION_TYPE
 ---@field wares? ItemForSell[]
+---@field dead boolean
 
 ---@class GemstoneWrapper
 ---@field def number

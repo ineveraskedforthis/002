@@ -1,7 +1,6 @@
 ---@type MetaActor
 local def = {
 	MAX_HP = 100,
-	ATK = 40,
 	DEF = 0,
 	SPD = 110,
 	name = "Chud",

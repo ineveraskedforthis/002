@@ -55,7 +55,13 @@ LOCATION = {
 	CITY = 1,
 	AT_CITY_GATES = 2,
 	FOREST_VILLAGE = 3,
-	FOREST_VILLAGE_NEIGHBOURHOOD = 4
+	FOREST_VILLAGE_NEIGHBOURHOOD = 4,
+	ESTATE_LORD_B = 5,
+	ESTATE_LORD_B_GUARDHOUSE_NEAR_FOREST = 6,
+	ESTATE_LORD_B_BAKERY = 7,
+	ESTATE_LORD_B_WELL_OFF_SERF = 8,
+	FOREST_VILLAGE_SWAMP = 9,
+	ESTATE_LORD_A = 100,
 }
 
 
@@ -432,6 +438,46 @@ function LEARN_LOCATION_ACCESS (journal, social_status, location, origin)
 	}
 	journal.available_log_id = journal.available_log_id + 1
 	table.insert(journal.log, temp)
+end
+
+---comment
+---@param state GameState
+---@param journal Journal
+---@param actor number
+function LEARN_ABOUT_DEATH(state, journal, actor, killer)
+	print("LEARN ABOUT DEATH", actor)
+	local dead = journal.actor_index_to_object_index[actor]
+
+	if dead == nil then
+		return
+	end
+
+
+	for index, value in ipairs(journal.topics) do
+		local topic_template = journal.topic_functors[value.name]
+		for param_index, param in ipairs(value.params) do
+			print(value.name, param, dead)
+			if param == dead then
+				topic_template.effect_on_parameter_actor_death(state, journal, value.params, param_index)
+			end
+		end
+	end
+end
+
+---comment
+---@param state GameState
+---@param journal Journal
+---@param actor number
+---@param killer number?
+function KILL(state, journal, actor, killer)
+	print("LEARN ABOUT DEATH", actor)
+	state.playable_actors[actor].dead = true
+
+	if state.playable_actors[state.main_character].location ~= state.playable_actors[actor].location then
+		return
+	end
+
+	LEARN_ABOUT_DEATH(state, journal, actor, killer)
 end
 
 

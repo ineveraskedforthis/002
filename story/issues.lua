@@ -58,11 +58,13 @@ TOPIC_KIND = {
 ---@field kind TOPIC_KIND
 ---@field trigger_on_meeting_character fun(state : GameState, journal : Journal, object_index : number) : boolean
 ---@field params_description TopicParam[]
----@field text fun(state: GameState, journal : Journal, params : number[]): string
----@field effect fun(state: GameState, journal : Journal, params : number[])
+---@field option_text fun(state: GameState, journal : Journal, params : number[], param_index: number): string
+---@field has_option fun(state: GameState, journal : Journal, params : number[], param_index: number): boolean
+---@field effect fun(state: GameState, journal : Journal, params : number[], param_index: number)
 ---@field has_journal_note boolean
 ---@field has_journal_note_even_if_not_done boolean?
----@field journal_text fun(state: GameState, journal : Journal, params : number[], param_index): string
+---@field journal_text fun(state: GameState, journal : Journal, params : number[], param_index: number): string
+---@field effect_on_parameter_actor_death fun(state: GameState, journal : Journal, params : number[], param_index)
 ---@field repeatable boolean
 
 ---@class TopicInstance
@@ -91,13 +93,19 @@ local back_to_action_choice = {
 	end,
 	name = "UTILITY_back_to_action",
 	params_description = {},
-	text = function (state, journal, params)
+	option_text = function (state, journal, params)
 		return "Back"
 	end,
 	repeatable = true,
 	has_journal_note = false,
 	journal_text = function (state, journal, params, param_index)
 		return ""
+	end,
+	has_option = function (state, journal, params, param_index)
+		return true
+	end,
+	effect_on_parameter_actor_death = function (state, journal, params, param_index)
+
 	end
 }
 
@@ -113,13 +121,19 @@ local movement_choice = {
 	end,
 	name = "UTILITY_move",
 	params_description = {},
-	text = function (state, journal, params)
+	option_text = function (state, journal, params)
 		return "Go to ..."
+	end,
+	has_option = function (state, journal, params, param_index)
+		return true
 	end,
 	repeatable = true,
 	has_journal_note = false,
 	journal_text = function (state, journal, params, param_index)
 		return ""
+	end,
+	effect_on_parameter_actor_death = function (state, journal, params, param_index)
+
 	end
 }
 
@@ -135,13 +149,19 @@ local talk_choice = {
 	end,
 	name = "UTILITY_talk",
 	params_description = {},
-	text = function (state, journal, params)
+	option_text = function (state, journal, params)
 		return "Talk to ..."
+	end,
+	has_option = function (state, journal, params, param_index)
+		return true
 	end,
 	repeatable = true,
 	has_journal_note = false,
 	journal_text = function (state, journal, params, param_index)
 		return ""
+	end,
+	effect_on_parameter_actor_death = function (state, journal, params, param_index)
+
 	end
 }
 
@@ -156,8 +176,11 @@ local talk_choice_2 = {
 		local journal_object = journal.objects[params[1]]
 		state.current_dialog_actor = journal_object.associated_actor
 	end,
-	text = function (state, journal, params)
+	option_text = function (state, journal, params)
 		return string.format("Talk to %s", SHORT_DESCRIPTION(state, journal, journal.objects[params[1]]))
+	end,
+	has_option = function (state, journal, params, param_index)
+		return true
 	end,
 	name = "UTILITY_talk_select",
 	params_description = {
@@ -170,6 +193,9 @@ local talk_choice_2 = {
 	has_journal_note = false,
 	journal_text = function (state, journal, params, param_index)
 		return ""
+	end,
+	effect_on_parameter_actor_death = function (state, journal, params, param_index)
+
 	end
 }
 
@@ -201,13 +227,19 @@ local learn_name = {
 		journal.known_names[actor_journal_index] = name
 		state.current_text = "The name was recorded into the journal."
 	end,
-	text = function (state, journal, params)
+	option_text = function (state, journal, params)
 		return "What is your name?"
+	end,
+	has_option = function (state, journal, params, param_index)
+		return true
 	end,
 	repeatable = false,
 	has_journal_note = true,
 	journal_text = function (state, journal, params, param_index)
 		return string.format("%s has told me their name", journal.known_names[params[param_index]])
+	end,
+	effect_on_parameter_actor_death = function (state, journal, params, param_index)
+
 	end
 }
 
@@ -236,9 +268,12 @@ local buy_commodity = {
 	effect = function (state, journal, params)
 
 	end,
-	text =function (state, journal, params)
+	option_text =function (state, journal, params)
 		local commodity_object = journal.objects[params[2]]
 		return string.format("Buy %s for %s", COMMODITY_STRING(commodity_object.commodity), params[3])
+	end,
+	has_option = function (state, journal, params, param_index)
+		return true
 	end,
 	repeatable = true,
 	has_journal_note = true,
@@ -251,6 +286,9 @@ local buy_commodity = {
 		end
 
 		return "???"
+	end,
+	effect_on_parameter_actor_death = function (state, journal, params, param_index)
+
 	end
 }
 
@@ -282,13 +320,19 @@ local wares = {
 			NEW_TOPIC_INSTANCE(state, journal, "buy_commodity",  {actor_journal_index, commodity_journal_index, value.price})
 		end
 	end,
-	text = function (state, journal, param)
+	option_text = function (state, journal, param)
 		return "What are you selling here?"
+	end,
+	has_option = function (state, journal, params, param_index)
+		return true
 	end,
 	repeatable = false,
 	has_journal_note = true,
 	journal_text = function (state, journal, params, param_index)
 		return string.format("They can sell something to me.")
+	end,
+	effect_on_parameter_actor_death = function (state, journal, params, param_index)
+
 	end
 }
 
@@ -311,8 +355,11 @@ local enter_the_city = {
 		end
 		return false
 	end,
-	text = function (state, journal, params)
+	option_text = function (state, journal, params)
 		return "Can I enter the city?"
+	end,
+	has_option = function (state, journal, params, param_index)
+		return true
 	end,
 	effect = function (state, journal, params)
 		state.current_text = "Of course not. You are not a citizen."
@@ -326,6 +373,9 @@ local enter_the_city = {
 	has_journal_note = true,
 	journal_text = function (state, journal, params, param_index)
 		return string.format("They don't allow me to enter the city.")
+	end,
+	effect_on_parameter_actor_death = function (state, journal, params, param_index)
+
 	end
 }
 
@@ -344,8 +394,11 @@ local enter_the_city_info = {
 	trigger_on_meeting_character = function (state, journal, object_index)
 		return false
 	end,
-	text = function (state, journal, params)
+	option_text = function (state, journal, params)
 		return "So, who can enter the city?"
+	end,
+	has_option = function (state, journal, params, param_index)
+		return true
 	end,
 	effect = function (state, journal, params)
 		local location = journal.objects[params[1]]
@@ -382,6 +435,9 @@ local enter_the_city_info = {
 	has_journal_note = false,
 	journal_text = function (state, journal, params, param_index)
 		return ""
+	end,
+	effect_on_parameter_actor_death = function (state, journal, params, param_index)
+
 	end
 }
 
@@ -429,8 +485,14 @@ local enter_location_info = {
 		end
 		return ""
 	end,
-	text = function (state, journal, params)
+	option_text = function (state, journal, params)
 		return ""
+	end,
+	has_option = function (state, journal, params, param_index)
+		return true
+	end,
+	effect_on_parameter_actor_death = function (state, journal, params, param_index)
+
 	end
 }
 
@@ -452,8 +514,11 @@ local job_suggestion_guard = {
 		end
 		return false
 	end,
-	text = function (state, journal, params)
+	option_text = function (state, journal, params)
 		return "Do you have any jobs for me?"
+	end,
+	has_option = function (state, journal, params, param_index)
+		return true
 	end,
 	effect = function (state, journal, params)
 		state.current_text = "No. Get lost."
@@ -462,6 +527,9 @@ local job_suggestion_guard = {
 	has_journal_note = true,
 	journal_text = function (state, journal, params, param_index)
 		return "They don't have any jobs for me."
+	end,
+	effect_on_parameter_actor_death = function (state, journal, params, param_index)
+
 	end
 }
 
@@ -488,8 +556,11 @@ local enter_the_city_aggression = {
 	trigger_on_meeting_character = function (state, journal, object_index)
 		return false
 	end,
-	text = function (state, journal, params)
+	option_text = function (state, journal, params)
 		return "And if I will try it to do it anyway?"
+	end,
+	has_option = function (state, journal, params, param_index)
+		return true
 	end,
 	effect = function (state, journal, params)
 		state.current_text = "I will murder you and report the trespassing accident."
@@ -514,6 +585,9 @@ local enter_the_city_aggression = {
 			)
 		end
 		return ""
+	end,
+	effect_on_parameter_actor_death = function (state, journal, params, param_index)
+
 	end
 }
 
@@ -532,8 +606,11 @@ local enter_the_city_aggression_attack = {
 	trigger_on_meeting_character = function (state, journal, object_index)
 		return false
 	end,
-	text = function (state, journal, params)
+	option_text = function (state, journal, params)
 		return "(Attack the guard)"
+	end,
+	has_option = function (state, journal, params, param_index)
+		return true
 	end,
 	effect = function (state, journal, params)
 		local journal_object = journal.objects[params[1]]
@@ -554,6 +631,9 @@ local enter_the_city_aggression_attack = {
 		-- local location = journal.objects[params[1]]
 		-- local group = journal.objects[params[2]]
 		return string.format("I have attacked them")
+	end,
+	effect_on_parameter_actor_death = function (state, journal, params, param_index)
+
 	end
 }
 
@@ -581,8 +661,14 @@ local caravan_at_gates = {
 	journal_text = function (state, journal, params, param_index)
 		return "They are unable to enter the city"
 	end,
-	text = function (state, journal, params)
+	option_text = function (state, journal, params)
 		return "Why is your caravan standing here, at the gates?"
+	end,
+	has_option = function (state, journal, params, param_index)
+		return true
+	end,
+	effect_on_parameter_actor_death = function (state, journal, params, param_index)
+
 	end
 }
 
@@ -608,11 +694,18 @@ local caravan_at_gates_issue = {
 	journal_text = function (state, journal, params, param_index)
 		return "They need a middleman who has connections in the city"
 	end,
-	text = function (state, journal, params)
+	option_text = function (state, journal, params)
 		return "So, what are you going to do?"
+	end,
+	has_option = function (state, journal, params, param_index)
+		return true
+	end,
+	effect_on_parameter_actor_death = function (state, journal, params, param_index)
+
 	end
 }
 
+---@type Topic
 local caravan_at_gates_job = {
 	severity = SEVERITY.MILD,
 	has_journal_note = false,
@@ -642,8 +735,14 @@ local caravan_at_gates_job = {
 	journal_text = function (state, journal, params, param_index)
 		return "They told me that people in the forest could use some help."
 	end,
-	text = function (state, journal, params)
+	option_text = function (state, journal, params)
 		return "Do you need any help?"
+	end,
+	has_option = function (state, journal, params, param_index)
+		return true
+	end,
+	effect_on_parameter_actor_death = function (state, journal, params, param_index)
+
 	end
 }
 
@@ -680,13 +779,19 @@ local village_issues_introduction = {
 			return string.format("They asked me to get rid of wolves around the village.")
 		end
 	end,
-	text = function (state, journal, params)
+	option_text = function (state, journal, params)
 		return "Are there any issues in the village?"
+	end,
+	has_option = function (state, journal, params, param_index)
+		return true
 	end,
 	trigger_on_meeting_character =function (state, journal, object_index)
 		return false
 	end,
-	has_journal_note_even_if_not_done = false
+	has_journal_note_even_if_not_done = false,
+	effect_on_parameter_actor_death = function (state, journal, params, param_index)
+
+	end
 }
 
 
@@ -717,7 +822,10 @@ local travel = {
 		local to = journal.objects[params[2]].location
 		print(from, LOCATION.AT_CITY_GATES)
 		print(to, LOCATION.CITY)
-		if (from ==LOCATION.AT_CITY_GATES) and (to == LOCATION.CITY) then
+
+		VISIT_JOURNAL_LOCATION(state, journal, params[2])
+
+		if (from == LOCATION.AT_CITY_GATES) and (to == LOCATION.CITY) then
 			state.die_on_battle_lost = true
 			battle_manager.start_battle(state, state.last_battle)
 			battle_manager.put_player_into_battle(state)
@@ -726,8 +834,20 @@ local travel = {
 			battle_manager.add_actor_to_battle(state.last_battle, enemy, false)
 			state.set_scene(state, scenes.battle)
 		end
-		VISIT_JOURNAL_LOCATION(state, journal, params[2])
+
+		if (from == LOCATION.FOREST_VILLAGE) and (to == LOCATION.ESTATE_LORD_B_GUARDHOUSE_NEAR_FOREST) then
+			state.die_on_battle_lost = true
+			battle_manager.start_battle(state, state.last_battle)
+			battle_manager.put_player_into_battle(state)
+			local guard = state.playable_actors[state.forest_guard]
+			local enemy = battle_manager.new_actor(guard.def, 1, 1)
+			battle_manager.add_actor_to_battle(state.last_battle, enemy, false)
+			state.set_scene(state, scenes.battle)
+
+			KILL(state, journal, state.forest_guard)
+		end
 		state.current_text = string.format("You have arrived to %s", SHORT_DESCRIPTION(state, journal, journal.objects[params[2]]))
+		state.current_time = state.current_time + 1
 	end,
 	journal_text = function (state, journal, params, param_index)
 		if param_index == 1 then
@@ -736,8 +856,14 @@ local travel = {
 			return string.format("I can travel here from %s.", SHORT_DESCRIPTION(state, journal, journal.objects[params[1]]))
 		end
 	end,
-	text = function (state, journal, params)
+	option_text = function (state, journal, params)
 		return string.format("Travel to the %s", SHORT_DESCRIPTION_INDEX(state, journal, params[2]))
+	end,
+	has_option = function (state, journal, params, param_index)
+		return true
+	end,
+	effect_on_parameter_actor_death = function (state, journal, params, param_index)
+
 	end
 }
 
@@ -782,11 +908,17 @@ local attack_wolves = {
 			is_location = true
 		}
 	},
-	text = function (state, journal, params)
+	option_text = function (state, journal, params)
 		return "Attack wolves"
+	end,
+	has_option = function (state, journal, params, param_index)
+		return true
 	end,
 	trigger_on_meeting_character = function (state, journal, object_index)
 		return false
+	end,
+	effect_on_parameter_actor_death = function (state, journal, params, param_index)
+
 	end
 }
 
@@ -800,10 +932,11 @@ local attack_wolves_success = {
 	has_journal_note_even_if_not_done = false,
 	effect =function (state, journal, params)
 		state.playable_actors[state.village_elder].trust = state.playable_actors[state.village_elder].trust + 20
-		state.current_text = "Thank you. Sadly, we can't repay you with anything valuable."
+		state.current_text = "Thank you. Sadly, we can't repay you with money, shelter or food, but I can provide you with blessing."
+		NEW_TOPIC_INSTANCE(state, journal, "swamp_blessing_start", params)
 	end,
 	journal_text =function (state, journal, params, param_index)
-		return "They are grateful for help"
+		return "They are grateful for help but could not offer anything except a blessing."
 	end,
 	params_description = {
 		{
@@ -811,13 +944,278 @@ local attack_wolves_success = {
 			is_actor = true
 		}
 	},
-	text = function (state, journal, params)
-		return "I have defeated the wolves"
+	option_text = function (state, journal, params)
+		return "I have defeated the wolves."
+	end,
+	has_option = function (state, journal, params, param_index)
+		return true
 	end,
 	trigger_on_meeting_character = function (state, journal, object_index)
 		return false
+	end,
+	effect_on_parameter_actor_death = function (state, journal, params, param_index)
+
 	end
 }
+
+---@type Topic
+local swamp_blessing_start = {
+	severity = SEVERITY.NONE,
+	has_journal_note = true,
+	kind = TOPIC_KIND.TALK,
+	name = "swamp_blessing_start",
+	repeatable = false,
+	has_journal_note_even_if_not_done = false,
+	effect =function (state, journal, params)
+		state.playable_actors[state.village_elder].trust = state.playable_actors[state.village_elder].trust + 20
+		state.current_text = "To get the blessing, go to swamps. Kill the shadows."
+		local village = LEARN_ABOUT_LOCATION(journal, LOCATION.FOREST_VILLAGE, params[1])
+		local swamp = LEARN_ABOUT_LOCATION(journal, LOCATION.FOREST_VILLAGE_SWAMP, params[1])
+		NEW_TOPIC_INSTANCE(state, journal, "travel", {village, swamp})
+		NEW_TOPIC_INSTANCE(state, journal, "travel", {swamp, village})
+
+		NEW_TOPIC_INSTANCE(state, journal, "swamp_blessing", {swamp})
+	end,
+	journal_text =function (state, journal, params, param_index)
+		return "They told me that to get a blessing, I have to kill shadows which live at swamps."
+	end,
+	params_description = {
+		{
+			description = "Village elder",
+			is_actor = true
+		}
+	},
+	option_text = function (state, journal, params)
+		return "So what should I do to get a blessing?"
+	end,
+	has_option = function (state, journal, params, param_index)
+		return true
+	end,
+	trigger_on_meeting_character = function (state, journal, object_index)
+		return false
+	end,
+	effect_on_parameter_actor_death = function (state, journal, params, param_index)
+
+	end
+}
+
+---@type Topic
+local swamp_blessing = {
+	severity = SEVERITY.NONE,
+	has_journal_note = true,
+	kind = TOPIC_KIND.ATTACK,
+	name = "swamp_blessing",
+	repeatable = false,
+	has_journal_note_even_if_not_done = false,
+
+	effect = function (state, journal, params)
+		state.die_on_battle_lost = true
+
+		journal.new_topic_on_battle_won = {
+			done = false,
+			name = "swamp_blessing_success",
+			params = {
+				journal.actor_index_to_object_index[state.village_elder]
+			}
+		}
+
+		state.current_text = ""
+		battle_manager.start_battle(state, state.last_battle)
+		battle_manager.put_player_into_battle(state)
+
+		local enemy = require "meta-actors.shadow"
+		battle_manager.add_actor_to_battle(state.last_battle, battle_manager.new_actor(enemy, 1, 1), false)
+		battle_manager.add_actor_to_battle(state.last_battle, battle_manager.new_actor(enemy, 2, 1), false)
+
+		state.set_scene(state, scenes.battle)
+	end,
+	journal_text = function (state, journal, params, param_index)
+		return "I was fighting shadows here"
+	end,
+	params_description = {
+		{
+			description = "Location",
+			is_location = true
+		}
+	},
+	option_text = function (state, journal, params)
+		return "Hunt shadows"
+	end,
+	has_option = function (state, journal, params, param_index)
+		return true
+	end,
+	trigger_on_meeting_character = function (state, journal, object_index)
+		return false
+	end,
+	effect_on_parameter_actor_death = function (state, journal, params, param_index)
+
+	end
+}
+
+---@type Topic
+local swamp_blessing_success = {
+	severity = SEVERITY.NONE,
+	has_journal_note = true,
+	kind = TOPIC_KIND.TALK,
+	name = "swamp_blessing_success",
+	repeatable = false,
+	has_journal_note_even_if_not_done = false,
+	effect =function (state, journal, params)
+		state.playable_actors[state.village_elder].trust = state.playable_actors[state.village_elder].trust + 20
+		state.playable_actors[state.village_girl].trust = state.playable_actors[state.village_girl].trust + 20
+		state.current_text = "Good... You are strong. Talk with this girl nearby. Maybe she has some requests for you."
+		state.playable_actors[state.main_character].additional_MAG = state.playable_actors[state.main_character].additional_MAG + 10
+		NEW_TOPIC_INSTANCE(state, journal, "flower_request_1", {journal.actor_index_to_object_index[state.village_girl]})
+	end,
+	journal_text =function (state, journal, params, param_index)
+		return "I have received the ancient blessing from the village elder."
+	end,
+	params_description = {
+		{
+			description = "Village elder",
+			is_actor = true
+		}
+	},
+	option_text = function (state, journal, params)
+		return "The shadows are gone."
+	end,
+	has_option = function (state, journal, params, param_index)
+		return true
+	end,
+	trigger_on_meeting_character = function (state, journal, object_index)
+		return false
+	end,
+	effect_on_parameter_actor_death = function (state, journal, params, param_index)
+
+	end
+}
+
+---@type Topic
+local flower_request_1 = {
+	severity = SEVERITY.MILD,
+	has_journal_note = true,
+	kind = TOPIC_KIND.TALK,
+	name = "flower_request_1",
+	repeatable = false,
+	has_journal_note_even_if_not_done = false,
+	effect =function (state, journal, params)
+		state.playable_actors[state.village_girl].trust = state.playable_actors[state.village_girl].trust + 20
+		state.current_text = "Yes. There is a very bad person outside of the forest who makes our lifes insufferable. He should go away. Encourage him to do it and you could join us. You need food and place to sleep, right?"
+
+		local guard_position = LEARN_ABOUT_LOCATION(journal, LOCATION.ESTATE_LORD_B_GUARDHOUSE_NEAR_FOREST, params[1])
+		local forest_village = LEARN_ABOUT_LOCATION(journal, LOCATION.FOREST_VILLAGE, nil)
+
+		local guard = MEET_ACTOR(state, journal, state.forest_guard, LOCATION.ESTATE_LORD_B_GUARDHOUSE_NEAR_FOREST)
+
+		NEW_TOPIC_INSTANCE(state, journal, "flower_request_2", {params[1], guard})
+		NEW_TOPIC_INSTANCE(state, journal, "travel", {forest_village, guard_position})
+		NEW_TOPIC_INSTANCE(state, journal, "travel", {guard_position, forest_village})
+	end,
+	journal_text =function (state, journal, params, param_index)
+		return "I should make a person outside of the forest go away."
+	end,
+	params_description = {
+		{
+			description = "Flower",
+			is_actor = true
+		}
+	},
+	option_text = function (state, journal, params)
+		return "The old man told me you have a request."
+	end,
+	has_option = function (state, journal, params, param_index)
+		return true
+	end,
+	trigger_on_meeting_character = function (state, journal, object_index)
+		return false
+	end,
+	effect_on_parameter_actor_death = function (state, journal, params, param_index)
+
+	end
+}
+
+---@type Topic
+local flower_request_2 = {
+	severity = SEVERITY.MILD,
+	has_journal_note = true,
+	kind = TOPIC_KIND.TALK,
+	name = "flower_request_2",
+	repeatable = false,
+	has_journal_note_even_if_not_done = false,
+	effect =function (state, journal, params)
+
+	end,
+	journal_text =function (state, journal, params, param_index)
+		return "I should make a person outside of the forest go away."
+	end,
+	params_description = {
+		{
+			description = "Flower",
+			is_actor = true
+		},
+		{
+			description = "Guard",
+			is_actor = true
+		}
+	},
+
+	option_text = function (state, journal, params, param_index)
+		return "I was told that you are messing with people living in the forest"
+	end,
+	has_option = function (state, journal, params, param_index)
+		return param_index == 2
+	end,
+	trigger_on_meeting_character = function (state, journal, object_index)
+		return false
+	end,
+	effect_on_parameter_actor_death = function (state, journal, params, param_index)
+		print("DEATH")
+		if param_index == 1 then
+			print("DEATH 1")
+		else
+			print("DEATH 2")
+			NEW_TOPIC_INSTANCE(state, journal, "flower_request_success", {params[1]})
+		end
+	end
+}
+
+---@type Topic
+local flower_request_success = {
+	severity = SEVERITY.MILD,
+	has_journal_note = true,
+	kind = TOPIC_KIND.TALK,
+	name = "flower_request_success",
+	repeatable = false,
+	has_journal_note_even_if_not_done = false,
+	effect =function (state, journal, params)
+		state.playable_actors[state.village_girl].trust = state.playable_actors[state.village_girl].trust + 20
+		state.current_text = "Now you are truly one of us..."
+	end,
+	journal_text =function (state, journal, params, param_index)
+		local journal_index = journal.location_index_to_object_index[LOCATION.FOREST_VILLAGE]
+		local journal_object = journal.objects[journal_index]
+		return string.format("I was accepted into %s", SHORT_DESCRIPTION(state, journal, journal_object))
+	end,
+	params_description = {
+		{
+			description = "Flower",
+			is_actor = true
+		}
+	},
+	option_text = function (state, journal, params)
+		return "The guard is gone."
+	end,
+	has_option = function (state, journal, params, param_index)
+		return true
+	end,
+	trigger_on_meeting_character = function (state, journal, object_index)
+		return false
+	end,
+	effect_on_parameter_actor_death = function (state, journal, params, param_index)
+
+	end
+}
+
 
 ---@param journal Journal
 return function (journal)
@@ -843,4 +1241,10 @@ return function (journal)
 	REGISTER_TOPIC(journal, village_issues_introduction)
 	REGISTER_TOPIC(journal, attack_wolves)
 	REGISTER_TOPIC(journal, attack_wolves_success)
+	REGISTER_TOPIC(journal, swamp_blessing_start)
+	REGISTER_TOPIC(journal, swamp_blessing)
+	REGISTER_TOPIC(journal, swamp_blessing_success)
+	REGISTER_TOPIC(journal, flower_request_1)
+	REGISTER_TOPIC(journal, flower_request_2)
+	REGISTER_TOPIC(journal, flower_request_success)
 end

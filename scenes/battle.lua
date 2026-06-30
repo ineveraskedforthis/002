@@ -56,6 +56,8 @@ local battle_actor_widget = require "ui.actor"
 local await_input = false
 
 function def.update(state, journal, dt)
+	dt = dt * 10
+
 	local battle = state.last_battle
 	skills_panel.update(state, dt)
 

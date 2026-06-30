@@ -18,7 +18,30 @@ BATTLE_RESULT = {
 	DRAW = 2
 }
 
-DAY_LENGTH = 24
+DAY_PART_LENGTH = 3
+DAY_SEGMENTS = 4
+DAY_LENGTH = DAY_PART_LENGTH * DAY_SEGMENTS
+
+function TIME_STRING (time)
+	local modulo_day = time % DAY_LENGTH
+	local day_part = math.floor(modulo_day / DAY_PART_LENGTH)
+	local day_part_segment = modulo_day % DAY_PART_LENGTH
+	local name = "Morning"
+	if day_part == 1 then
+		name = "Day"
+	elseif day_part == 2 then
+		name = "Evening"
+	elseif day_part == 3 then
+		name = "Night"
+	end
+	local modifier = "Early"
+	if day_part_segment == 1 then
+		modifier = "Mid"
+	elseif day_part_segment == 2 then
+		modifier = "Late"
+	end
+	return string.format("%s %s", modifier, name)
+end
 
 ---@class GameState
 ---@field current_lineup number[]
@@ -30,6 +53,8 @@ DAY_LENGTH = 24
 ---@field current_guard number
 ---@field caravan_master number
 ---@field village_elder number
+---@field village_girl number
+---@field forest_guard number
 ---@field current_dialog_actor number?
 ---@field options_state OPTIONS_STATE
 ---@field collected_gemstones GemstoneWrapper[]
@@ -46,6 +71,7 @@ DAY_LENGTH = 24
 ---@field last_battle_awaits_topic_resolution boolean
 ---@field die_on_battle_lost boolean
 ---@field vfx ManagerVFX
+---@field current_time number
 local state = {
 	currency = 0,
 	current_lineup = {},
@@ -69,7 +95,8 @@ local state = {
 	story_atoms = {},
 	options_state = OPTIONS_STATE.NONE,
 	last_battle_awaits_topic_resolution = false,
-	last_battle_result = BATTLE_RESULT.DRAW
+	last_battle_result = BATTLE_RESULT.DRAW,
+	current_time = 0
 }
 
 ---comment

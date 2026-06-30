@@ -45,7 +45,17 @@ local journal = {
 	topics = {},
 	location_index_to_object_index = {},
 	commodity_index_to_object_index = {},
-	social_group_to_object_index = {}
+	social_group_to_object_index = {},
+	new_topic_on_battle_lost = {
+		done = true,
+		name = "INVALID",
+		params = {}
+	},
+	new_topic_on_battle_won = {
+		done = true,
+		name = "INVALID",
+		params = {}
+	}
 }
 
 require "story.game-start"(state, journal)
