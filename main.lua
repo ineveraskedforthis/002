@@ -3,6 +3,7 @@ require "mechanics.basic"
 require "scenes._loader"
 require "story.game-start"
 require "story.journal"
+require "effects-campaign.utility"
 
 local scene_manager = require "scenes._manager"
 
@@ -55,7 +56,7 @@ function love.load()
 	require "state.init-state-release"(state)
 	love.window.setMode( 1280, 720, {msaa = 0} )
 
-	state.current_location = LOCATION.AT_CITY_GATES
+	state.playable_actors[state.main_character].location = LOCATION.AT_CITY_GATES
 
 	journal.actor_index_to_object_index = {}
 	journal.available_id = 1

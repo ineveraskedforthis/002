@@ -90,9 +90,9 @@ function def.update(state, journal, dt)
 			battle_manager.stop_battle(state, battle)
 			if (state.enemy_pack) then
 				state.enemy_pack.alive = false
-				state.set_scene(state, ids.location)
+				ON_BATTLE_END(state, BATTLE_RESULT.VICTORY)
 			else
-				state.set_scene(state, ids.location)
+				ON_BATTLE_END(state, BATTLE_RESULT.VICTORY)
 			end
 		else
 			battle_manager.begin_new_wave(state, battle)
@@ -108,15 +108,19 @@ function def.update(state, journal, dt)
 		end
 		if (state.enemy_pack) then
 			state.enemy_pack.alive = false
-			state.set_scene(state, ids.location)
+			ON_BATTLE_END(state, BATTLE_RESULT.VICTORY)
 		else
-			state.set_scene(state, ids.location)
+			ON_BATTLE_END(state, BATTLE_RESULT.VICTORY)
 		end
 	end
 	if res == BATTLE_SYSTEM_RESPONSE.BATTLE_LOST then
 		print("lose")
 		battle_manager.stop_battle(state, battle)
-		state.set_scene(state, ids.game_over)
+		if state.die_on_battle_lost then
+			state.set_scene(state, ids.game_over)
+		else
+			ON_BATTLE_END(state, BATTLE_RESULT.DEFEAT)
+		end
 	end
 end
 

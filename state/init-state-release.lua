@@ -61,13 +61,14 @@ return function (state)
 
 	battles_manager.stop_battle(state, state.last_battle)
 
-	local main_character = register_actor(
+	local main_character, gg_index = register_actor(
 		state,
 		require "meta-actors.main-character",
 		{}
 	)
 	main_character.lineup_position = 1
 	main_character.trust = 100
+	state.main_character = gg_index
 
 	local caravan_master, caravan_master_index = register_actor(
 		state,
@@ -115,12 +116,17 @@ return function (state)
 		require "meta-actors.flower",
 		{FACTION.HIGHWAY_JESTERS}
 	)
+	poisoner.location = LOCATION.FOREST_VILLAGE
+	poisoner.occupation = OCCUPATION_TYPE.FOREST_VILLAGER
 
-	local poisoner_2 = register_actor(
+	local poisoner_2, poisoner_2_index = register_actor(
 		state,
 		require "meta-actors.chud",
 		{FACTION.HIGHWAY_JESTERS}
 	)
+	poisoner_2.location = LOCATION.FOREST_VILLAGE
+	poisoner_2.occupation = OCCUPATION_TYPE.FOREST_VILLAGE_ELDER
+	state.village_elder = poisoner_2_index
 
 	local light_master, q = register_actor(
 		state,

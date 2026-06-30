@@ -53,7 +53,12 @@ local function interface(state, journal, render, click, mx, my)
 
 	local actor = state.playable_actors[state.current_dialog_actor]
 	if (actor) then
-		love.graphics.draw(actor.def.image_battle, win_w - 500, win_h - 500)
+		if actor.def.image_battle then
+			love.graphics.draw(actor.def.image_battle, win_w - 500, win_h - 500)
+		else
+			love.graphics.draw(actor.def.image, win_w - 400, win_h - 400, 0, 4, 4)
+
+		end
 	end
 
 
@@ -82,16 +87,38 @@ local function interface(state, journal, render, click, mx, my)
 	---@type TopicInstance[]
 	local options = {}
 
+	if (state.last_battle_awaits_topic_resolution) then
+		state.last_battle_awaits_topic_resolution = false
+		if state.last_battle_result ==BATTLE_RESULT.VICTORY then
+			table.insert(journal.topics, journal.new_topic_on_battle_won)
+		elseif state.last_battle_result == BATTLE_RESULT.DEFEAT then
+			table.insert(journal.topics, journal.new_topic_on_battle_lost)
+		end
+	end
+
 	if state.current_dialog_actor == nil then
 		-- actions
 		if state.options_state == OPTIONS_STATE.NONE then
-			options =utility_options_base
+			for k, v in ipairs(utility_options_base) do
+				table.insert(options, v)
+			end
+
+			for key, value in pairs(journal.topics) do
+				local topic = journal.topic_functors[value.name]
+				if
+					(not value.done)
+					and topic.kind ==TOPIC_KIND.ATTACK
+					and value.params[1] == journal.location_index_to_object_index[state.playable_actors[state.main_character].location]
+				then
+					table.insert(options, value)
+				end
+			end
 		elseif state.options_state == OPTIONS_STATE.MOVE then
 			for index, value in ipairs(journal.topics) do
 				local functor = journal.topic_functors[value.name]
 				if
 					functor.kind ==TOPIC_KIND.MOVEMENT
-					and value.params[1] == journal.location_index_to_object_index[state.current_location]
+					and value.params[1] == journal.location_index_to_object_index[state.playable_actors[state.main_character].location]
 				then
 					table.insert(options, value)
 				end
@@ -99,7 +126,10 @@ local function interface(state, journal, render, click, mx, my)
 			table.insert(options, back_to_utility)
 		elseif state.options_state == OPTIONS_STATE.TALK then
 			for index, value in ipairs(state.playable_actors) do
-				if value.location == state.current_location then
+				if
+					value.location == state.playable_actors[state.main_character].location
+					and index ~= state.main_character
+				then
 					local object_index = journal.actor_index_to_object_index[index]
 					local object = journal.objects[object_index]
 					---@type TopicInstance
@@ -166,7 +196,7 @@ local function interface(state, journal, render, click, mx, my)
 
 		style.header_font()
 
-		local journal_index = journal.location_index_to_object_index[state.current_location]
+		local journal_index = journal.location_index_to_object_index[state.playable_actors[state.main_character].location]
 		local actor = state.playable_actors[state.current_dialog_actor]
 		local journal_object = journal.objects[journal_index]
 		local name = SHORT_DESCRIPTION(state, journal, journal_object)
@@ -193,7 +223,7 @@ local function interface(state, journal, render, click, mx, my)
 				end
 
 				if relevant then
-					log = log .. "\n\t" .. journal.topic_functors[value.name].journal_text(state, journal, value.params, relevant_index)
+					log = log .. "\n\t" .. value.name .. "\t" .. journal.topic_functors[value.name].journal_text(state, journal, value.params, relevant_index)
 				end
 			end
 		end

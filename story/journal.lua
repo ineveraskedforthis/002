@@ -17,6 +17,8 @@
 ---@field flags GameFlags
 ---@field topics TopicInstance[]
 ---@field topic_functors table<string, Topic>
+---@field new_topic_on_battle_won TopicInstance
+---@field new_topic_on_battle_lost TopicInstance
 
 ---@enum JOURNAL_OBJECT_TYPE
 JOURNAL_OBJECT_TYPE = {
@@ -35,7 +37,9 @@ OCCUPATION_TYPE = {
 	NONE = 0,
 	GUARD = 1,
 	MERCHANT = 2,
-	CITIZEN = 3
+	CITIZEN = 3,
+	FOREST_VILLAGER = 4,
+	FOREST_VILLAGE_ELDER = 5
 }
 
 ---@enum SOCIAL_STATUS
@@ -50,7 +54,8 @@ SOCIAL_STATUS = {
 LOCATION = {
 	CITY = 1,
 	AT_CITY_GATES = 2,
-	FOREST_VILLAGE = 3
+	FOREST_VILLAGE = 3,
+	FOREST_VILLAGE_NEIGHBOURHOOD = 4
 }
 
 
@@ -83,6 +88,10 @@ function OCCUPATION_STRING(occupation)
 		return "merchant"
 	elseif occupation == OCCUPATION_TYPE.CITIZEN then
 		return "citizen"
+	elseif occupation == OCCUPATION_TYPE.FOREST_VILLAGER then
+		return "villager"
+	elseif occupation == OCCUPATION_TYPE.FOREST_VILLAGE_ELDER then
+		return "village elder"
 	else
 		return "unknown"
 	end
@@ -113,6 +122,8 @@ function SHORT_DESCRIPTION(state, journal, object)
 			return "outside of the gates of Old Fortress City"
 		elseif object.location ==LOCATION.FOREST_VILLAGE then
 			return "Forest Village"
+		elseif object.location == LOCATION.FOREST_VILLAGE_NEIGHBOURHOOD then
+			return "Area around The Forest Village"
 		end
 	end
 
@@ -145,7 +156,7 @@ function SHORT_DESCRIPTION(state, journal, object)
 			end
 			return "the stranger"
 		elseif name == nil and occupation ~= nil then
-			return "the " .. OCCUPATION_STRING(occupation)
+			return "the " .. GENDER_TO_STRING(gender) .. " " .. OCCUPATION_STRING(occupation)
 		end
 
 		if name ~= nil and occupation ~= nil then
@@ -369,7 +380,7 @@ end
 ---@param journal Journal
 ---@param location LOCATION
 function VISIT_LOCATION (state, journal, location)
-	state.current_location = location
+	state.playable_actors[state.main_character].location = location
 
 	local value = LEARN_ABOUT_LOCATION(journal, location)
 	for index, value in ipairs(state.playable_actors) do
@@ -386,7 +397,7 @@ end
 ---@param location number
 function VISIT_JOURNAL_LOCATION (state, journal, location)
 	local obj = journal.objects[location]
-	print(state.current_location, "MOVE TO", obj.location)
+	print(state.playable_actors[state.main_character].location, "MOVE TO", obj.location)
 	return VISIT_LOCATION(state, journal, obj.location)
 end
 

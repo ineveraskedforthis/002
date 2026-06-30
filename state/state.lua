@@ -11,14 +11,25 @@ OPTIONS_STATE = {
 	TALK = 2
 }
 
+---@enum BATTLE_RESULT
+BATTLE_RESULT = {
+	DEFEAT = 0,
+	VICTORY = 1,
+	DRAW = 2
+}
+
+DAY_LENGTH = 24
+
 ---@class GameState
 ---@field current_lineup number[]
 ---@field selected_lineup_position number
 ---@field playable_actors MetaActorWrapper[]
+---@field main_character number
 ---@field current_text string
 ---@field available_guards number[]
 ---@field current_guard number
 ---@field caravan_master number
+---@field village_elder number
 ---@field current_dialog_actor number?
 ---@field options_state OPTIONS_STATE
 ---@field collected_gemstones GemstoneWrapper[]
@@ -27,11 +38,14 @@ OPTIONS_STATE = {
 ---@field current_scripted_fight SCRIPTED_BATTLE
 ---@field current_location_x number
 ---@field current_location_y number
----@field current_location LOCATION
 ---@field last_battle BattleState
 ---@field wandering boolean
 ---@field enemy_pack EnemyPack?
 ---@field current_story_atom string
+---@field last_battle_result BATTLE_RESULT
+---@field last_battle_awaits_topic_resolution boolean
+---@field die_on_battle_lost boolean
+---@field vfx ManagerVFX
 local state = {
 	currency = 0,
 	current_lineup = {},
@@ -53,7 +67,9 @@ local state = {
 	current_story_atom = "invalid",
 	vfx = require "scenes._vfx_manager",
 	story_atoms = {},
-	options_state = OPTIONS_STATE.NONE
+	options_state = OPTIONS_STATE.NONE,
+	last_battle_awaits_topic_resolution = false,
+	last_battle_result = BATTLE_RESULT.DRAW
 }
 
 ---comment

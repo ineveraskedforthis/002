@@ -43,7 +43,8 @@ TOPIC_KIND = {
 	MOVEMENT = 0,
 	TALK = 1,
 	UTILITY = 2,
-	INFO = 3
+	INFO = 3,
+	ATTACK = 4
 }
 
 ---@class TopicParam
@@ -540,18 +541,11 @@ local enter_the_city_aggression_attack = {
 		local actor_object = state.playable_actors[actor_index]
 
 		state.current_text = ""
+		state.die_on_battle_lost = true
 		battle_manager.start_battle(state, state.last_battle)
 		battle_manager.put_player_into_battle(state)
 		local enemy = battle_manager.new_actor(actor_object.def, 1, 1)
 		battle_manager.add_actor_to_battle(state.last_battle, enemy, false)
-
-		do
-			-- local enemy = require "meta-actors.creation"
-			-- battle_manager.add_actor_to_battle(state.last_battle, battle_manager.new_actor(enemy, 1, 1), false)
-			-- battle_manager.add_actor_to_battle(state.last_battle, battle_manager.new_actor(enemy, 2, 1), false)
-			-- battle_manager.add_actor_to_battle(state.last_battle, battle_manager.new_actor(enemy, 3, 1), false)
-		end
-
 
 		state.set_scene(state, scenes.battle)
 	end,
@@ -640,6 +634,10 @@ local caravan_at_gates_job = {
 		local gates = LEARN_ABOUT_LOCATION(journal, LOCATION.AT_CITY_GATES, params[1])
 		NEW_TOPIC_INSTANCE(state, journal, "travel", {forest, gates})
 		NEW_TOPIC_INSTANCE(state, journal, "travel", {gates, forest})
+
+		local village_elder = MEET_ACTOR(state, journal, state.village_elder, LOCATION.FOREST_VILLAGE)
+
+		NEW_TOPIC_INSTANCE(state, journal, "village_issues_introduction", {forest, village_elder})
 	end,
 	journal_text = function (state, journal, params, param_index)
 		return "They told me that people in the forest could use some help."
@@ -648,6 +646,50 @@ local caravan_at_gates_job = {
 		return "Do you need any help?"
 	end
 }
+
+---@type Topic
+local village_issues_introduction = {
+	severity = SEVERITY.MILD,
+	has_journal_note = true,
+	kind = TOPIC_KIND.TALK,
+	name = "village_issues_introduction",
+	repeatable = false,
+	params_description = {
+		{
+			description = "Village",
+			is_location = true
+		},
+		{
+			description = "Elder",
+			is_actor = true
+		}
+	},
+	effect = function (state, journal, params)
+		state.current_text = "Wolves. A lot of wolves. We need someone to get rid of them. I am too old to do it myself."
+		local village = LEARN_ABOUT_LOCATION(journal, LOCATION.FOREST_VILLAGE, params[2])
+		local village_area = LEARN_ABOUT_LOCATION(journal, LOCATION.FOREST_VILLAGE_NEIGHBOURHOOD, params[2])
+		NEW_TOPIC_INSTANCE(state, journal, "travel", {village, village_area})
+		NEW_TOPIC_INSTANCE(state, journal, "travel", {village_area, village})
+
+		NEW_TOPIC_INSTANCE(state, journal, "attack_wolves", {village_area})
+	end,
+	journal_text =function (state, journal, params, param_index)
+		if param_index == 1 then
+			return string.format("Area around the village is plagued with wolves.", SHORT_DESCRIPTION_INDEX(state, journal, params[param_index]))
+		else
+			return string.format("They asked me to get rid of wolves around the village.")
+		end
+	end,
+	text = function (state, journal, params)
+		return "Are there any issues in the village?"
+	end,
+	trigger_on_meeting_character =function (state, journal, object_index)
+		return false
+	end,
+	has_journal_note_even_if_not_done = false
+}
+
+
 
 ---@type Topic
 local travel = {
@@ -676,6 +718,7 @@ local travel = {
 		print(from, LOCATION.AT_CITY_GATES)
 		print(to, LOCATION.CITY)
 		if (from ==LOCATION.AT_CITY_GATES) and (to == LOCATION.CITY) then
+			state.die_on_battle_lost = true
 			battle_manager.start_battle(state, state.last_battle)
 			battle_manager.put_player_into_battle(state)
 			local guard = state.playable_actors[state.current_guard]
@@ -695,6 +738,84 @@ local travel = {
 	end,
 	text = function (state, journal, params)
 		return string.format("Travel to the %s", SHORT_DESCRIPTION_INDEX(state, journal, params[2]))
+	end
+}
+
+
+---@type Topic
+local attack_wolves = {
+	severity = SEVERITY.MILD,
+	has_journal_note = true,
+	kind = TOPIC_KIND.ATTACK,
+	name = "attack_wolves",
+	repeatable = false,
+	has_journal_note_even_if_not_done = false,
+
+	effect = function (state, journal, params)
+		state.die_on_battle_lost = true
+
+		journal.new_topic_on_battle_won = {
+			done = false,
+			name = "attack_wolves_success",
+			params = {
+				journal.actor_index_to_object_index[state.village_elder]
+			}
+		}
+
+		state.current_text = ""
+		battle_manager.start_battle(state, state.last_battle)
+		battle_manager.put_player_into_battle(state)
+
+		local enemy = require "meta-actors.wolf"
+		battle_manager.add_actor_to_battle(state.last_battle, battle_manager.new_actor(enemy, 1, 1), false)
+		battle_manager.add_actor_to_battle(state.last_battle, battle_manager.new_actor(enemy, 2, 1), false)
+		battle_manager.add_actor_to_battle(state.last_battle, battle_manager.new_actor(enemy, 3, 1), false)
+
+		state.set_scene(state, scenes.battle)
+	end,
+	journal_text = function (state, journal, params, param_index)
+		return "I was fighting wolves here"
+	end,
+	params_description = {
+		{
+			description = "Location",
+			is_location = true
+		}
+	},
+	text = function (state, journal, params)
+		return "Attack wolves"
+	end,
+	trigger_on_meeting_character = function (state, journal, object_index)
+		return false
+	end
+}
+
+---@type Topic
+local attack_wolves_success = {
+	severity = SEVERITY.MILD,
+	has_journal_note = true,
+	kind = TOPIC_KIND.TALK,
+	name = "attack_wolves_success",
+	repeatable = false,
+	has_journal_note_even_if_not_done = false,
+	effect =function (state, journal, params)
+		state.playable_actors[state.village_elder].trust = state.playable_actors[state.village_elder].trust + 20
+		state.current_text = "Thank you. Sadly, we can't repay you with anything valuable."
+	end,
+	journal_text =function (state, journal, params, param_index)
+		return "They are grateful for help"
+	end,
+	params_description = {
+		{
+			description = "Village elder",
+			is_actor = true
+		}
+	},
+	text = function (state, journal, params)
+		return "I have defeated the wolves"
+	end,
+	trigger_on_meeting_character = function (state, journal, object_index)
+		return false
 	end
 }
 
@@ -719,4 +840,7 @@ return function (journal)
 	REGISTER_TOPIC(journal, job_suggestion_guard)
 	REGISTER_TOPIC(journal, travel)
 	REGISTER_TOPIC(journal, caravan_at_gates_job)
+	REGISTER_TOPIC(journal, village_issues_introduction)
+	REGISTER_TOPIC(journal, attack_wolves)
+	REGISTER_TOPIC(journal, attack_wolves_success)
 end

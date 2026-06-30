@@ -11,6 +11,7 @@ local BATTLE_SYSTEM_RESPONSE = require "fights._response"
 ---@field in_progress boolean
 ---@field wave number
 ---@field stage BATTLE_STAGE
+---@field death_on_lose boolean
 
 local manager = {}
 

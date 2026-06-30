@@ -24,7 +24,7 @@ return function (state, journal)
 					print("current guard: " .. tostring(guard))
 					state.current_dialog_actor = state.available_guards[guard]
 					print("current guard character: " .. tostring(state.current_dialog_actor))
-					MEET_ACTOR(state, journal, state.current_dialog_actor, state.current_location)
+					MEET_ACTOR(state, journal, state.current_dialog_actor, state.playable_actors[state.main_character].location)
 					journal.objects[journal.actor_index_to_object_index[state.current_dialog_actor]].occupation = OCCUPATION_TYPE.GUARD
 				end
 			}
@@ -37,7 +37,7 @@ return function (state, journal)
 				effect = function (state, actor)
 					SET_STORY_ATOM(state, "caravan_master_greeting")
 					state.current_dialog_actor = state.caravan_master
-					MEET_ACTOR(state, journal, state.current_dialog_actor, state.current_location)
+					MEET_ACTOR(state, journal, state.current_dialog_actor, state.playable_actors[state.main_character].location)
 				end
 
 			}
