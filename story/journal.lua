@@ -64,6 +64,26 @@ LOCATION = {
 	ESTATE_LORD_A = 100,
 }
 
+---@type table<LOCATION, string>
+LOCATION_STRING = {}
+LOCATION_STRING[LOCATION.CITY] = "Old Fortress City"
+LOCATION_STRING[LOCATION.AT_CITY_GATES] = "Gates of Old Fortress City"
+LOCATION_STRING[LOCATION.ESTATE_LORD_A] = "South Hills Village"
+LOCATION_STRING[LOCATION.ESTATE_LORD_B] = "Bread Village"
+LOCATION_STRING[LOCATION.ESTATE_LORD_B_BAKERY] = "Bakery"
+LOCATION_STRING[LOCATION.ESTATE_LORD_B_GUARDHOUSE_NEAR_FOREST] = "Forest Guardhouse"
+LOCATION_STRING[LOCATION.ESTATE_LORD_B_WELL_OFF_SERF] = "Sturdy house"
+LOCATION_STRING[LOCATION.FOREST_VILLAGE] = "Forest Village"
+LOCATION_STRING[LOCATION.FOREST_VILLAGE_NEIGHBOURHOOD] = "Forest (East)"
+LOCATION_STRING[LOCATION.FOREST_VILLAGE_SWAMP] = "Forest (Swamp)"
+
+---comment
+---@param location LOCATION
+function GET_LOCATION_STRING(location)
+	local s = LOCATION_STRING[location]
+	if s then return s else return "Unknown location" end
+end
+
 
 ---@class JournalObject
 ---@field id number
@@ -120,17 +140,7 @@ function SHORT_DESCRIPTION(state, journal, object)
 	end
 
 	if object.type == JOURNAL_OBJECT_TYPE.LOCATION then
-		if object.location == nil then
-			return "the unknown location"
-		elseif  object.location == LOCATION.CITY then
-			return "Old Fortress City"
-		elseif  object.location == LOCATION.AT_CITY_GATES then
-			return "outside of the gates of Old Fortress City"
-		elseif object.location ==LOCATION.FOREST_VILLAGE then
-			return "Forest Village"
-		elseif object.location == LOCATION.FOREST_VILLAGE_NEIGHBOURHOOD then
-			return "Area around The Forest Village"
-		end
+		return GET_LOCATION_STRING(object.location)
 	end
 
 	if object.type == JOURNAL_OBJECT_TYPE.STATUS then
@@ -200,6 +210,7 @@ end
 ---@param name string
 ---@param params number[]
 function NEW_TOPIC_INSTANCE(state, journal, name, params)
+	print("new topic instance:", name, params[0], params[1])
 	-- ensure that all params are numbers
 	for index, value in ipairs(params) do
 		if type(value) ~= "number" then

@@ -722,15 +722,16 @@ local caravan_at_gates_job = {
 		return false
 	end,
 	effect = function (state, journal, params)
-		state.current_text = "I don't think you can help me personally, but folks in the forest could use some help."
+		state.current_text = "I don't think you can help me personally, but folks in the forest or village nearby could use some help."
 		local forest = LEARN_ABOUT_LOCATION(journal, LOCATION.FOREST_VILLAGE, params[1])
+		local village = LEARN_ABOUT_LOCATION(journal, LOCATION.ESTATE_LORD_B, params[1])
 		local gates = LEARN_ABOUT_LOCATION(journal, LOCATION.AT_CITY_GATES, params[1])
+
 		NEW_TOPIC_INSTANCE(state, journal, "travel", {forest, gates})
 		NEW_TOPIC_INSTANCE(state, journal, "travel", {gates, forest})
 
-		local village_elder = MEET_ACTOR(state, journal, state.village_elder, LOCATION.FOREST_VILLAGE)
-
-		NEW_TOPIC_INSTANCE(state, journal, "village_issues_introduction", {forest, village_elder})
+		NEW_TOPIC_INSTANCE(state, journal, "travel", {village, gates})
+		NEW_TOPIC_INSTANCE(state, journal, "travel", {gates, village})
 	end,
 	journal_text = function (state, journal, params, param_index)
 		return "They told me that people in the forest could use some help."
@@ -755,29 +756,25 @@ local village_issues_introduction = {
 	repeatable = false,
 	params_description = {
 		{
-			description = "Village",
-			is_location = true
-		},
-		{
 			description = "Elder",
 			is_actor = true
 		}
 	},
 	effect = function (state, journal, params)
 		state.current_text = "Wolves. A lot of wolves. We need someone to get rid of them. I am too old to do it myself."
-		local village = LEARN_ABOUT_LOCATION(journal, LOCATION.FOREST_VILLAGE, params[2])
-		local village_area = LEARN_ABOUT_LOCATION(journal, LOCATION.FOREST_VILLAGE_NEIGHBOURHOOD, params[2])
+		local village = LEARN_ABOUT_LOCATION(journal, LOCATION.FOREST_VILLAGE, params[1])
+		local village_area = LEARN_ABOUT_LOCATION(journal, LOCATION.FOREST_VILLAGE_NEIGHBOURHOOD, params[1])
 		NEW_TOPIC_INSTANCE(state, journal, "travel", {village, village_area})
 		NEW_TOPIC_INSTANCE(state, journal, "travel", {village_area, village})
 
 		NEW_TOPIC_INSTANCE(state, journal, "attack_wolves", {village_area})
 	end,
 	journal_text =function (state, journal, params, param_index)
-		if param_index == 1 then
-			return string.format("Area around the village is plagued with wolves.", SHORT_DESCRIPTION_INDEX(state, journal, params[param_index]))
-		else
-			return string.format("They asked me to get rid of wolves around the village.")
-		end
+		return string.format("They asked me to get rid of wolves around the village.")
+		-- if param_index == 1 then
+		-- else
+		-- 	return string.format("Area around the village is plagued with wolves.", SHORT_DESCRIPTION_INDEX(state, journal, params[param_index]))
+		-- end
 	end,
 	option_text = function (state, journal, params)
 		return "Are there any issues in the village?"
@@ -785,8 +782,9 @@ local village_issues_introduction = {
 	has_option = function (state, journal, params, param_index)
 		return true
 	end,
-	trigger_on_meeting_character =function (state, journal, object_index)
-		return false
+	trigger_on_meeting_character = function (state, journal, object_index)
+		print("test", object_index, state.village_elder)
+		return object_index == state.village_elder
 	end,
 	has_journal_note_even_if_not_done = false,
 	effect_on_parameter_actor_death = function (state, journal, params, param_index)
