@@ -18,5 +18,6 @@ return {
 	cost = 2,
 	allowed_weapons = {},
 	required_energy = 0,
-	is_attack = true
+	is_attack = true,
+	program = PROGRAM.MELEE_ATTACK
 }

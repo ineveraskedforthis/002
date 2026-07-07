@@ -90,8 +90,8 @@ function love.load()
 end
 
 function love.update(dt)
-	state.vfx.update(dt)
 	scene_manager.get(state.current_scene).update(state, journal, dt)
+	state.vfx.update(dt)
 end
 
 function love.draw()

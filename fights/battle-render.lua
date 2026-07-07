@@ -1,6 +1,6 @@
 local style = require "ui._style"
 
-local draw_actor = require "ui.actor"
+
 local fill_rect = require "ui.fill-rect"
 local draw_rect = require "ui.draw-rect"
 local fill_image = require "ui.fill-image"

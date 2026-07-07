@@ -8,136 +8,10 @@ ACTOR_HEIGHT = 70
 
 local widget = {}
 
----@param colors table[]
-local function gradient_h(colors)
-	local result = love.image.newImageData(#colors, 1)
-	for i, color in ipairs(colors) do
-		local x, y = i - 1, 0
-		print(x, y)
-		result:setPixel(x, y, color[1], color[2], color[3], color[4] or 1)
-	end
-	local result_image = love.graphics.newImage(result)
-	result_image:setFilter('linear', 'linear')
-	return result_image
-end
-
-local function draw_image_in_rect(img, x, y, w, h, r, ox, oy, kx, ky)
-	return love.graphics.draw(img, x, y, r, w / img:getWidth(), h / img:getHeight(), ox, oy, kx, ky)
-end
-
-local hp_gradient_ally = gradient_h({{0.7, 0.9, 0.8}, {100 / 255, 190 / 255, 175 / 255}})
-local hp_gradient_enemy = gradient_h({{0.95, 0.1, 0.05}, {1, 0.11, 0.05}})
-
----comment
----@param x number
----@param y number
----@param w number
----@param h number
----@param hp number
----@param hp_view number
----@param max_hp number
----@param shield number
----@param team number
----@param level number?
-local function hp_bar(x, y, w, h, hp, hp_view, max_hp, shield, team, level)
-	local outerouter = 1
-	local outer = 1
-	local shield_offset = 1
-	local fill = 1
-	local inner = 1
-
-	if level then
-		love.graphics.setColor(0, 0, 0)
-		love.graphics.circle("fill", x - h, y + h / 2, h + 2)
-		love.graphics.setColor(1, 1, 1)
-		love.graphics.circle("fill", x - h, y + h / 2, h)
-		style.default_font()
-		style.basic_element_color()
-		local font_height = style.default_font_height()
-		love.graphics.printf(tostring(level), x - h * 2, y + h / 2 - font_height / 2, h * 2, "center")
-	end
-
-	-- outer outer border
-	love.graphics.setColor(0, 0, 0)
-	love.graphics.rectangle("fill", x, y, w, h)
-
-	-- outer border
-	love.graphics.setColor(0.29, 0.35, 0.32)
-	love.graphics.rectangle("fill", x + outerouter, y + outerouter, w - outerouter * 2, h - outerouter * 2)
-
-	-- betweeen border fill
-	love.graphics.setColor(0.4, 0.4, 0.4)
-	love.graphics.rectangle("fill", x + outer + outerouter, y + outer + outerouter, w - (outer + outerouter) * 2, h - (outer + outerouter) * 2)
-
-	-- shield
-	local shield_ratio = math.min(1, shield / max_hp / 10)
-	love.graphics.setColor(0.95, 0.95, 1)
-	love.graphics.rectangle("fill", x + shield_offset, y + shield_offset, (w - shield_offset * 2) * shield_ratio, h - shield_offset * 2)
-
-	-- inner border
-	do
-		love.graphics.setColor(0.1, 0.15, 0.1)
-		local margin = outer + fill
-		local _x = x + margin
-		local _y = y + margin
-		local _w = w - 2 * margin
-		local _h = h - 2 * margin
-
-		love.graphics.rectangle("fill", _x, _y, _w, _h)
-	end
-
-	-- hp bar
-	do
-		local hp_ratio_actual = hp / max_hp
-		local hp_ratio_view = hp_view / max_hp
-		local margin = outer + fill + inner
-		local _x = x + margin
-		local _y = y + margin
-		local _w = w - 2 * margin
-		local _h = h - 2 * margin
-		love.graphics.setColor(1, 1, 1)
-		if team == 1 then
-			draw_image_in_rect(hp_gradient_enemy, _x, _y, _w * hp_ratio_actual, _h, 0)
-		else
-			draw_image_in_rect(hp_gradient_ally, _x, _y, _w * hp_ratio_actual, _h, 0)
-		end
-
-		if team == 1 then
-			love.graphics.setColor(1, 0.8, 0.8, 1)
-		else
-			love.graphics.setColor(0.35, 0.45, 0.4)
-		end
-
-		if hp_ratio_view > hp_ratio_actual then
-			love.graphics.rectangle("fill", _x + _w * hp_ratio_actual, _y, _w * (hp_ratio_view - hp_ratio_actual), _h)
-		else
-			love.graphics.rectangle("fill", _x + _w * hp_ratio_view, _y, _w * (hp_ratio_actual - hp_ratio_view), _h)
-		end
-	end
-
-	-- inner border
-	do
-		love.graphics.setColor(0.1, 0.15, 0.1)
-		local margin = outer + fill
-		local _x = x + margin
-		local _y = y + margin
-		local _w = w - 2 * margin
-		local _h = h - 2 * margin
-
-		-- draw inner border color lines to show hp blocks for every X hp:
-		local blocks = max_hp / 200
-		local block_size = _w / blocks
-		for i = 1, blocks do
-			love.graphics.rectangle("fill", _x + i * block_size, _y, 1, _h)
-		end
-	end
-
-end
-
-local function image_classic(battle, x, y, actor, alpha)
-	if battle.selected_actor == actor then
-		love.graphics.rectangle("line", x - 4, y - 4, ACTOR_WIDTH + 8, ACTOR_HEIGHT + 8)
-	end
+local function image_classic(x, y, actor, alpha)
+	-- if state.selected_actor == actor then
+		-- love.graphics.rectangle("line", x - 4, y - 4, ACTOR_WIDTH + 8, ACTOR_HEIGHT + 8)
+	-- end
 	love.graphics.setColor(0, 0, 0, alpha)
 	style.default_font()
 	love.graphics.printf(actor.definition.name, x - 10, y - 20, ACTOR_WIDTH + 20, "center")
@@ -167,22 +41,25 @@ end
 
 ---comment
 ---@param state GameState
----@param battle BattleState
 ---@param x number
 ---@param y number
----@param actor Actor
-function widget.render(state, battle, x, y, actor, alpha)
+---@param actor_index number
+---@param alpha number
+---@param hostile boolean
+function widget.render(state, x, y, actor_index, alpha, hostile)
 	local mouse_x, mouse_y = love.mouse.getPosition()
 	if not alpha then
 		alpha = 1
 	end
+
+	local actor = state.actors[actor_index]
 
 	local max_hp = TOTAL_MAX_HP(actor.definition, actor.wrapper)
 
 	local margin = 5
 
 	if actor.definition.image_battle then
-		local quad_index = actor.battle_id % 30 + 1
+		local quad_index = actor_index % 30 + 1
 
 		local t = SMOOTHERSTEP(quad_progress[quad_index])
 		local current_scale = scale + t * 1 / 12
@@ -212,7 +89,7 @@ function widget.render(state, battle, x, y, actor, alpha)
 		hp_bar(
 			x, y + base_height * scale, 500 * scale, 12,
 			actor.HP, actor.HP_view or actor.HP, max_hp, actor.SHIELD,
-			actor.team, level
+			hostile, level
 		)
 		style.header_font()
 		local ty = y + base_height * scale - 60
@@ -239,13 +116,13 @@ function widget.render(state, battle, x, y, actor, alpha)
 		actor.w = base_width * scale
 		actor.h = base_height * scale + 12
 	else
-		image_classic(battle, x, y, actor, alpha)
+		image_classic(x, y, actor, alpha)
 		local hp_bar_left = x - 8
 		local hp_bar_width = ACTOR_WIDTH + 16
 		hp_bar(
 			hp_bar_left, y + ACTOR_HEIGHT + margin, hp_bar_width, 12,
 			actor.HP, actor.HP_view or actor.HP, max_hp, actor.SHIELD,
-			actor.team
+			hostile
 		)
 		love.graphics.setColor(0, 0, 0, alpha)
 		if (actor.SHIELD > 0) then
@@ -255,27 +132,10 @@ function widget.render(state, battle, x, y, actor, alpha)
 		end
 	end
 
-	for index, value in ipairs(actor.pending_damage) do
-		if not value.particle_exist then
-			local rgb = {1, 0, 0}
-			if value.value <= 0 then
-				rgb = {0, 1, 0}
-			end
-			state.vfx.new_text(
-				tostring(math.abs(value.value)), rgb,
-				x, y,
-				love.math.randomNormal() * 20,
-				-20,
-				math.log(math.abs(value.value) + 1, 3),
-				4
-			)
-			value.particle_exist = true
-		end
-	end
 end
 
 
-function widget.update(state, battle, dt)
+function widget.update(dt)
 	for index, value in ipairs(quad_active) do
 		if value then
 			quad_progress[index] = math.min(1, quad_progress[index] + dt)
@@ -290,13 +150,14 @@ end
 ---@param battle BattleState
 ---@param x number
 ---@param y number
----@param actor Actor
+---@param actor_index number
 ---@return number
 ---@return number
 ---@return number
 ---@return number
-function widget.get_rect(state, battle, x, y, actor)
-	local quad_index = actor.battle_id % 30 + 1
+function widget.get_rect(state, battle, x, y, actor_index)
+	local actor = state.actors[actor_index]
+	local quad_index = actor_index % 30 + 1
 	if actor.definition.image_battle then
 		local t = SMOOTHERSTEP(quad_progress[quad_index])
 		local current_scale = scale + t * 1 / 12

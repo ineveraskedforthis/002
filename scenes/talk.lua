@@ -9,7 +9,6 @@ local def = manager.get(id)
 local button = require "ui.button"
 local panel = require "ui.panel"
 
-local bg = love.graphics.newImage("assets/bg/default.jpg")
 
 ---@type IndexedTopicInstance[]
 local utility_options_base = {
@@ -30,16 +29,6 @@ local utility_options_base = {
 		}
 	}
 
-}
-
----@type IndexedTopicInstance
-local back_to_utility = {
-	param_index = 1,
-	topic = {
-		done = false,
-		name = "UTILITY_back_to_action",
-		params = {}
-	}
 }
 
 ---@class IndexedTopicInstance
@@ -78,27 +67,8 @@ local function interface(state, journal, render, click, mx, my)
 	end
 
 
-	panel(render, win_w / 2 - 200, win_h - 200, 400, 200 - style.base_margin - status_bar_heigth_with_margins)
-
-	style.default_font_color()
-	style.conversation_font()
-
-	-- local atom = state.story_atoms[state.current_story_atom]
-
-	-- if atom == nil then
-		-- error(state.current_story_atom .. " lacks definition.")
-	-- end
-
-	local current_text  = state.current_text
-	love.graphics.printf(current_text, win_w / 2 - 200 + style.base_margin, win_h - 200 + style.base_margin, 400 - 2 * style.base_margin, "center")
-
-	-- local options = atom.options(state, state.playable_actors[state.current_dialog_actor])
 
 	local h = 50
-
-	-- if (options == nil) then
-		-- error(state.current_story_atom .. "lacks options")
-	-- end
 
 	---@type IndexedTopicInstance[]
 	local options = {}
@@ -163,57 +133,11 @@ local function interface(state, journal, render, click, mx, my)
 			table.insert(options, back_to_utility)
 		end
 	else
-		-- topics relevant to this actor
-		local actor_journal_index = journal.actor_index_to_object_index[state.current_dialog_actor]
-		for index, value in ipairs(journal.topics) do
-			local topic = journal.topic_functors[value.name]
-			if not value.done then
-				if topic == nil then
-					error ("Missing topic " .. value.name)
-				end
-				for param_index, param in ipairs(value.params) do
-					if
-						param == actor_journal_index
-						and topic.params_description[param_index].is_actor
-						and topic.has_option(state, journal, value.params, param)
-					then
-						table.insert(options, {topic = value, param_index = param_index})
-						goto continue
-					end
-				end
-			end
-			::continue::
-		end
-		table.insert(options, back_to_utility)
+
 	end
 
 	-- print(#options)
 
-	for index, value in ipairs(options) do
-		local topic_f = journal.topic_functors[value.topic.name]
-		if (topic_f == nil) then
-			error("Missing " .. value.topic.name .. " topic functor")
-		end
-		local option_text = topic_f.option_text(state, journal, value.topic.params, value.param_index)
-		if button(render, click, option_text, win_w / 2 - 200, h + index * 60, 400, 50, mx, my, true) then
-			topic_f.effect(state, journal, value.topic.params, value.param_index)
-			if not topic_f.repeatable then
-				value.topic.done = true
-			end
-		end
-	end
-
-
-	-- Status bar
-
-	local status_x = style.base_margin
-	local status_y = win_h - status_bar_heigth_with_margins
-
-	panel(render, status_x, status_y, win_w - style.base_margin * 2, status_bar_height)
-
-	local status_string = string.format("%d coins. %s", state.currency, TIME_STRING(state.current_time))
-
-	love.graphics.print(status_string, status_x + style.base_margin, status_y)
 
 	-- LOG
 

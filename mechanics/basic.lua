@@ -150,18 +150,17 @@ function TOTAL_SPD(a, w)
 end
 
 ---@param state GameState
----@param battle BattleState
 ---@param origin Actor
 ---@param target Actor?
 ---@param sequence number[]
-local function add_sequence_of_effects(state, battle, origin, target, sequence)
+local function add_sequence_of_effects(state, origin, target, sequence)
 	if sequence == nil then
 		return
 	end
 	for index, effect in ipairs(sequence) do
 		local def = effects.get(effect)
 		if def.target_selection then
-			target = def.target_selection(state, battle, origin)
+			target = def.target_selection(state, origin)
 		else
 			assert(target ~= nil)
 		end
@@ -176,7 +175,7 @@ local function add_sequence_of_effects(state, battle, origin, target, sequence)
 				started = false,
 				times_activated = 0
 			}
-			table.insert(battle.effects_queue, new_effect)
+			table.insert(state.effects_queue, new_effect)
 		end
 	end
 end
@@ -185,41 +184,39 @@ end
 ---@param battle BattleState
 ---@param origin Actor
 ---@param target Actor
-function ON_BEING_ATTACKED(state, battle, origin, target)
+function ON_BEING_ATTACKED(state, origin, target)
 	-- find all skills which run on attack
 	for index, value in ipairs(target.definition.inherent_skills) do
-		add_sequence_of_effects(state, battle, target, origin, value.on_being_attacked_sequence)
+		add_sequence_of_effects(state, target, origin, value.on_being_attacked_sequence)
 	end
 	if target.wrapper then
 		for index, value in ipairs(target.wrapper.skills) do
-			add_sequence_of_effects(state, battle, target, origin, value.on_being_attacked_sequence)
+			add_sequence_of_effects(state, target, origin, value.on_being_attacked_sequence)
 		end
 	end
 end
 
 ---@param state GameState
----@param battle BattleState
 ---@param origin Actor
 ---@param target Actor?
 ---@param skill ActiveSkill
-function USE_SKILL(state, battle, origin, target, skill)
+function USE_SKILL(state, origin, target, skill)
 	assert(skill.on_skill_used_sequence ~= nil)
 	assert(origin.energy >= skill.required_energy)
 	origin.energy = origin.energy - skill.required_energy
 
 	if skill.is_attack and target then
-		ON_BEING_ATTACKED(state, battle, origin, target)
+		ON_BEING_ATTACKED(state, origin, target)
 	end
 
-	add_sequence_of_effects(state, battle, origin, target, skill.on_skill_used_sequence)
+	add_sequence_of_effects(state, origin, target, skill.on_skill_used_sequence)
 end
 
 ---@param state GameState
----@param battle BattleState
 ---@param origin Actor
 ---@param target Actor
 ---@param skill ActiveSkill
-function CAN_USE_SKILL(state, battle, origin, target, skill)
+function CAN_USE_SKILL(state, origin, target, skill)
 	if skill.on_skill_used_sequence == nil then
 		return false
 	end
@@ -230,61 +227,57 @@ function CAN_USE_SKILL(state, battle, origin, target, skill)
 end
 
 ---@param state GameState
----@param battle BattleState
 ---@param a Actor
 ---@param b Actor
 ---@param actual_damage number
-function ON_DAMAGE_DEALT(state, battle, a, b, actual_damage)
+function ON_DAMAGE_DEALT(state, a, b, actual_damage)
 	if a.wrapper then
 		for index, value in ipairs(a.wrapper.gemstones) do
 			local def = gemstones.get(value)
-			def.on_damage_dealt_effect(state, battle, a, b, actual_damage)
+			def.on_damage_dealt_effect(state, a, b, actual_damage)
 		end
 	end
 	if b.wrapper then
 		for index, value in ipairs(b.wrapper.gemstones) do
 			local def = gemstones.get(value)
-			def.on_damage_received_effect(state, battle, a, b, actual_damage)
+			def.on_damage_received_effect(state, a, b, actual_damage)
 		end
 	end
 end
 
 ---@param state GameState
----@param battle BattleState
 ---@param a Actor
-function ON_TURN_START(state, battle, a)
+function ON_TURN_START(state, a)
 	a.energy = math.min(a.definition.max_energy, a.energy + 1)
 	for _, value in ipairs(a.status_effects) do
-		table.insert(battle.effects_queue, value)
+		table.insert(state.effects_queue, value)
 	end
 	if a.wrapper then
 		for _, value in ipairs(a.wrapper.gemstones) do
 			local def = gemstones.get(value)
-			def.on_turn_start(state, battle, a)
+			def.on_turn_start(state, a)
 		end
 	end
 end
 
----@param state	GameState
----@param battle BattleState
+---@param state GameState
 ---@param a Actor
 ---@param b Actor
-function ON_KILL(state, battle, a, b)
+function ON_KILL(state, a, b)
 	if a.wrapper then
 		for index, value in ipairs(a.wrapper.gemstones) do
 			local def = gemstones.get(value)
-			def.on_kill_effect(state, battle, a, b)
+			def.on_kill_effect(state, a, b)
 		end
 	end
 end
 
 ---comment
 ---@param state GameState
----@param battle BattleState
 ---@param a Actor
 ---@param b Actor
 ---@param damage number
-function DEAL_DAMAGE(state, battle, a, b, damage)
+function DEAL_DAMAGE(state, a, b, damage)
 	print("attacker", a.definition.name)
 	print("defender", b.definition.name)
 
@@ -320,7 +313,7 @@ function DEAL_DAMAGE(state, battle, a, b, damage)
 		particle_exist = false
 	}
 	table.insert(b.pending_damage, pending)
-	ON_DAMAGE_DEALT(state, battle, a, b, actual_damage)
+	ON_DAMAGE_DEALT(state, a, b, actual_damage)
 
 
 	if b.HP == 0 then
@@ -334,8 +327,8 @@ function DEAL_DAMAGE(state, battle, a, b, damage)
 			time_passed = 0,
 			times_activated = 0
 		}
-		table.insert(battle.effects_queue, death)
-		ON_KILL(state, battle, a, b)
+		table.insert(state.effects_queue, death)
+		ON_KILL(state, a, b)
 	end
 
 	if b.definition.damaged_sound then
@@ -354,11 +347,10 @@ function ADD_SHIELD(origin, target, amount)
 end
 
 ---@param state GameState
----@param battle BattleState
 ---@param origin Actor
 ---@param target Actor
 ---@param amount number
-function RESTORE_HP(state, battle, origin, target, amount)
+function RESTORE_HP(state, origin, target, amount)
 	local amount = math.floor(amount)
 	local target_max_hp = TOTAL_MAX_HP(target.definition, target.wrapper)
 	target.HP = math.min(target_max_hp, target.HP + amount)

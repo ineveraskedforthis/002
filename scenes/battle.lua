@@ -6,7 +6,6 @@ local id = ids.battle
 local def = manager.get(id)
 
 local rect = require "ui.rect"
-local skills_panel = require "ui.skills-panel"
 
 local effects_manager = require "effects._manager"
 local battle_manager = require "fights._battle-system"
@@ -16,40 +15,6 @@ local battle_loader = require "fights._loader"
 local BATTLE_SYSTEM_RESPONSE = require "fights._response"
 local learn_skill = require "effects-campaign.learn-skills"
 
----comment
----@param actor Actor
----@param dt number
-local function update_hp_view(actor, dt)
-	if not actor.HP_view then
-		actor.HP_view = actor.HP
-	end
-
-	for index, pending in ipairs(actor.pending_damage) do
-		pending.alpha = pending.alpha - dt * 2 * (1 / (1 + index))
-	end
-
-	local count = #actor.pending_damage
-	---@type number[]
-	local to_remove = {}
-	for i = count, 1, -1 do
-		if actor.pending_damage[i].alpha < 0 then
-			table.insert(to_remove, i)
-		end
-	end
-
-	for index, value in ipairs(to_remove) do
-		table.remove(actor.pending_damage, value)
-	end
-
-	local diff = actor.HP - actor.HP_view
-	local diff_abs = math.abs(diff)
-	local max_hp = TOTAL_MAX_HP(actor.definition, actor.wrapper)
-	if (diff_abs < max_hp / 20) then
-		actor.HP_view = actor.HP
-	else
-		actor.HP_view = actor.HP_view + math.max(-max_hp, math.min(max_hp, diff / diff_abs * max_hp * dt))
-	end
-end
 
 local battle_actor_widget = require "ui.actor"
 
@@ -59,7 +24,6 @@ function def.update(state, journal, dt)
 	dt = dt * 10
 
 	local battle = state.last_battle
-	skills_panel.update(state, dt)
 
 	for key, value in ipairs(battle.actors) do
 		if (value.visible) then
@@ -67,9 +31,6 @@ function def.update(state, journal, dt)
 		end
 	end
 
-	for _, value in ipairs(battle.actors) do
-		update_hp_view(value, dt)
-	end
 
 	local res = battle_manager.update_battle_state(state, battle, dt)
 	if res == BATTLE_SYSTEM_RESPONSE.AWAIT_USER_INPUT then
@@ -170,6 +131,4 @@ function def.render(state, journal)
 		love.graphics.print("YOUR TURN", 150, 10)
 	end
 
-	-- draw skill buttons
-	skills_panel.render(state.last_battle)
 end

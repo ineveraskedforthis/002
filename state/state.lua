@@ -20,19 +20,20 @@ BATTLE_RESULT = {
 
 DAY_PART_LENGTH = 3
 DAY_SEGMENTS = 4
+DAY_SEGMENT_LENGTH = 100
 DAY_LENGTH = DAY_PART_LENGTH * DAY_SEGMENTS
 
 function TIME_STRING (time)
-	local modulo_day = time % DAY_LENGTH
+	local modulo_day = math.floor(time / DAY_SEGMENT_LENGTH) % DAY_LENGTH
 	local day_part = math.floor(modulo_day / DAY_PART_LENGTH)
 	local day_part_segment = modulo_day % DAY_PART_LENGTH
-	local name = "Morning"
+	local name = "Night"
 	if day_part == 1 then
-		name = "Day"
+		name = "Morning"
 	elseif day_part == 2 then
-		name = "Evening"
+		name = "Day"
 	elseif day_part == 3 then
-		name = "Night"
+		name = "Evening"
 	end
 	local modifier = "Early"
 	if day_part_segment == 1 then
@@ -43,11 +44,20 @@ function TIME_STRING (time)
 	return string.format("%s %s", modifier, name)
 end
 
+---@alias InstructionDefinition fun(state : GameState, frame: RegisterFrame, dt: number, arg1, arg2, arg3) : boolean, boolean
+
+---@enum TURN_STAGE
+TURN_STAGE = {
+	AWAIT_INPUT = 1,
+	RUN_INTERPRETER = 2
+}
+
 ---@class GameState
----@field current_lineup number[]
 ---@field selected_lineup_position number
 ---@field playable_actors MetaActorWrapper[]
+---@field actors Actor[]
 ---@field main_character number
+---@field main_character_actor number
 ---@field current_text string
 ---@field available_guards number[]
 ---@field current_guard number
@@ -60,37 +70,28 @@ end
 ---@field collected_gemstones GemstoneWrapper[]
 ---@field currency number
 ---@field current_scene number
----@field current_scripted_fight SCRIPTED_BATTLE
----@field current_location_x number
----@field current_location_y number
----@field last_battle BattleState
----@field wandering boolean
----@field enemy_pack EnemyPack?
----@field current_story_atom string
----@field last_battle_result BATTLE_RESULT
----@field last_battle_awaits_topic_resolution boolean
 ---@field die_on_battle_lost boolean
 ---@field vfx ManagerVFX
 ---@field current_time number
+---@field programs table<PROGRAM, number>
+---@field instruction_stack ParsedInstruction[]
+---@field instruction_stack_top number
+---@field command_buffer RegisterFrame[]
+---@field command_buffer_left number
+---@field command_buffer_right number
+---@field command_buffer_size number
+---@field instruction_set table<number, InstructionDefinition>
+---@field tile_lock boolean[][]
+---@field effects_queue Effect[]
+---@field turn_stage TURN_STAGE
+---@field location_data table<LOCATION, LocationData>
 local state = {
 	currency = 0,
-	current_lineup = {},
 	current_scene = 0,
-	last_battle = {
-		actors = {},
-		await_turn = false,
-		effects_queue = {},
-		in_progress = false,
-		processing_effects = false,
-		selected_actor = nil,
-		stage = require "fights._stages".STOPPED,
-		wave = 1
-	},
 	playable_actors = {},
 	current_location_x = 0,
 	current_location_y = 0,
 	wandering = false,
-	current_story_atom = "invalid",
 	vfx = require "scenes._vfx_manager",
 	story_atoms = {},
 	options_state = OPTIONS_STATE.NONE,
@@ -99,18 +100,6 @@ local state = {
 	current_time = 0
 }
 
----comment
----@param state GameState
----@param atom string
-function SET_STORY_ATOM(state, atom)
-	state.current_story_atom = atom
-	if (state.story_atoms[state.current_story_atom] == nil) then
-		print("UNKNOWN STORY ATOM:", atom)
-	end
-	if state.story_atoms[state.current_story_atom].initial_effect then
-		state.story_atoms[state.current_story_atom].initial_effect(state, state.playable_actors[state.current_dialog_actor])
-	end
-end
 
 function state.load()
 	assert(false)

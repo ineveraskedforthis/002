@@ -564,7 +564,6 @@ local enter_the_city_aggression = {
 	end,
 	effect = function (state, journal, params)
 		state.current_text = "I will murder you and report the trespassing accident."
-		NEW_TOPIC_INSTANCE(state, journal, "enter_the_city_aggression_attack", params)
 	end,
 	has_journal_note = true,
 	journal_text = function (state, journal, params, param_index)
@@ -585,52 +584,6 @@ local enter_the_city_aggression = {
 			)
 		end
 		return ""
-	end,
-	effect_on_parameter_actor_death = function (state, journal, params, param_index)
-
-	end
-}
-
----@type Topic
-local enter_the_city_aggression_attack = {
-	severity = SEVERITY.NONE,
-	kind = TOPIC_KIND.TALK,
-	name = "enter_the_city_aggression_attack",
-	params_description = {
-		{
-			description = "Guard",
-			is_actor = true
-		}
-	},
-	repeatable = false,
-	trigger_on_meeting_character = function (state, journal, object_index)
-		return false
-	end,
-	option_text = function (state, journal, params)
-		return "(Attack the guard)"
-	end,
-	has_option = function (state, journal, params, param_index)
-		return true
-	end,
-	effect = function (state, journal, params)
-		local journal_object = journal.objects[params[1]]
-		local actor_index = journal_object.associated_actor
-		local actor_object = state.playable_actors[actor_index]
-
-		state.current_text = ""
-		state.die_on_battle_lost = true
-		battle_manager.start_battle(state, state.last_battle)
-		battle_manager.put_player_into_battle(state)
-		local enemy = battle_manager.new_actor(actor_object.def, 1, 1)
-		battle_manager.add_actor_to_battle(state.last_battle, enemy, false)
-
-		state.set_scene(state, scenes.battle)
-	end,
-	has_journal_note = true,
-	journal_text = function (state, journal, params, param_index)
-		-- local location = journal.objects[params[1]]
-		-- local group = journal.objects[params[2]]
-		return string.format("I have attacked them")
 	end,
 	effect_on_parameter_actor_death = function (state, journal, params, param_index)
 
@@ -1229,7 +1182,6 @@ return function (journal)
 	REGISTER_TOPIC(journal, enter_the_city)
 	REGISTER_TOPIC(journal, enter_the_city_info)
 	REGISTER_TOPIC(journal, enter_the_city_aggression)
-	REGISTER_TOPIC(journal, enter_the_city_aggression_attack)
 	REGISTER_TOPIC(journal, enter_location_info)
 	REGISTER_TOPIC(journal, caravan_at_gates)
 	REGISTER_TOPIC(journal, caravan_at_gates_issue)

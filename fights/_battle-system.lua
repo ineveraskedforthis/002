@@ -1,12 +1,10 @@
 local clear = require "table.clear"
-local effects_manager = require "effects._manager"
 
 local BATTLE_STAGE = require "fights._stages"
 local BATTLE_SYSTEM_RESPONSE = require "fights._response"
 
 ---@class BattleState
 ---@field actors Actor[]
----@field effects_queue Effect[]
 ---@field selected_actor Actor?
 ---@field in_progress boolean
 ---@field wave number
@@ -14,59 +12,9 @@ local BATTLE_SYSTEM_RESPONSE = require "fights._response"
 
 local manager = {}
 
----@param state GameState
----@param battle BattleState
----@param effect Effect
-local function handle_singular_effect(state, battle, effect)
-	local def = effects_manager.get(effect.def)
 
-	if def.multi_target_selection then
-		local targets = def.multi_target_selection(state, battle, effect.origin)
-		for index, value in ipairs(targets) do
-			def.target_effect(state, battle, effect.origin, value, effect.data)
-		end
-	else
-		def.target_effect(state, battle, effect.origin, effect.target, effect.data)
-	end
-end
 
----comment
----@param state GameState
----@param battle BattleState
----@param dt number
-local function update_effects(state, battle, dt)
-	local current_effect = battle.effects_queue[1]
-	if current_effect == nil then
-		return true
-	end
 
-	local def = effects_manager.get(current_effect.def)
-
-	if not current_effect.started then
-		def.scene_on_start(state, battle, current_effect.origin, current_effect.target, current_effect.data)
-		current_effect.started = true
-	end
-
-	current_effect.time_passed = current_effect.time_passed + dt
-
-	if not def.do_not_skip then
-		local origin_dead = current_effect.origin.HP <= 0
-		local target_dead = current_effect.target.HP <= 0
-
-		if origin_dead or target_dead then
-			table.remove(battle.effects_queue, 1)
-			return false
-		end
-	end
-
-	if def.scene_update(state, battle, current_effect.time_passed, dt, current_effect.origin, current_effect.target, current_effect.data) then
-		-- effect time run out, we can perform actual effect and delete effect from queue
-		table.remove(battle.effects_queue, 1)
-		handle_singular_effect(state, battle, current_effect)
-	end
-
-	return false
-end
 
 ---@param state GameState
 ---@param battle BattleState
@@ -222,17 +170,6 @@ local function battle_lost(state, battle)
 	return result
 end
 
-
----@param state GameState
----@param battle BattleState
-function manager.stop_battle(state, battle)
-	clear(battle.actors)
-	clear(battle.effects_queue)
-	battle.in_progress = false
-	battle.selected_actor = nil
-	battle.wave = 1
-	battle.stage = BATTLE_STAGE.STOPPED
-end
 
 ---@param state GameState
 ---@param battle BattleState
@@ -435,40 +372,6 @@ local available_id = 0
 local get_x = require "ui.battle".get_x
 local get_y = require "ui.battle".get_y
 
----comment
----@param def MetaActor
----@param pos number
----@param team number
----@param wrapper MetaActorWrapper|nil
-function manager.new_actor(def, pos, team, wrapper)
-	---@type Actor
-	local temp = {
-		HP = TOTAL_MAX_HP(def, wrapper),
-		SHIELD = 0,
-		action_number = 0,
-		definition = def,
-		pending_damage = {},
-		pos = pos,
-		status_effects = {},
-		team = team,
-		x = 0,
-		y = 0,
-		visible = false,
-		wrapper = wrapper,
-		energy = def.max_energy,
-		battle_id = available_id,
-		battle_order = 0,
-		w = 0,
-		h = 0,
-	}
-
-	available_id = available_id + 1
-
-	temp.x = get_x(temp)
-	temp.y = get_y(temp)
-
-	return temp
-end
 
 ---comment
 ---@param state GameState

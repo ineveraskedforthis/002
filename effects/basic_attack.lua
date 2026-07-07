@@ -3,6 +3,7 @@ local duration = 0.6
 local id, def = manager.new_effect(duration)
 def.description = "Deal [100% of STR] x [weapon damage] x [1 + weapon mastery] damage."
 
+
 function def.target_effect(state, battle, origin, target, scene_data)
 	local mastery = WEAPON_MASTERY_ACTOR(origin)
 	local from_weapon = WEAPON_ADD_DAMAGE(origin.definition.weapon)

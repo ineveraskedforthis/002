@@ -13,5 +13,7 @@ return {
 	cost = 0,
 	allowed_weapons = {},
 	required_energy = 0,
-	is_attack = false
+	is_attack = false,
+	program = PROGRAM.MOVE,
+	movement = true
 }
