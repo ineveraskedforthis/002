@@ -12,6 +12,7 @@ INSTRUCTION = {
 	MELEE_COUNTERATTACK = 10,
 	LOAD_REGISTER_CURRENT_TO_ORIGIN = 11,
 	SET_CURRENT_DIALOG = 12,
+	RETURN_IF_TARGET_AND_ORIGIN_ARE_SAME = 13
 }
 
 ---@param state GameState
@@ -32,27 +33,24 @@ return function (state)
 		if progress >= 1 or distance == 0 then
 			actor.x = frame.target_x
 			actor.y = frame.target_y
-			print("SUCCESS:", frame.target_x, frame.target_y)
+			-- print("SUCCESS:", frame.target_x, frame.target_y)
 			actor.view_x = frame.target_x
 			actor.view_y = frame.target_y
 			frame.timer = 0
 			return true, false
 		else
 			frame.timer = timer + dt
-			print("PROGRESS TARGET:", frame.target_x, frame.target_y)
-			print("PROGRESS ORIGIN:", frame.origin_x, frame.origin_y)
+			-- print("PROGRESS TARGET:", frame.target_x, frame.target_y)
+			-- print("PROGRESS ORIGIN:", frame.origin_x, frame.origin_y)
 			actor.view_x = frame.target_x * progress + frame.origin_x * (1 - progress)
 			actor.view_y = frame.target_y * progress + frame.origin_y * (1 - progress)
-			print("NEXT_VIEW:", actor.view_x, actor.view_y, distance)
+			-- print("NEXT_VIEW:", actor.view_x, actor.view_y, distance)
 			return false, false
 		end
 	end
 	state.instruction_set[INSTRUCTION.MELEE_ATTACK] = function (state, frame, dt, arg1, arg2, arg3)
 		local actor = state.actors[frame.acting_actor]
 		local target = state.actors[frame.target_actor]
-
-		local timer = frame.timer
-		local progress = timer
 
 		-- print("COUNT", target.counterattack_count)
 
@@ -72,12 +70,12 @@ return function (state)
 			return true, false
 		end
 
-		if progress >= 1 then
+		if frame.timer >= 1 then
 			frame.timer = 0
 			DEAL_DAMAGE(state, actor, target, 50)
 			return true, false
 		else
-			frame.timer = timer + dt
+			frame.timer = frame.timer + dt
 			return false, false
 		end
 	end
@@ -107,13 +105,13 @@ return function (state)
 		if lock then
 			return false, false
 		else
-			print("ACQUIRE TILE", frame.target_x, frame.target_y)
+			-- print("ACQUIRE TILE", frame.target_x, frame.target_y)
 			state.tile_lock[frame.target_x][frame.target_y] = true
 			return true, false
 		end
 	end
 	state.instruction_set[INSTRUCTION.LOCK_POSITION_TARGET_RELEASE] = function (state, frame, dt, arg1, arg2, arg3)
-		print("RELEASE TILE", frame.target_x, frame.target_y)
+		-- print("RELEASE TILE", frame.target_x, frame.target_y)
 		state.tile_lock[frame.target_x][frame.target_y] = false
 		return true, false
 	end
@@ -153,6 +151,13 @@ return function (state)
 
 	state.instruction_set[INSTRUCTION.SET_CURRENT_DIALOG] = function (state, frame, dt, arg1, arg2, arg3)
 		state.current_dialog_actor = frame.target_actor
+		return true, false
+	end
+
+	state.instruction_set[INSTRUCTION.RETURN_IF_TARGET_AND_ORIGIN_ARE_SAME] =function (state, frame, dt, arg1, arg2, arg3)
+		if frame.acting_actor == frame.target_actor then
+			return true, true
+		end
 		return true, false
 	end
 end

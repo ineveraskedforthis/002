@@ -17,6 +17,7 @@ local back_to_utility = {
 	}
 }
 
+local hp_bar = require "ui.hp-bar"
 
 ---comment
 ---@param actor Actor
@@ -558,7 +559,7 @@ local function interface(state, journal, render, click, mx, my)
 		if selected_meta_wrapper then
 			level = state.playable_actors[selected_meta_wrapper].level
 		end
-		require "ui.hp-bar"(w_w - 400, w_h - 75, 300, 20, value.HP, value.HP_view, TOTAL_MAX_HP(value.definition), value.SHIELD, false, nil)
+		hp_bar(w_w - 400, w_h - 75, 300, 20, value.HP, value.HP_view, TOTAL_MAX_HP(value.definition), value.SHIELD, false, nil)
 	end
 
 
@@ -679,10 +680,7 @@ local function interface(state, journal, render, click, mx, my)
 		local day_time = time % (DAY_LENGTH * DAY_SEGMENT_LENGTH)
 		local day_progress = day_time / (DAY_LENGTH * DAY_SEGMENT_LENGTH)
 
-		local night_ratio = math.cos(day_progress * 2 * math.pi)
-		local day_ratio = math.sin(day_progress * 2 * math.pi)
-
-		-- print(day_progress)
+		local day_ratio = math.sin(day_progress * math.pi)
 
 		local location_data = state.location_data[LOCATION.AT_CITY_GATES]
 
@@ -690,10 +688,6 @@ local function interface(state, journal, render, click, mx, my)
 		love.graphics.draw(location_data.image_night, left, top)
 		love.graphics.setColor(1, 1, 1, day_ratio * day_ratio)
 		love.graphics.draw(location_data.image_day, left, top)
-
-		-- print(day_ratio * day_ratio)
-
-
 
 		for index, value in ipairs(state.actors) do
 			if value.visible and value.wrapper.location == state.playable_actors[state.main_character].location then
@@ -707,7 +701,6 @@ local function interface(state, journal, render, click, mx, my)
 		end
 
 		-- panel(render, g_1_w + style.base_margin * 2, style.base_margin, g_2_w, g_1_1_h)
-		-- print(g_2_w, g_1_1_h)
 		local shift_x = g_1_w + style.base_margin * 2 + g_2_w / 2
 		local shift_y = style.base_margin + g_1_1_h / 2
 		local center_x = math.floor(camera_center_x / cell_width)
@@ -868,7 +861,7 @@ local function interface(state, journal, render, click, mx, my)
 					if skill_button(render, click, current_x, offset_y, skill_button_width, skill_button_height, mx, my, actor, value) then
 						reserve_points = value.required_energy
 						if click and (not value.targeted or (selected_actor ~= nil and state.actors[selected_actor].visible)) then
-							print(value.program, state.programs[value.program])
+							-- print(value.program, state.programs[value.program])
 							local ta = selected_actor
 							if (ta == nil) then
 								ta = state.main_character
@@ -920,6 +913,8 @@ local function interface(state, journal, render, click, mx, my)
 					)
 				end
 				-- skills_panel.render(state.last_battle, main_actor, 200, -status_bar_heigth_with_margins)
+
+				hp_bar(left + style.base_margin, top + h + style.base_margin, g_2_w - style.base_margin * 2, 20, player_actor.HP, player_actor.HP_view, TOTAL_MAX_HP_ACTOR(player_actor), player_actor.SHIELD, false, nil)
 
 			end
 		else
@@ -1146,12 +1141,11 @@ function def.update(state, journal, dt)
 		end
 
 	elseif state.turn_stage ==TURN_STAGE.RUN_INTERPRETER then
-		local switch_stage = true
+		local switch_stage = false
 		-- run interpreter
 		state.current_time = state.current_time + dt * 100
 		for index, value in ipairs(state.actors) do
 			if value.stack_top > 0 then
-				switch_stage = false
 				local ready = true
 				local ret = false
 				while ready and not ret do
@@ -1160,12 +1154,13 @@ function def.update(state, journal, dt)
 					ready, ret = state.instruction_set[current_instruction[1]](state, frame, dt, current_instruction[2], current_instruction[3], current_instruction[4])
 					if ready then
 						frame.stack_pointer = frame.stack_pointer + 1
-						print(value.view_x, value.view_y)
 					end
 					if ret then
 						value.stack_top = value.stack_top - 1
 					end
 				end
+			else
+				switch_stage = true
 			end
 		end
 		if switch_stage then

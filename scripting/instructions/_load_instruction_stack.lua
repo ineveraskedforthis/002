@@ -47,6 +47,7 @@ return function (state)
 	})
 
 	state.programs[PROGRAM.MELEE_ATTACK] = push_program(state, {
+		{INSTRUCTION.RETURN_IF_TARGET_AND_ORIGIN_ARE_SAME},
 		{INSTRUCTION.LOCK_ACTOR_TARGET_ACQUIRE},
 		{INSTRUCTION.LOCK_ACTOR_ORIGIN_ACQUIRE},
 		{INSTRUCTION.MELEE_ATTACK},
@@ -57,6 +58,7 @@ return function (state)
 
 	-- assume that it interrupts actions when target and origin locks have been already acquired
 	state.programs[PROGRAM.MELEE_COUNTERATTACK] = push_program(state, {
+		{INSTRUCTION.RETURN_IF_TARGET_AND_ORIGIN_ARE_SAME},
 		{INSTRUCTION.LOCK_ACTOR_TARGET_ACQUIRE},
 		{INSTRUCTION.LOCK_ACTOR_ORIGIN_ACQUIRE},
 		{INSTRUCTION.MELEE_COUNTERATTACK},
